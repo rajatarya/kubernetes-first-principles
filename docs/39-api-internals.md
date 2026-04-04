@@ -129,6 +129,60 @@ Validating webhooks are called **in parallel** after all mutating webhooks have 
 - Blocking privileged containers
 - Preventing deployments to protected namespaces
 
+### The Admission Webhook Pipeline
+
+The following diagram traces a Pod creation through the full admission webhook pipeline, showing how mutating webhooks run serially (each receiving the output of the previous one) while validating webhooks run in parallel (all must allow for the request to succeed).
+
+```
+ADMISSION WEBHOOK PIPELINE: SEQUENCE OF EVENTS
+────────────────────────────────────────────────
+
+  Client        API Server     Mutating WH 1   Mutating WH 2   Schema         Validating WH 1  Validating WH 2   etcd
+  (kubectl)                    (e.g. Istio      (e.g. Vault     Validation     (e.g. OPA        (e.g. Kyverno)
+                               sidecar inject)  secret inject)                  Gatekeeper)
+    |               |               |               |               |               |               |              |
+    |  CREATE Pod   |               |               |               |               |               |              |
+    |-------------->|               |               |               |               |               |              |
+    |               |  authn/authz  |               |               |               |               |              |
+    |               |---(internal)--|               |               |               |               |              |
+    |               |               |               |               |               |               |              |
+    |               |-- SERIAL -----|               |               |               |               |              |
+    |               |  POST /mutate |               |               |               |               |              |
+    |               |-------------->|               |               |               |               |              |
+    |               |  mutated obj  |               |               |               |               |              |
+    |               |<--------------|               |               |               |               |              |
+    |               |               |               |               |               |               |              |
+    |               |  POST /mutate (with mutations from WH 1)      |               |               |              |
+    |               |------------------------------->|               |               |               |              |
+    |               |  mutated obj  |               |               |               |               |              |
+    |               |<-------------------------------|               |               |               |              |
+    |               |               |               |               |               |               |              |
+    |               |  validate schema              |               |               |               |              |
+    |               |----------------------------------------------->|               |               |              |
+    |               |  OK           |               |               |               |               |              |
+    |               |<-----------------------------------------------|               |               |              |
+    |               |               |               |               |               |               |              |
+    |               |-- PARALLEL ---|---------------|---------------|               |               |              |
+    |               |  POST /validate               |               |               |               |              |
+    |               |----------------------------------------------------------------------->|               |              |
+    |               |  POST /validate               |               |               |               |              |
+    |               |--------------------------------------------------------------------------------------->|              |
+    |               |               |               |               |  allowed: true |               |              |
+    |               |<-----------------------------------------------------------------------|               |              |
+    |               |               |               |               |               |  allowed: true |              |
+    |               |<---------------------------------------------------------------------------------------|              |
+    |               |               |               |               |               |               |              |
+    |               |  ALL passed -> store          |               |               |               |              |
+    |               |---------------------------------------------------------------------------------------------->|
+    |               |  stored       |               |               |               |               |              |
+    |               |<----------------------------------------------------------------------------------------------|
+    |  201 Created  |               |               |               |               |               |              |
+    |<--------------|               |               |               |               |               |              |
+
+  Mutating webhooks run SERIALLY -- each sees the output of the previous one
+  Validating webhooks run in PARALLEL -- ALL must allow, ANY can reject
+```
+
 ### Configuration Details
 
 A webhook configuration includes several critical fields:

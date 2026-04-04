@@ -113,6 +113,57 @@ Karpenter eliminates this entirely. It evaluates the full instance type catalog 
 
 **Scaling speed.** Karpenter's end-to-end latency is approximately 55 seconds --- roughly 3x faster than Cluster Autoscaler. It skips the node group indirection and calls the cloud API directly. It also batches pending pods for 10 seconds before making a decision, which produces better bin-packing.
 
+The following sequence diagram shows the timing of each step in Karpenter's scaling cascade --- notice the 10-second batching window that enables better bin-packing:
+
+```
+KARPENTER SCALING CASCADE (~55 seconds end-to-end)
+───────────────────────────────────────────────────
+
+  Pending Pod     Karpenter        EC2 Fleet API    New EC2          kubelet         Scheduler       Pod
+  (unschedulable) Controller                        Instance         (on new node)
+    │               │                  │               │               │               │              │
+    │  detected     │                  │               │               │               │              │
+    │  (0-10s)      │                  │               │               │               │              │
+    ├──────────────▶│                  │               │               │               │              │
+    │               │                  │               │               │               │              │
+    │               │  batch pending   │               │               │               │              │
+    │               │  pods (10s wait) │               │               │               │              │
+    │               │                  │               │               │               │              │
+    │               │  select optimal  │               │               │               │              │
+    │               │  instance type   │               │               │               │              │
+    │               │  (bin-pack)      │               │               │               │              │
+    │               │                  │               │               │               │              │
+    │               │  CreateFleet     │               │               │               │              │
+    │               │  (spot/OD, AZ,   │               │               │               │              │
+    │               │   instance type) │               │               │               │              │
+    │               ├─────────────────▶│               │               │               │              │
+    │               │  fleet accepted  │               │               │               │              │
+    │               │◀─────────────────┤               │               │               │              │
+    │               │  (~5s)           │               │               │               │              │
+    │               │                  │  launch VM    │               │               │              │
+    │               │                  ├──────────────▶│               │               │              │
+    │               │                  │               │               │               │              │
+    │               │                  │               │  boot OS,     │               │              │
+    │               │                  │               │  start kubelet│               │              │
+    │               │                  │               │  (~20-30s)    │               │              │
+    │               │                  │               ├──────────────▶│               │              │
+    │               │                  │               │               │               │              │
+    │               │                  │               │               │  register      │              │
+    │               │                  │               │               │  node with     │              │
+    │               │                  │               │               │  API server    │              │
+    │               │                  │               │               │  (~5s)         │              │
+    │               │                  │               │               │               │              │
+    │               │                  │               │               │  node Ready    │              │
+    │               │                  │               │               ├──────────────▶│              │
+    │               │                  │               │               │               │              │
+    │               │                  │               │               │               │  bind pod    │
+    │               │                  │               │               │               │  to node     │
+    │               │                  │               │               │               ├─────────────▶│
+    │               │                  │               │               │               │              │
+    │               │                  │               │               │               │  Running     │
+    │               │                  │               │               │               │  (~55s total)│
+```
+
 **Consolidation.** Karpenter continuously evaluates whether existing nodes can be consolidated. If node A is 30% utilized and node B is 25% utilized, Karpenter can cordon both, move their pods to a single smaller node, and terminate the originals. Cluster Autoscaler can only scale down nodes that are underutilized --- it cannot replace a node with a smaller one.
 
 **Disruption budgets.** Karpenter respects `NodePool` disruption budgets that control how many nodes can be disrupted simultaneously during consolidation, drift remediation, or node expiry. This prevents consolidation from causing service disruptions.

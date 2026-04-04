@@ -224,7 +224,70 @@ When scaling from 3 to 5 members, you gain tolerance for 2 failures instead of 1
 
 ## Disaster Recovery Procedure
 
-When etcd is down and you have a snapshot, follow this sequence:
+When etcd is down and you have a snapshot, follow this sequence.
+
+The following sequence diagram shows the exact ordering of a disaster recovery restore. **The order is critical** --- starting API servers before etcd is stopped, or restoring only some members, causes data loss or split-brain:
+
+```
+ETCD DISASTER RECOVERY: RESTORE SEQUENCE
+──────────────────────────────────────────
+
+  SRE /          API Server     API Server     etcd           etcd           etcd           etcdutl
+  Operator       (node 1)       (node 2+3)     member-1       member-2       member-3
+    │               │               │              │              │              │              │
+    │  1. Stop ALL API servers      │              │              │              │              │
+    │  (prevent writes during       │              │              │              │              │
+    │   restore)                    │              │              │              │              │
+    ├──────────────▶│               │              │              │              │              │
+    ├───────────────────────────────▶              │              │              │              │
+    │           stopped         stopped            │              │              │              │
+    │               │               │              │              │              │              │
+    │  2. Stop ALL etcd members     │              │              │              │              │
+    ├──────────────────────────────────────────────▶│              │              │              │
+    ├─────────────────────────────────────────────────────────────▶│              │              │
+    ├────────────────────────────────────────────────────────────────────────────▶│              │
+    │               │               │          stopped         stopped        stopped          │
+    │               │               │              │              │              │              │
+    │  3. Restore snapshot on EACH member          │              │              │              │
+    │     (etcdutl snapshot restore)               │              │              │              │
+    ├─────────────────────────────────────────────────────────────────────────────────────────▶│
+    │               │               │              │              │              │              │
+    │               │               │  restore     │  restore     │  restore     │              │
+    │               │               │  to new      │  to new      │  to new      │              │
+    │               │               │  data-dir    │  data-dir    │  data-dir    │              │
+    │               │               │◀─────────────────────────────────────────────────────────┤
+    │               │               │              │◀──────────────────────────────────────────┤
+    │               │               │              │              │◀─────────────────────────────┤
+    │               │               │              │              │              │              │
+    │  4. Replace data directories  │              │              │              │              │
+    │     (mv new-data → /var/lib/etcd)            │              │              │              │
+    ├──────────────────────────────────────────────▶├──────────────├──────────────┤              │
+    │               │               │              │              │              │              │
+    │  5. Start etcd members (one at a time)       │              │              │              │
+    ├──────────────────────────────────────────────▶│              │              │              │
+    │               │               │           running          │              │              │
+    ├─────────────────────────────────────────────────────────────▶│              │              │
+    │               │               │              │           running          │              │
+    ├────────────────────────────────────────────────────────────────────────────▶│              │
+    │               │               │              │              │           running           │
+    │               │               │              │              │              │              │
+    │  6. Verify: etcdctl endpoint health          │              │              │              │
+    │     + etcdctl member list     │              │              │              │              │
+    ├──────────────────────────────────────────────▶├──────────────├──────────────┤              │
+    │               │               │          all healthy        │              │              │
+    │               │               │              │              │              │              │
+    │  7. Start API servers         │              │              │              │              │
+    ├──────────────▶│               │              │              │              │              │
+    ├───────────────────────────────▶              │              │              │              │
+    │           running         running            │              │              │              │
+    │               │               │              │              │              │              │
+    │  ⚠ CRITICAL: If you start API servers       │              │              │              │
+    │  before stopping etcd, new writes            │              │              │              │
+    │  will be lost when the snapshot              │              │              │              │
+    │  overwrites the data directory.              │              │              │              │
+```
+
+Follow these steps:
 
 1. **Stop all API servers.** They will reconnect when etcd is back.
 2. **Stop all etcd members.**

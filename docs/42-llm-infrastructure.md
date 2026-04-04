@@ -220,6 +220,63 @@ Traditional LLM serving treats prefill and decode as a single operation on the s
 
 Requests flow: client --> prefill node (processes prompt, generates KV cache) --> KV cache transfer --> decode node (generates tokens, streams back to client).
 
+The following sequence diagram shows how llm-d splits a single inference request across two specialized node pools --- the prefill node processes the full prompt, then hands off the KV cache to a decode node for token generation:
+
+```
+LLM-D DISAGGREGATED SERVING: PREFILL/DECODE SPLIT
+───────────────────────────────────────────────────
+
+  Client          Gateway /        Prefill Node        KV Cache         Decode Node         Client
+  (API request)   EPP Router       (vLLM worker)       Transfer         (vLLM worker)       (streaming)
+    │                │                  │                  │                  │                  │
+    │  POST /chat/   │                  │                  │                  │                  │
+    │  completions   │                  │                  │                  │                  │
+    │  {prompt:      │                  │                  │                  │                  │
+    │   4096 tokens} │                  │                  │                  │                  │
+    ├───────────────▶│                  │                  │                  │                  │
+    │                │                  │                  │                  │                  │
+    │                │  route to        │                  │                  │                  │
+    │                │  prefill pool    │                  │                  │                  │
+    │                │  (prompt-heavy)  │                  │                  │                  │
+    │                ├─────────────────▶│                  │                  │                  │
+    │                │                  │                  │                  │                  │
+    │                │                  │  process full    │                  │                  │
+    │                │                  │  prompt in one   │                  │                  │
+    │                │                  │  forward pass    │                  │                  │
+    │                │                  │  (compute-bound, │                  │                  │
+    │                │                  │   high GPU util) │                  │                  │
+    │                │                  │                  │                  │                  │
+    │                │                  │  transfer KV     │                  │                  │
+    │                │                  │  cache state     │                  │                  │
+    │                │                  ├─────────────────▶│                  │                  │
+    │                │                  │                  │                  │                  │
+    │                │                  │  prefill done,   │  deliver KV     │                  │
+    │                │                  │  GPU freed for   │  cache to       │                  │
+    │                │                  │  next prompt     │  decode worker  │                  │
+    │                │                  │                  ├─────────────────▶│                  │
+    │                │                  │                  │                  │                  │
+    │                │                  │                  │                  │  auto-regressive │
+    │                │                  │                  │                  │  token generation│
+    │                │                  │                  │                  │  (memory-bound,  │
+    │                │                  │                  │                  │   sequential)    │
+    │                │                  │                  │                  │                  │
+    │                │                  │                  │                  │  stream tokens   │
+    │                │◀────────────────────────────────────────────────────────┤                  │
+    │  token         │                  │                  │                  │                  │
+    │◀───────────────┤                  │                  │                  │                  │
+    │  token         │                  │                  │                  │                  │
+    │◀───────────────┤                  │                  │                  │                  │
+    │  token         │                  │                  │                  │                  │
+    │◀───────────────┤                  │                  │                  │                  │
+    │  ...           │                  │                  │                  │                  │
+    │  [DONE]        │                  │                  │                  │                  │
+    │◀───────────────┤                  │                  │                  │                  │
+
+  Key insight: Prefill is compute-bound (one large forward pass). Decode is
+  memory-bound (sequential token generation). Splitting them lets each pool
+  use optimally-sized GPUs and scale independently.
+```
+
 ### KV Cache Management
 
 llm-d implements hierarchical KV cache offloading:

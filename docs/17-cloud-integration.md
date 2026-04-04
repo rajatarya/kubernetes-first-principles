@@ -177,7 +177,69 @@ The **Node Plugin** runs as a DaemonSet (one per node). It handles operations th
 
 ### Dynamic Provisioning Flow
 
-When you create a PVC with a StorageClass, the following sequence occurs:
+When you create a PVC with a StorageClass, the following sequence occurs. The following sequence diagram shows the full lifecycle --- six different components coordinate to turn a PVC into a mounted filesystem inside a running pod:
+
+```
+CSI DYNAMIC PROVISIONING: PVC TO MOUNTED VOLUME
+─────────────────────────────────────────────────
+
+  User         API Server    external-       CSI Controller   Cloud API     external-      kubelet /       Pod
+  (kubectl)                  provisioner     Plugin           (EBS/GCE)     attacher       CSI Node Plugin
+    │              │             │               │               │              │              │              │
+    │ create PVC   │             │               │               │              │              │              │
+    ├─────────────▶│             │               │               │              │              │              │
+    │              │             │               │               │              │              │              │
+    │              │  watch:     │               │               │              │              │              │
+    │              │  new PVC    │               │               │              │              │              │
+    │              ├────────────▶│               │               │              │              │              │
+    │              │             │               │               │              │              │              │
+    │              │             │ CreateVolume  │               │              │              │              │
+    │              │             ├──────────────▶│               │              │              │              │
+    │              │             │               │  create disk  │              │              │              │
+    │              │             │               ├──────────────▶│              │              │              │
+    │              │             │               │  disk ready   │              │              │              │
+    │              │             │               │◀──────────────┤              │              │              │
+    │              │             │  volume ID    │               │              │              │              │
+    │              │             │◀──────────────┤               │              │              │              │
+    │              │             │               │               │              │              │              │
+    │              │  create PV, │               │               │              │              │              │
+    │              │  bind PVC   │               │               │              │              │              │
+    │              │◀────────────┤               │               │              │              │              │
+    │              │             │               │               │              │              │              │
+    │              │  (Pod scheduled to node)    │               │              │              │              │
+    │              │             │               │               │              │              │              │
+    │              │  watch:     │               │               │              │              │              │
+    │              │  VolumeAttachment           │               │              │              │              │
+    │              ├────────────────────────────────────────────────────────────▶│              │              │
+    │              │             │               │               │              │              │              │
+    │              │             │               │ ControllerPublish            │              │              │
+    │              │             │               │ (attach disk  │              │              │              │
+    │              │             │               │  to node)     │              │              │              │
+    │              │             │  ┌────────────┤◀─────────────────────────────┤              │              │
+    │              │             │  │            │  attach to    │              │              │              │
+    │              │             │  │            ├──────────────▶│              │              │              │
+    │              │             │  │            │  attached     │              │              │              │
+    │              │             │  │            │◀──────────────┤              │              │              │
+    │              │             │  └───────────▶│               │              │              │              │
+    │              │             │               │               │              │              │              │
+    │              │  kubelet: mount volume      │               │              │              │              │
+    │              ├──────────────────────────────────────────────────────────────────────────▶│              │
+    │              │             │               │               │              │              │              │
+    │              │             │               │ NodeStage +   │              │              │              │
+    │              │             │               │ NodePublish   │              │              │              │
+    │              │             │               │ (format, mount)              │              │              │
+    │              │             │               │◀─────────────────────────────────────────────┤              │
+    │              │             │               │  mounted      │              │              │              │
+    │              │             │               ├──────────────────────────────────────────────▶│              │
+    │              │             │               │               │              │              │              │
+    │              │             │               │               │              │  start       │              │
+    │              │             │               │               │              │  container   │              │
+    │              │             │               │               │              │  with mount  │              │
+    │              │             │               │               │              ├─────────────▶│              │
+    │              │             │               │               │              │              │   Running    │
+```
+
+The same steps in a compact numbered form:
 
 ```
 DYNAMIC PROVISIONING FLOW
