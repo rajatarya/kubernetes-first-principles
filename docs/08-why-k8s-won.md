@@ -64,7 +64,7 @@ Kubernetes' ultimate contribution is not the code (which will be replaced someda
 - [HashiCorp Nomad Documentation](https://developer.hashicorp.com/nomad/docs) -- Official docs for Nomad, the scheduler that remains a viable Kubernetes alternative for teams wanting simpler orchestration without the full Kubernetes ecosystem.
 - [CNCF Governance Documents](https://github.com/cncf/foundation/tree/main/charter.md) -- The charter and governance structure of the Cloud Native Computing Foundation, explaining how vendor-neutral governance gave Kubernetes an adoption advantage over vendor-controlled alternatives.
 - [The History of Containers (Red Hat)](https://www.redhat.com/en/blog/history-containers) -- Timeline from FreeBSD jails to Docker to Kubernetes, covering how container technologies evolved from early OS-level virtualization through modern orchestration.
-- [The Kubernetes Effect (Kelsey Hightower)](https://www.youtube.com/watch?v=oNa3xK2GFKY) -- Kelsey Hightower's reflections on how Kubernetes changed not just container orchestration but the way organizations think about infrastructure as a whole.
+- [Kelsey Hightower -- "Kubernetes and the Path to Serverless" (KubeCon keynote)](https://www.youtube.com/watch?v=oNa3xK2GFKY) --- A keynote exploring Kubernetes' role in the broader cloud-native ecosystem and its evolution toward serverless patterns.
 - [Why We Chose Kubernetes over ECS, Mesos, and Nomad (various engineering blogs)](https://kubernetes.io/case-studies/) -- Collection of case studies from organizations explaining their evaluation criteria and why they landed on Kubernetes.
 
 ---

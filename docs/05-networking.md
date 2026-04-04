@@ -144,10 +144,10 @@ Network Policies are implemented by the CNI plugin (not all plugins support them
 
 - [Kubernetes Networking Model](https://kubernetes.io/docs/concepts/cluster-administration/networking/) -- Official documentation explaining the fundamental requirement that every pod gets a unique IP and can communicate with every other pod without NAT.
 - [CNI Specification](https://www.cni.dev/docs/spec/) -- The Container Network Interface spec that defines how network plugins integrate with container runtimes; essential for understanding how Calico, Cilium, Flannel, and others plug in.
-- [Life of a Packet in Kubernetes (KubeCon talk by Ricardo Katz)](https://www.youtube.com/watch?v=0Omvgd7Hg1I) -- KubeCon presentation tracing a network packet from a client through Services, kube-proxy, and CNI to a destination pod.
+- [Life of a Packet in Kubernetes (KubeCon, Michael Rubin)](https://www.youtube.com/watch?v=0Omvgd7Hg1I) --- Traces a network packet from pod to pod, covering CNI, kube-proxy, and iptables/IPVS rules.
 - [CoreDNS Documentation](https://coredns.io/manual/toc/) -- Reference for the default DNS server in Kubernetes, covering service discovery, custom DNS entries, and plugin-based extensibility.
 - [iptables vs. IPVS for kube-proxy](https://www.tigera.io/blog/comparing-kube-proxy-modes-iptables-or-ipvs/) -- Tigera blog post comparing the two kube-proxy modes, including performance benchmarks and guidance on when to switch to IPVS.
-- [Kubernetes Networking Deep Dive (KubeCon talk by Laurent Bernaille & Bowei Du)](https://www.youtube.com/watch?v=tq9ng_Nz9j8) -- In-depth walkthrough of how pod networking, Services, and DNS work together under the hood.
+- [Kubernetes Networking Intro and Deep-Dive (KubeCon, Bowei Du & Tim Hockin)](https://www.youtube.com/watch?v=tq9ng_Nz9j8) --- Comprehensive walkthrough of the Kubernetes networking model, Services, DNS, and ingress.
 - [Gateway API Documentation](https://gateway-api.sigs.k8s.io/) -- The next-generation Kubernetes API for L7 routing, replacing Ingress with a more expressive and role-oriented model.
 
 ---

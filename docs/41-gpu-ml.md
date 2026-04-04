@@ -60,6 +60,74 @@ DEVICE PLUGIN REGISTRATION AND ALLOCATION FLOW
                            └────────────────┘
 ```
 
+The device plugin protocol has two phases --- registration (once at startup) and per-pod allocation. The following sequence diagram shows both:
+
+```
+GPU DEVICE PLUGIN: REGISTRATION AND ALLOCATION
+────────────────────────────────────────────────
+
+  NVIDIA Device     kubelet           API Server      Scheduler       User
+  Plugin            (device manager)                                  (kubectl)
+    │                  │                  │               │              │
+    │                  │                  │               │              │
+    │ ═══ PHASE 1: REGISTRATION (startup) ═══            │              │
+    │                  │                  │               │              │
+    │  Register()      │                  │               │              │
+    │  via Unix socket │                  │               │              │
+    ├─────────────────▶│                  │               │              │
+    │  accepted        │                  │               │              │
+    │◀─────────────────┤                  │               │              │
+    │                  │                  │               │              │
+    │  ListAndWatch()  │                  │               │              │
+    │  stream: [gpu-0, │                  │               │              │
+    │   gpu-1, gpu-2,  │                  │               │              │
+    │   gpu-3]         │                  │               │              │
+    ├─────────────────▶│                  │               │              │
+    │                  │                  │               │              │
+    │                  │  update Node     │               │              │
+    │                  │  .status.capacity│               │              │
+    │                  │  nvidia.com/gpu:4│               │              │
+    │                  ├─────────────────▶│               │              │
+    │                  │                  │               │              │
+    │ ═══ PHASE 2: PER-POD ALLOCATION ═══│               │              │
+    │                  │                  │               │              │
+    │                  │                  │               │  create Pod  │
+    │                  │                  │               │  nvidia.com/ │
+    │                  │                  │               │  gpu: 1      │
+    │                  │                  │◀──────────────────────────────┤
+    │                  │                  │               │              │
+    │                  │                  │  schedule:    │              │
+    │                  │                  │  node has     │              │
+    │                  │                  │  available GPU│              │
+    │                  │                  ├──────────────▶│              │
+    │                  │                  │               │              │
+    │                  │                  │  bind Pod     │              │
+    │                  │                  │  to node      │              │
+    │                  │◀─────────────────┤               │              │
+    │                  │                  │               │              │
+    │  Allocate()      │                  │               │              │
+    │  request: gpu-0  │                  │               │              │
+    │◀─────────────────┤                  │               │              │
+    │                  │                  │               │              │
+    │  response:       │                  │               │              │
+    │  devices:        │                  │               │              │
+    │   /dev/nvidia0   │                  │               │              │
+    │  env:            │                  │               │              │
+    │   CUDA_VISIBLE_  │                  │               │              │
+    │   DEVICES=0      │                  │               │              │
+    │  mounts:         │                  │               │              │
+    │   /usr/lib/nvidia│                  │               │              │
+    ├─────────────────▶│                  │               │              │
+    │                  │                  │               │              │
+    │                  │  start container │               │              │
+    │                  │  with GPU access │               │              │
+    │                  │  (via CRI)       │               │              │
+    │                  │                  │               │              │
+    │                  │  update Pod      │               │              │
+    │                  │  status: Running │               │              │
+    │                  ├─────────────────▶│               │              │
+```
+
 ### Critical Constraints
 
 The device plugin model has several hard limitations that shape everything downstream:
