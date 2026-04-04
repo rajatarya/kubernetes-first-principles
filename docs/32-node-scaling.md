@@ -189,7 +189,7 @@ Both Cluster Autoscaler and Karpenter solve the same problem: translating pod-le
 - [Cluster Autoscaler FAQ](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md) --- Detailed behavior documentation
 - [Karpenter Documentation](https://karpenter.sh/docs/) --- Official Karpenter docs
 - [Karpenter Best Practices](https://aws.github.io/aws-eks-best-practices/karpenter/) --- AWS EKS guide
-- [Karpenter vs Cluster Autoscaler](https://aws.amazon.com/blogs/containers/comparing-karpenter-and-cluster-autoscaler/) --- AWS comparison
+- [Karpenter Migration Guide](https://karpenter.sh/docs/getting-started/migrating-from-cas/) --- Migrating from Cluster Autoscaler
 
 ---
 

@@ -10,7 +10,7 @@ These academic and industry papers provide the theoretical foundation for Kubern
 - https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/
 
 **Borg, Omega, and Kubernetes** (Burns, Grant, Oppenheimer, Tune, Wilkes, ACM Queue 2016) --- A retrospective by the architects of all three systems, explicitly discussing the lessons learned from Borg and Omega that were applied to Kubernetes. This is perhaps the single most important reference for understanding Kubernetes' design rationale.
-- https://queue.acm.org/detail.cfm?id=2898444
+- https://research.google/pubs/borg-omega-and-kubernetes/
 
 **Omega: flexible, scalable schedulers for large compute clusters** (Schwarzkopf et al., EuroSys 2013) --- Describes Google's Omega scheduling system and its shared-state, optimistic-concurrency approach, which influenced Kubernetes' multi-controller architecture.
 

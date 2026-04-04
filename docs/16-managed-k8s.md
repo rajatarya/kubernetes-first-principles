@@ -184,7 +184,7 @@ A "free" AKS control plane cluster running three m5.large worker nodes with a lo
 - [EKS Best Practices Guide](https://aws.github.io/aws-eks-best-practices/) --- AWS's official best practices for EKS
 - [Karpenter documentation](https://karpenter.sh/) --- Intelligent node autoscaling for Kubernetes
 - [GKE Autopilot overview](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview) --- Understanding the fully managed mode
-- [KubeCon talks on YouTube](https://www.youtube.com/c/CloudNativeComputingFoundation) --- Conference presentations on real-world managed K8s usage
+- [KubeCon talks on YouTube](https://www.youtube.com/@caborhood) --- CNCF conference presentations on real-world managed K8s usage
 - [CNCF Slack #eks, #gke, #aks channels](https://slack.cncf.io/) --- Community support for each provider
 
 ---

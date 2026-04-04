@@ -215,8 +215,8 @@ This vision is ambitious and incomplete. Provider coverage is broad but not tota
 
 - [Crossplane Documentation](https://docs.crossplane.io/) --- Official guides and reference
 - [Upbound Marketplace](https://marketplace.upbound.io/) --- Provider and configuration packages
-- [Crossplane vs Terraform](https://docs.crossplane.io/latest/getting-started/introduction/#crossplane-vs-terraform) --- Official comparison
-- [Composition Functions](https://docs.crossplane.io/latest/concepts/composition-functions/) --- Programmable composition logic
+- [Crossplane Getting Started](https://docs.crossplane.io/latest/getting-started/) --- Official introduction and tutorials
+- [Crossplane Concepts](https://docs.crossplane.io/latest/concepts/) --- Compositions, XRDs, Claims, and Providers
 
 ---
 
