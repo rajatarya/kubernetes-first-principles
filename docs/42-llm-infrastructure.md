@@ -365,12 +365,12 @@ spec:
 
 Google's [Hyperdisk ML](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/hyperdisk-ml) volumes provide up to 1.2 TB/s read throughput from a block storage volume. For Llama 3.1 405B loading, GKE benchmarks show reduction from **90 minutes (GCS download) to approximately 20 minutes** with Hyperdisk ML, with further improvement possible through multi-volume striping.
 
-## The HuggingFace Ecosystem on Kubernetes
+## The Hugging Face Ecosystem on Kubernetes
 
 ### Text Generation Inference (TGI)
 
 [TGI](https://github.com/huggingface/text-generation-inference) was the first production-grade open-source LLM inference server. It pioneered several techniques now considered industry standard: continuous batching, flash attention integration, tensor parallelism, quantization support (GPTQ, AWQ, EETQ), and speculative decoding.
-As of December 2025, the HuggingFace team recommends vLLM or SGLang for new LLM serving deployments. TGI remains in maintenance mode for existing users. If you are currently running TGI in production, it continues to work reliably --- but new deployments should evaluate vLLM (for throughput) or SGLang (for structured generation and agent workloads) first.
+As of December 2025, the Hugging Face team recommends vLLM or SGLang for new LLM serving deployments. TGI remains in maintenance mode for existing users. If you are currently running TGI in production, it continues to work reliably --- but new deployments should evaluate vLLM (for throughput) or SGLang (for structured generation and agent workloads) first.
 
 ### Text Embeddings Inference (TEI)
 
@@ -385,7 +385,7 @@ TEI is the right choice for embedding pipelines in RAG architectures. Run it on 
 
 ### Hub Integration on Kubernetes
 
-Most HuggingFace models are served from the [HuggingFace Hub](https://huggingface.co). On Kubernetes, the integration pattern is:
+Most Hugging Face models are served from the [Hugging Face Hub](https://huggingface.co). On Kubernetes, the integration pattern is:
 
 1. **Authentication**: Store your token in a Kubernetes Secret and mount as `HUGGING_FACE_HUB_TOKEN` (or `HF_TOKEN`) environment variable.
 2. **Caching**: The Hub client caches downloads in `~/.cache/huggingface/hub`. Mount a PVC at this path to persist downloads across pod restarts.
@@ -442,14 +442,14 @@ Use NIM when you need maximum performance with minimal tuning effort and are run
 
 Use vLLM directly when you need full control over serving configuration, run non-NVIDIA hardware (AMD ROCm, Intel Gaudi), serve models not in the NIM catalog, or need to customize the serving logic (custom sampling, constrained decoding, speculative decoding with draft models). vLLM's open-source community moves fast --- new model architectures are typically supported within days of release.
 
-For HuggingFace infrastructure specifically, the typical pattern is: vLLM for the Inference API (maximum model coverage, rapid updates) and NIM for dedicated enterprise deployments where a fixed set of models must run at peak performance.
+For Hugging Face infrastructure specifically, the typical pattern is: vLLM for the Inference API (maximum model coverage, rapid updates) and NIM for dedicated enterprise deployments where a fixed set of models must run at peak performance.
 
 ## Common Mistakes and Misconceptions
 
 - **"Serving an LLM is just deploying a container."** Large models need tensor parallelism across multiple GPUs, KV cache management, continuous batching, and careful memory planning.
 - **"Bigger instances are always better for LLM serving."** Cost-per-token often favors multiple smaller GPU instances over fewer large ones, depending on model size and batching strategy. Profile your specific model to find the cost-optimal configuration.
 - **"Auto-scaling LLM inference works like web services."** LLM pods take minutes to load models into GPU memory. Scale-from-zero is extremely slow. Maintain warm replicas and scale on custom metrics (queue depth, KV cache utilization) rather than CPU.
-- **"All LLM serving frameworks are interchangeable."** vLLM excels at throughput with PagedAttention, TGI integrates tightly with HuggingFace models, Triton supports multi-model serving. Choose based on your specific model and serving requirements.
+- **"All LLM serving frameworks are interchangeable."** vLLM excels at throughput with PagedAttention, TGI integrates tightly with Hugging Face models, Triton supports multi-model serving. Choose based on your specific model and serving requirements.
 
 ## Further Reading
 
