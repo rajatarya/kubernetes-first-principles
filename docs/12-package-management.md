@@ -185,6 +185,12 @@ The significance of GitOps is not the specific tools --- it is the operational m
 
 GitOps is the logical endpoint of the declarative, desired-state model that runs through all of Kubernetes' design. Kubernetes says "declare the desired state and let controllers reconcile." GitOps says "store the desired state in Git and let a controller reconcile." It is the same pattern, applied at a higher level of abstraction.
 
+## Common Mistakes and Misconceptions
+
+- **"Helm charts are always safe to install."** Helm charts can contain arbitrary Kubernetes resources including ClusterRoles and webhooks. Always review chart templates before installing, especially from unknown sources.
+- **"Kustomize replaces Helm."** They solve different problems. Helm templates generate YAML; Kustomize patches existing YAML. Many teams use both: Helm for third-party charts, Kustomize for environment overlays.
+- **"Putting all configuration in values.yaml is good practice."** Over-parameterizing Helm charts makes them harder to maintain than raw YAML. Only expose values that actually change between environments.
+
 ## Further Reading
 
 - [Helm documentation](https://helm.sh/docs/) -- Official reference for Helm, covering chart structure, templating, release management, and the Helm SDK. Start with the "Chart Developer Guide" for understanding how charts are built.

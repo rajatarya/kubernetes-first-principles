@@ -184,6 +184,12 @@ spec:
 
 The `mode: "Off"` per container is particularly useful for sidecars (Istio proxies, log collectors) that should retain their manually tuned requests.
 
+## Common Mistakes and Misconceptions
+
+- **"VPA automatically right-sizes my pods."** In `updateMode: Auto`, VPA evicts and recreates pods with new resources, causing restarts. Use `Off` mode to get recommendations without disruption, then apply them during planned maintenance.
+- **"VPA recommendations are immediately correct."** VPA needs days to weeks of historical data to produce good recommendations. Initial recommendations based on hours of data are often wrong. Let it observe through at least one full traffic cycle.
+- **"I should apply VPA to every workload."** VPA's pod-restart behavior makes it unsuitable for workloads that can't tolerate restarts (single-replica databases, leader-election services). Use it for stateless services with multiple replicas.
+
 ## Further Reading
 
 - [VPA Documentation](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler) --- Official VPA repository

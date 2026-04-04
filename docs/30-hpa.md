@@ -267,6 +267,13 @@ spec:
       selectPolicy: Max
 ```
 
+## Common Mistakes and Misconceptions
+
+- **"HPA reacts instantly to traffic spikes."** HPA checks metrics every 15 seconds (default), then applies stabilization windows and cooldown periods. End-to-end reaction time is typically 1-2 minutes. For faster response, use KEDA or custom metrics with shorter intervals.
+- **"I can use HPA and VPA together on CPU."** HPA and VPA both try to act on CPU metrics, creating a conflict. Use HPA for horizontal scaling on CPU/memory and VPA only for non-HPA-targeted resources, or use the VPA recommendation-only mode alongside HPA.
+- **"Setting target CPU utilization to 50% wastes resources."** 50% target means HPA scales up when average utilization exceeds 50%. This headroom absorbs traffic spikes during the scaling delay. Setting it to 90% means pods are overloaded before new ones arrive.
+- **"HPA works without resource requests."** HPA computes utilization as a percentage of requests. Without requests, the utilization percentage is undefined, and CPU/memory-based HPA cannot function.
+
 ## Further Reading
 
 - [HPA Algorithm Details](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#algorithm-details) --- Official algorithm documentation

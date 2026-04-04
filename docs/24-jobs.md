@@ -428,6 +428,12 @@ spec:
 | Does it need stable identity? | Use StatefulSet |
 | Does it need parallel indexed processing? | Use Job with `completionMode: Indexed` |
 
+## Common Mistakes and Misconceptions
+
+- **"CronJobs are reliable for exactly-once execution."** CronJobs can create 0 or 2+ Jobs for a single schedule point (missed schedules, clock skew). Use `concurrencyPolicy: Forbid` and design jobs to be idempotent.
+- **"Failed Jobs retry forever."** Jobs respect `backoffLimit` (default 6). After that many failures, the Job is marked Failed. Set `activeDeadlineSeconds` to prevent runaway jobs consuming resources.
+- **"Jobs clean up after themselves."** Completed and Failed Jobs (and their pods) persist in the API until you or a TTL controller deletes them. Set `ttlSecondsAfterFinished` to auto-clean, or they accumulate and clutter `kubectl get pods`.
+
 ## Further Reading
 
 - [Jobs documentation](https://kubernetes.io/docs/concepts/workloads/controllers/job/) --- Official Job reference

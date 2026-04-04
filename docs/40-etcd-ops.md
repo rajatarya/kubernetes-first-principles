@@ -239,6 +239,12 @@ After a restore, the cluster will be in the state captured by the snapshot. Any 
 
 If only one member has failed (and quorum is maintained), do not restore from a snapshot. Instead, remove the failed member, provision a new one, and add it to the cluster. The Raft protocol will replicate the current state to the new member automatically.
 
+## Common Mistakes and Misconceptions
+
+- **"etcd backs up automatically in managed Kubernetes."** True for the control plane etcd in EKS/GKE/AKS. But if you run self-managed clusters or use etcd for other purposes, backups are your responsibility. Test restores regularly.
+- **"etcd can store large values."** etcd has a default per-value limit of 1.5 MB. Storing large ConfigMaps, Secrets, or CRDs that approach this limit degrades performance. Keep resources small.
+- **"Adding more etcd nodes improves write performance."** More nodes means more replication for each write (Raft consensus requires majority acknowledgment). 3 or 5 members is optimal; 7+ actually hurts write latency.
+
 ## Further Reading
 
 - [etcd Documentation](https://etcd.io/docs/latest/) --- the official etcd docs covering installation, configuration, clustering, authentication, and the client API.

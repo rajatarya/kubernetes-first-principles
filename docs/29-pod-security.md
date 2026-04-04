@@ -310,6 +310,12 @@ RECOMMENDED PSA CONFIGURATION
   for new applications.
 ```
 
+## Common Mistakes and Misconceptions
+
+- **"Running as root in a container is the same as root on the host."** Without proper configuration, it can be. Container root can escape to host root via privileged containers, host mounts, or kernel exploits. Always set `runAsNonRoot: true` and drop capabilities.
+- **"Pod Security Standards are optional."** Without enforcement (via PSS labels or admission controllers), any user who can create pods can create privileged pods. Default to `restricted` and grant exceptions explicitly.
+- **"My application needs `privileged: true`."** Very few applications genuinely need host-level access. Most cases can be solved with specific Linux capabilities (NET_BIND_SERVICE, SYS_PTRACE) instead of full privilege.
+
 ## Further Reading
 
 - [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) --- Profile definitions

@@ -132,6 +132,16 @@ Network Policies are implemented by the CNI plugin (not all plugins support them
 | Pod-to-Service (service discovery) | Service abstraction with ClusterIP | kube-proxy/CNI programs iptables/IPVS rules for load balancing |
 | External-to-Service | NodePort, LoadBalancer, Ingress | Expose services externally via port mapping, cloud LB, or L7 routing |
 
+## Common Mistakes and Misconceptions
+
+- **"Pods need NAT to talk to each other."** Kubernetes requires a flat network where every pod can reach every other pod directly by IP without NAT. This is a fundamental requirement of the networking model, enforced by the CNI plugin. If you find yourself configuring NAT between pods, something is misconfigured.
+
+- **"Services are load balancers."** A Service is a stable virtual IP (ClusterIP) with endpoint tracking and basic load distribution via kube-proxy rules. Only `type: LoadBalancer` provisions an actual external load balancer. ClusterIP and NodePort Services are internal routing constructs, not load balancer appliances.
+
+- **"Pod IPs are stable."** Pod IPs are ephemeral and change every time a pod is restarted or rescheduled. Never hard-code pod IPs in configuration. Use Services for stable endpoints and DNS-based service discovery.
+
+- **"NodePort is fine for production."** NodePort exposes a high-numbered port on every node in the cluster, making it difficult to manage, secure, and integrate with external DNS or TLS. For production external traffic, use Ingress controllers or `type: LoadBalancer` Services instead.
+
 ## Further Reading
 
 - [Kubernetes Networking Model](https://kubernetes.io/docs/concepts/cluster-administration/networking/) -- Official documentation explaining the fundamental requirement that every pod gets a unique IP and can communicate with every other pod without NAT.

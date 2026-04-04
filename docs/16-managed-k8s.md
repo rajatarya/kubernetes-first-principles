@@ -176,6 +176,12 @@ The control plane fee is the smallest part of the bill. The real costs are:
 
 A "free" AKS control plane cluster running three m5.large worker nodes with a load balancer, NAT gateway, and 100 GB of persistent storage will cost approximately $300-400/month before data transfer.
 
+## Common Mistakes and Misconceptions
+
+- **"Managed Kubernetes means fully managed."** You still manage worker nodes (unless using Autopilot/Fargate), networking, storage, RBAC, monitoring, and your applications. "Managed" refers primarily to the control plane.
+- **"EKS/GKE/AKS clusters are identical to vanilla Kubernetes."** Each provider adds proprietary networking (VPC CNI, Alias IPs), identity (IRSA, Workload Identity), and storage integrations that don't exist in upstream K8s.
+- **"The control plane fee is my main Kubernetes cost."** The $72-74/month control plane fee is typically under 5% of the total bill. Worker node compute, load balancers, NAT gateways, and data transfer dominate costs.
+
 ## Further Reading
 
 - [GKE documentation](https://cloud.google.com/kubernetes-engine/docs) --- Comprehensive guides for Standard and Autopilot modes

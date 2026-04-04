@@ -158,6 +158,12 @@ Many organizations adopt a layered approach:
 
 This path minimizes risk while building the operational muscle needed to run databases on Kubernetes if and when it makes sense.
 
+## Common Mistakes and Misconceptions
+
+- **"Never run databases on Kubernetes."** This was good advice in 2018. Modern operators (CloudNativePG, Percona, Vitess) handle replication, failover, backup, and restore. For many teams, K8s-native databases are simpler than managing separate DB infrastructure.
+- **"Kubernetes storage is too slow for databases."** Cloud SSDs (gp3, pd-ssd) provide consistent IOPS. Local NVMe on dedicated node pools rivals bare-metal performance. The storage layer is rarely the bottleneck.
+- **"A database operator means zero operational effort."** Operators automate routine tasks but still require monitoring, capacity planning, backup verification, and version upgrade planning. They reduce effort, not eliminate it.
+
 ## Further Reading
 
 - [CloudNativePG documentation](https://cloudnative-pg.io/documentation/) --- The leading PostgreSQL operator

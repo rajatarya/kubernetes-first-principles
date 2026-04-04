@@ -45,6 +45,14 @@ Kubernetes' ultimate contribution is not the code (which will be replaced someda
 | **Eric Tune** | Google engineer. Co-author of the Borg paper and early Kubernetes contributor. |
 | **Clayton Coleman** | Red Hat architect. Major contributor to Kubernetes API machinery, CRDs, and extensibility. |
 
+## Common Mistakes and Misconceptions
+
+- **"Kubernetes won because it's the simplest."** Kubernetes won despite its complexity, not because of simplicity. The decisive factors were API extensibility (CRDs and custom controllers), vendor-neutral governance through the CNCF, and the ecosystem flywheel these created. Simpler alternatives like Docker Swarm lost because they lacked these properties.
+
+- **"Docker Swarm failed because Docker was bad."** Swarm's user experience was widely praised as simpler and more intuitive than Kubernetes. Swarm lost because Kubernetes' extension model (CRDs, Operators, admission webhooks) attracted far more ecosystem investment, creating a virtuous cycle that Swarm's closed architecture could not match.
+
+- **"There are no alternatives to Kubernetes."** HashiCorp Nomad, AWS ECS, and various platform-as-a-service offerings (Cloud Run, Fly.io, Railway) are valid alternatives for many workloads. Kubernetes is the right choice for complex, multi-service, multi-team environments at scale, but not every application needs what Kubernetes provides.
+
 ## Further Reading
 
 - [Apache Mesos Retirement Announcement (Apache Foundation, 2021)](https://attic.apache.org/projects/mesos.html) -- The official notice that Apache Mesos moved to the Attic, marking the end of active development for Kubernetes' most technically sophisticated competitor.

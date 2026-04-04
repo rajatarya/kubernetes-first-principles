@@ -238,6 +238,12 @@ A complete disaster recovery strategy for Kubernetes looks like this:
 
 The cost of this infrastructure is a fraction of the cost of an unrecoverable outage. The investment is not in the tools --- Velero is open source, etcd snapshots are built in --- but in the discipline of testing and maintaining the procedures.
 
+## Common Mistakes and Misconceptions
+
+- **"Backing up etcd is enough for DR."** etcd contains cluster state, but not PersistentVolume data, external DNS records, cloud load balancers, or IAM configurations. A complete DR plan includes application data, infrastructure-as-code, and secrets.
+- **"Velero backs up everything."** Velero backs up Kubernetes resources and can snapshot cloud volumes, but it doesn't back up external databases, object storage contents, or resources managed outside K8s. Know what's covered and what isn't.
+- **"I'll figure out DR when I need it."** By definition, you need DR during an emergency when you have the least capacity for planning. Test restores quarterly. An untested backup is not a backup.
+
 ## Further Reading
 
 - [Velero Documentation](https://velero.io/docs/) --- the open-source tool for backing up and restoring Kubernetes cluster resources and persistent volumes, including scheduled backups, storage provider plugins, and restore workflows.

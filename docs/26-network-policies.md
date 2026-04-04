@@ -325,12 +325,20 @@ The standard NetworkPolicy API has real limitations:
 
 For these capabilities, use your CNI's extended policy CRDs. Calico's GlobalNetworkPolicy and Cilium's CiliumNetworkPolicy both address these gaps.
 
+## Common Mistakes and Misconceptions
+
+- **"Pods are isolated by default."** The opposite: all pods can reach all other pods by default. You must explicitly create NetworkPolicies to restrict traffic. No policy = fully open.
+- **"A NetworkPolicy on ingress also blocks egress."** Ingress and egress are independent. A policy selecting only ingress rules does not restrict outbound traffic. You need separate egress rules.
+- **"My CNI supports NetworkPolicy."** Not all CNIs do. Flannel does not enforce NetworkPolicies. You need Calico, Cilium, or another policy-aware CNI. Apply a policy and test it — don't assume.
+- **"NetworkPolicies work across namespaces automatically."** You must use `namespaceSelector` to allow cross-namespace traffic. A policy only applies to pods in its own namespace.
+
 ## Further Reading
 
 - [Network Policies documentation](https://kubernetes.io/docs/concepts/services-networking/network-policies/) --- Official reference
 - [Network Policy recipes](https://github.com/ahmetb/kubernetes-network-policy-recipes) --- Practical examples
 - [Calico Network Policy](https://docs.tigera.io/calico/latest/network-policy/) --- Extended policy features
 - [Cilium Network Policy](https://docs.cilium.io/en/stable/network/kubernetes/policy/) --- L7-aware policies
+- [Network Policy Editor](https://editor.networkpolicy.io/) --- Visual editor for building and understanding NetworkPolicies
 
 ---
 

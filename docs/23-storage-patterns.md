@@ -310,6 +310,12 @@ A production storage configuration for a StatefulSet database combines everythin
 
 Storage is the foundation that stateful workloads rest on. Get it right and your databases can survive node failures, zone outages, and operational mistakes. Get it wrong and you will learn why the operations community repeats: "backups are worthless; restores are priceless."
 
+## Common Mistakes and Misconceptions
+
+- **"All PersistentVolumes are the same."** RWO (ReadWriteOnce) can only be mounted by one node. RWX (ReadWriteMany) works across nodes but requires NFS or cloud file systems (EFS, Filestore). Choosing wrong access mode causes mount failures.
+- **"Storage classes are just about disk type."** Storage classes also control reclaim policy (Delete vs Retain), volume binding mode (Immediate vs WaitForFirstConsumer), and provisioner. WaitForFirstConsumer is critical for zone-aware scheduling.
+- **"I can resize PVCs freely."** Volume expansion must be enabled on the storage class (`allowVolumeExpansion: true`). Not all provisioners support it. Shrinking is never supported — plan initial sizes carefully.
+
 ## Further Reading
 
 - [Kubernetes Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) --- Official PV/PVC reference

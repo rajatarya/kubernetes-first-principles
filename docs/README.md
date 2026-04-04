@@ -119,6 +119,14 @@ This is an eight-part course that takes you from "why does Kubernetes exist?" to
 - Part 7: [Building Internal Developer Platforms](35-platform-engineering.md)
 - Part 8: [GPU Workloads and AI/ML on Kubernetes](41-gpu-ml.md)
 
+## Appendices
+
+- [Appendix A: Glossary](A1-glossary.md) — Quick-reference definitions for 100+ Kubernetes terms
+- [Appendix B: Mental Models](A2-mental-models.md) — Visual diagrams showing how concepts in each part connect
+- [Appendix C: Decision Trees](A3-decision-trees.md) — Flowcharts for choosing workload types, storage, networking, and tools
+- [Appendix D: Troubleshooting Quick Reference](A4-troubleshooting.md) — Error messages mapped to root causes and fixes
+- [Appendix E: Architecture Evolution Timeline](A5-timeline.md) — How the Kubernetes ecosystem evolved from 2013 to today
+
 ## Companion Material
 
 - [install.sh](../install.sh) --- The bootstrap script we built to provision Kubernetes nodes on EC2

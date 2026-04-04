@@ -184,6 +184,12 @@ For most AWS-based clusters starting today, Karpenter is the better default. Its
 
 Both Cluster Autoscaler and Karpenter solve the same problem: translating pod-level demand into infrastructure-level capacity. The architectural lesson is clear. Intermediary abstractions (node groups) that seemed like necessary simplifications became the bottleneck. Karpenter's insight was to remove that indirection and let the scheduler's output (pending pods with specific resource requirements) drive infrastructure decisions directly. This pattern --- eliminating indirection layers to reduce latency and improve optimization --- appears repeatedly in the evolution of cloud-native infrastructure.
 
+## Common Mistakes and Misconceptions
+
+- **"Karpenter and Cluster Autoscaler are interchangeable."** Karpenter provisions individual right-sized nodes; CA scales pre-defined node groups. Karpenter is architecturally superior but only supports AWS (GA) and Azure (preview). Use CA on GCP and other clouds.
+- **"Cluster Autoscaler scales down immediately."** CA waits 10 minutes (default `scale-down-delay-after-add`) before considering a node for removal, then checks if pods can be moved safely. Scale-down is intentionally conservative.
+- **"Spot/preemptible instances are unreliable for anything."** With proper pod disruption budgets, multiple instance types, and spread across availability zones, spot instances work well for stateless services. Karpenter handles spot interruptions by proactively replacing nodes.
+
 ## Further Reading
 
 - [Cluster Autoscaler FAQ](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md) --- Detailed behavior documentation

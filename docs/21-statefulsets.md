@@ -267,6 +267,12 @@ This is deliberate. When you scale back up, `db-3` and `db-4` get their old data
 
 A common anti-pattern is using StatefulSets for applications that just need persistent storage but do not need stable identity. If your application uses a single shared PVC (ReadWriteMany), a Deployment with a PVC is simpler and more appropriate.
 
+## Common Mistakes and Misconceptions
+
+- **"StatefulSets are just Deployments with persistent storage."** StatefulSets provide ordered startup/shutdown, stable network identities (pod-0, pod-1), and per-replica PVCs. These guarantees come with trade-offs: slower scaling and more complex operations.
+- **"Deleting a StatefulSet deletes its PVCs."** PVCs are deliberately retained to prevent data loss. You must delete PVCs manually. This is a safety feature, not a bug.
+- **"I need a StatefulSet for any app that uses a database."** If your app is stateless but connects to an external database, use a Deployment. StatefulSets are for when the pod itself holds state (e.g., the pod IS the database).
+
 ## Further Reading
 
 - [StatefulSet documentation](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) --- Official reference

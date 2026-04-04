@@ -276,6 +276,13 @@ Observability infrastructure is itself a system that can fail. Monitor:
 
 An observability system that silently drops data during the incident you need to debug is worse than no observability at all, because it gives you confidence that is not warranted.
 
+## Common Mistakes and Misconceptions
+
+- **"Metrics, logs, and traces are three separate systems."** They're three facets of the same system behavior. Correlate them: a metric alert should link to relevant logs and traces. OpenTelemetry is unifying the collection of all three.
+- **"Prometheus can store data forever."** Prometheus is designed for real-time monitoring with limited retention (default 15 days). For long-term storage, use Thanos, Cortex, or Grafana Mimir as a remote write backend.
+- **"More metrics are always better."** High-cardinality metrics (per-user, per-request-id labels) can overwhelm Prometheus and explode storage costs. Be intentional about labels. Cardinality is the primary cost driver in metrics systems.
+- **"Logging everything to stdout is sufficient."** Unstructured logs are hard to query. Use structured logging (JSON) with consistent fields (request_id, user_id, trace_id). This makes log aggregation systems (Loki, Elasticsearch) actually useful.
+
 ## Further Reading
 
 - [Prometheus Documentation](https://prometheus.io/docs/) --- the CNCF graduated project for metrics collection and alerting, covering PromQL, service discovery, recording rules, and alerting configuration.

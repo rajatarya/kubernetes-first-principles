@@ -164,6 +164,12 @@ The Current Ecosystem (2024+)
 
 The container runtime wars are effectively over. The lesson they teach is a design lesson: **define clean interfaces early, and the ecosystem will sort itself out.** CRI turned the container runtime from a hardwired dependency into a pluggable component, and the result was a healthier ecosystem where runtimes could compete on merit without requiring changes to Kubernetes core. The removal of dockershim, despite the community anxiety it caused, was the natural conclusion of a process that began six years earlier with the introduction of CRI.
 
+## Common Mistakes and Misconceptions
+
+- **"I need Docker installed to run containers on Kubernetes."** Since K8s 1.24, dockershim was removed. Kubernetes uses containerd or CRI-O directly. Docker is a development tool, not a K8s runtime dependency.
+- **"containerd and Docker are completely different."** containerd was extracted from Docker. Docker uses containerd internally. The difference is that K8s talks to containerd directly via CRI, skipping the Docker daemon.
+- **"OCI images built with Docker won't work with containerd."** OCI images are runtime-agnostic. An image built with `docker build` runs identically on containerd, CRI-O, or any OCI-compliant runtime.
+
 ## Further Reading
 
 - [Container Runtime Interface (CRI) specification](https://github.com/kubernetes/cri-api) -- The formal API definition that decoupled Kubernetes from any single container runtime, enabling the pluggable ecosystem described in this chapter.

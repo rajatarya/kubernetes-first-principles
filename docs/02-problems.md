@@ -75,6 +75,14 @@ This is not merely a philosophical preference. The imperative model breaks down 
 | Scalability | Requires operator attention proportional to scale | Controller workload scales, but operator intent stays constant |
 | Composition | Commands must be carefully ordered | Controllers reconcile independently and concurrently |
 
+## Common Mistakes and Misconceptions
+
+- **"Kubernetes is only for microservices."** Kubernetes runs monoliths, batch jobs, stateful workloads, ML training pipelines, and more. Its primitives (Deployments, Jobs, StatefulSets, DaemonSets) are designed for a wide variety of workload patterns, not just microservices.
+
+- **"I need Kubernetes for my small application."** For a single service with low traffic, a VM or platform-as-a-service (Heroku, Cloud Run, App Engine) is simpler, cheaper, and faster to operate. Kubernetes' value emerges when you have the scaling, scheduling, and self-healing problems described in this chapter.
+
+- **"Kubernetes replaces your CI/CD pipeline."** Kubernetes is a runtime platform, not a build or deploy tool. You still need a CI/CD system (GitHub Actions, Jenkins, ArgoCD, etc.) to build images, run tests, and push manifests. Kubernetes runs what your pipeline delivers.
+
 ## Further Reading
 
 - [The Twelve-Factor App](https://12factor.net/) -- Adam Wiggins' methodology for building software-as-a-service applications. Kubernetes' design embodies many of these factors, particularly port binding, concurrency via process model, disposability, and dev/prod parity.

@@ -292,6 +292,12 @@ END-TO-END SUPPLY CHAIN SECURITY
   └─────────────┘
 ```
 
+## Common Mistakes and Misconceptions
+
+- **"I scan images once and they're secure."** New CVEs are discovered daily. Images that were clean yesterday may have critical vulnerabilities today. Continuous scanning in the registry (not just at build time) is essential.
+- **"Using official base images means no vulnerabilities."** Even official images contain OS packages with CVEs. Use distroless or scratch-based images to minimize attack surface. Regularly rebuild images to pick up base image patches.
+- **"Image signing is enough."** Signing proves provenance but not safety. A signed image can still contain vulnerabilities. Signing + scanning + admission policy (Kyverno/Gatekeeper) together form the chain.
+
 ## Further Reading
 
 - [Sigstore documentation](https://docs.sigstore.dev/) --- Cosign, Fulcio, Rekor

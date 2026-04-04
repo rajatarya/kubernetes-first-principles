@@ -94,6 +94,14 @@ Kubernetes was donated to the newly formed Cloud Native Computing Foundation (CN
 
 > **The Borg Lineage**: Kubernetes (Greek: helmsman) was originally codenamed "Project Seven" --- a reference to Seven of Nine from Star Trek, a Borg who became an individual. The name is a deliberate allusion to Kubernetes' origins in Google's Borg system, while signaling that it had been liberated from Google's proprietary infrastructure to become something independent.
 
+## Common Mistakes and Misconceptions
+
+- **"Kubernetes is just Docker orchestration."** Kubernetes is a general-purpose container orchestrator. Docker is one of many supported container runtimes (and modern K8s clusters typically use containerd, not Docker). Kubernetes predates most Docker-native orchestration features and was designed to be runtime-agnostic from the start.
+
+- **"Google open-sourced Borg."** Borg is still an internal Google system and has never been released. Kubernetes is a clean-room redesign inspired by Borg's lessons and design principles, not a port or fork of Borg. The two systems share no code.
+
+- **"Kubernetes was the first container orchestrator."** Apache Mesos with Marathon, Fleet, and Docker Swarm all predated or emerged alongside Kubernetes. K8s won the orchestration wars not by being first but through superior API design, extensibility, and community governance.
+
 ## Further Reading
 
 - [Large-scale cluster management at Google with Borg](https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/) -- The original 2015 Borg paper from EuroSys, detailing how Google manages billions of containers across its fleet.

@@ -39,6 +39,14 @@ This is why Kubernetes controllers are built around Informers that maintain a ca
 
 > **Level-Triggered Design**: Kubernetes controllers react to the current state of the world ("there are 2 pods but 3 desired"), not to individual events ("a pod was deleted"). This makes them robust against missed events, disconnections, and restarts. If a controller misses an event, it will still observe the state discrepancy on its next reconciliation cycle and take corrective action.
 
+## Common Mistakes and Misconceptions
+
+- **"Declarative means one-shot."** Declarative does not mean "apply once and walk away." It means continuous reconciliation: Kubernetes constantly compares the actual state of the cluster to the desired state and drives toward convergence. The system is always working, not just at the moment you run `kubectl apply`.
+
+- **"Controllers run once when you apply a change."** Controllers run in continuous loops, not as one-shot handlers. They watch for any drift from desired state, whether caused by your changes, hardware failures, resource pressure, or other controllers. A controller that only ran once would miss all subsequent drift.
+
+- **"Level-triggered and event-triggered are equally reliable."** Level-triggered design is fundamentally more reliable in distributed systems. If a controller misses an event (due to a restart, network partition, or watch disconnection), an event-triggered system loses that information. A level-triggered system simply observes the current state on the next reconciliation and corrects the discrepancy regardless of what events were missed.
+
 ## Further Reading
 
 - [Level Triggering and Reconciliation in Kubernetes (Hackernoon)](https://hackernoon.com/level-triggering-and-reconciliation-in-kubernetes-1f17fe30333d) -- Essential article explaining why Kubernetes controllers are level-triggered rather than edge-triggered, and how this design choice makes the system resilient to missed events.

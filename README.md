@@ -22,6 +22,7 @@ This book was written for someone who understands Linux, networking, and computi
 | **6. Scaling** | 30-33 | HPA, VPA, Karpenter, CPU throttling, resource tuning |
 | **7. Platform Engineering** | 34-37 | Multi-cluster, Crossplane, internal developer platforms, multi-tenancy |
 | **8. Advanced Topics** | 38-45 | Writing operators, API internals, etcd ops, **GPU/ML workloads**, **LLM infrastructure**, DR, cost, observability |
+| **Appendices** | A-E | Glossary, mental models, decision trees, troubleshooting quick reference, architecture evolution timeline |
 
 ## Who This Is For
 

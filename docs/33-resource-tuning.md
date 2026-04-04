@@ -229,6 +229,13 @@ This means a cluster with 100 CPUs of total requests might only be using 13 CPUs
 
 Start with VPA recommendations in Off mode, remove CPU limits for web workloads, always set memory limits, and monitor `container_cpu_cfs_throttled_seconds_total` as a key performance indicator.
 
+## Common Mistakes and Misconceptions
+
+- **"CPU limits prevent my app from using idle CPU."** CPU limits enforce CFS quotas regardless of available CPU. A pod hitting its CPU limit is throttled even if the node has idle cores. This is why some teams remove CPU limits entirely.
+- **"Setting requests equal to limits (Guaranteed QoS) is always best."** Guaranteed QoS means your pod is never throttled or OOM-killed for using burst capacity, but it also means you pay for peak capacity at all times. Burstable QoS is more cost-effective for most workloads.
+- **"Memory limits protect my application."** Memory limits protect the node by OOM-killing your container when it exceeds the limit. This is protection for neighbors, not for you. Your app crashes. Set limits above your expected peak, and profile memory usage to right-size.
+- **"1 CPU means one full core."** 1 CPU = 1000 millicores of CFS bandwidth, enforced in 100ms periods (100ms of CPU time per 100ms wall clock). On a throttled container, "1 CPU" may deliver far less throughput than expected due to CFS burst behavior.
+
 ## Further Reading
 
 - [Managing Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) --- Official resource management docs

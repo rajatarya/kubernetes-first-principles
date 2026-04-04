@@ -169,6 +169,12 @@ Reading the version history as a narrative rather than a changelog reveals a cle
 
 The version history also reveals the disciplined API lifecycle that makes Kubernetes trustworthy as a platform. Features progress through alpha (disabled by default, may change or be removed), beta (enabled by default, API may change), and GA (stable, backward compatible, will not be removed). This lifecycle gives users clear signals about what is safe to depend on and gives the community space to iterate on APIs before committing to them permanently.
 
+## Common Mistakes and Misconceptions
+
+- **"I should always run the latest Kubernetes version."** New versions may have bugs, and your tools/operators may not support them yet. Use release channels (Stable or Regular) and wait 1-2 months after a minor release before upgrading production.
+- **"Skipping minor versions during upgrades is fine."** Kubernetes supports upgrading one minor version at a time (e.g., 1.28 → 1.29 → 1.30). Skipping versions can break API compatibility and is unsupported.
+- **"Deprecated APIs will keep working forever."** Deprecated APIs are removed after a defined period (typically 2-3 releases). Plan migrations early using `kubectl convert` or tools like Pluto to detect deprecated APIs.
+
 ## Further Reading
 
 - [Kubernetes Release Notes (official)](https://kubernetes.io/releases/) -- The canonical list of all Kubernetes releases with links to changelogs, release notes, and upgrade guides. Start here to understand what changed in any specific version.

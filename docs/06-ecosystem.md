@@ -85,6 +85,14 @@ The result is that Kubernetes is not a platform; it is a **platform for building
 
 This composability is both Kubernetes' greatest strength and its greatest source of complexity. The bare Kubernetes API is relatively simple; the ecosystem built on top of it is vast and sometimes overwhelming. Understanding that this is by design --- that Kubernetes provides the kernel, not the full operating system --- is essential to understanding the Kubernetes landscape.
 
+## Common Mistakes and Misconceptions
+
+- **"CNCF graduated means production-ready for my use case."** Graduated status indicates mature governance, broad adoption, and a proven security audit process. It does not guarantee the project is the right fit for your specific workload, scale, or operational constraints. Always evaluate projects against your own requirements.
+
+- **"I need to install every CNCF tool."** Most production clusters need only 5-10 ecosystem tools (a CNI plugin, an ingress controller, monitoring, logging, and perhaps a GitOps tool). The CNCF landscape contains 1000+ projects; installing everything would create an unmanageable operational burden.
+
+- **"The CNCF landscape is the complete ecosystem."** Many important Kubernetes tools live outside the CNCF, including commercial products, independent open-source projects, and cloud-provider-specific integrations. The CNCF landscape is a significant subset, not the totality of the ecosystem.
+
 ## Further Reading
 
 - [CNCF Landscape](https://landscape.cncf.io/) -- Interactive map of the entire cloud-native ecosystem, categorized by function (orchestration, observability, service mesh, etc.), with funding and maturity data.

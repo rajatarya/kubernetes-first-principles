@@ -445,6 +445,13 @@ Use vLLM directly when you need full control over serving configuration, run non
 
 For HuggingFace infrastructure specifically, the typical pattern is: vLLM for the Inference API (maximum model coverage, rapid updates) and NIM for dedicated enterprise deployments where a fixed set of models must run at peak performance.
 
+## Common Mistakes and Misconceptions
+
+- **"Serving an LLM is just deploying a container."** Large models need tensor parallelism across multiple GPUs, KV cache management, continuous batching, and careful memory planning. A simple Deployment with one container won't work for models larger than one GPU's memory.
+- **"Bigger instances are always better for LLM serving."** Cost-per-token often favors multiple smaller GPU instances over fewer large ones, depending on model size and batching strategy. Profile your specific model to find the cost-optimal configuration.
+- **"Auto-scaling LLM inference works like web services."** LLM pods take minutes to load models into GPU memory. Scale-from-zero is extremely slow. Maintain warm replicas and scale on custom metrics (queue depth, KV cache utilization) rather than CPU.
+- **"All LLM serving frameworks are interchangeable."** vLLM excels at throughput with PagedAttention, TGI integrates tightly with HuggingFace models, Triton supports multi-model serving. Choose based on your specific model and serving requirements.
+
 ## Further Reading
 
 - [vLLM Documentation and GitHub](https://github.com/vllm-project/vllm) --- the open-source inference engine covering PagedAttention, continuous batching, tensor parallelism, and supported model architectures.

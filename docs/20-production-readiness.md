@@ -448,6 +448,12 @@ Before declaring a cluster production-ready, verify:
 - [ ] **etcd backups**: Automated (managed K8s) or scripted (self-managed)
 - [ ] **Upgrade plan**: Documented process for upgrading Kubernetes and node OS
 
+## Common Mistakes and Misconceptions
+
+- **"My app works in dev, so it's production-ready."** Production requires health probes, resource requests/limits, PodDisruptionBudgets, anti-affinity rules, graceful shutdown handling, and monitoring. Dev-working is the starting line, not the finish.
+- **"Setting replicas to 1 with a PDB is fine."** A PDB with `minAvailable: 1` on a single-replica Deployment blocks all voluntary disruptions (node drains, upgrades). Use at least 2 replicas for anything that needs PDB protection.
+- **"Liveness probes should check dependencies."** If your liveness probe checks the database and the database goes down, Kubernetes kills all your pods — making recovery impossible. Liveness checks should only verify the process itself is alive.
+
 ## Further Reading
 
 - [kube-prometheus-stack Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) --- The standard monitoring deployment

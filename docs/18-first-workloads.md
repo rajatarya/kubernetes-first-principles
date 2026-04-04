@@ -377,6 +377,13 @@ Service (ClusterIP)
 
 Apply resources in dependency order: Namespace, ConfigMap, Secret, PVC, Deployment, Service, Ingress. Or put them all in one file separated by `---` and let `kubectl apply` handle the ordering.
 
+## Common Mistakes and Misconceptions
+
+- **"Using the `latest` tag is convenient and fine."** `latest` is mutable — it can point to different images over time. This breaks reproducibility and rollbacks. Always use specific version tags or digests.
+- **"Pods don't need resource requests and limits."** Without requests, the scheduler can't make good placement decisions. Without limits, a single pod can consume all node resources and crash neighbors.
+- **"Restarting a Deployment means deleting and recreating it."** Use `kubectl rollout restart deployment/<name>` to trigger a rolling restart without downtime or losing the Deployment's history.
+- **"I should use `kubectl run` for everything."** `kubectl run` creates bare pods without a controller. Use Deployments for services (self-healing, rolling updates) and Jobs for batch work.
+
 ## Further Reading
 
 - [Kubernetes Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) --- Official Deployment documentation
@@ -386,6 +393,8 @@ Apply resources in dependency order: Namespace, ConfigMap, Secret, PVC, Deployme
 - [ConfigMap and Secrets](https://kubernetes.io/docs/concepts/configuration/configmap/) --- Configuration management best practices
 - [KillerCoda interactive labs](https://killercoda.com/kubernetes) --- Browser-based exercises for Deployments, Services, and Ingress
 - [KodeKloud CKAD course](https://kodekloud.com/courses/certified-kubernetes-application-developer-ckad/) --- Hands-on application deployment labs
+- [Kubernetes Basics Tutorial](https://kubernetes.io/docs/tutorials/kubernetes-basics/) --- Official interactive tutorial for deploying your first app
+- [Killercoda Kubernetes Labs](https://killercoda.com/kubernetes) --- Browser-based interactive scenarios for hands-on practice
 
 ---
 

@@ -208,6 +208,12 @@ Tools and automation are necessary but not sufficient. Cost optimization sticks 
 
 The goal is not to minimize cost --- it is to maximize the value per dollar. A service that costs $50,000/month and handles 10 million requests is not expensive. A service that costs $500/month and handles zero requests is infinitely expensive.
 
+## Common Mistakes and Misconceptions
+
+- **"Kubernetes saves money."** Kubernetes adds overhead: control plane costs, monitoring, engineer expertise, and operational complexity. It saves money at scale through bin-packing and automation, but small deployments often cost more than VMs.
+- **"Spot instances are always 60-90% cheaper."** Spot pricing is dynamic. Popular instance types in busy regions may offer small discounts. Diversify across instance families and AZs. Karpenter handles this automatically.
+- **"Right-sizing is a one-time task."** Application resource needs change with code changes, traffic patterns, and data growth. Continuous monitoring with VPA recommendations or tools like Kubecost is necessary to prevent drift.
+
 ## Further Reading
 
 - [Kubecost Documentation](https://docs.kubecost.com/) --- real-time Kubernetes cost monitoring with allocation by namespace, label, and deployment, plus recommendations for right-sizing and savings.

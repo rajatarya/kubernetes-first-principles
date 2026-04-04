@@ -234,6 +234,12 @@ Do *The Hard Way* once, then use kubeadm for everything after. The exercise take
 | Wrong podSubnet | CNI and kubeadm disagree on pod CIDR | Match `podSubnet` in kubeadm config with CNI config |
 | Expired bootstrap token | Workers cannot join after 24h | Generate new token: `kubeadm token create --print-join-command` |
 
+## Common Mistakes and Misconceptions
+
+- **"One control plane node is enough for production."** A single control plane is a single point of failure. Production clusters need 3 or 5 control plane nodes for etcd quorum and API server HA.
+- **"Worker nodes should be as large as possible."** Fewer large nodes means each node failure impacts more pods. Balance node size against blast radius — many medium nodes are often better than few huge ones.
+- **"I can skip configuring kubelet flags."** Defaults work for learning, but production kubelets need tuning: eviction thresholds, max-pods, image garbage collection, and system reserved resources.
+
 ## Further Reading
 
 - [kubeadm init documentation](https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/) --- Official reference for all phases and flags
@@ -242,6 +248,7 @@ Do *The Hard Way* once, then use kubeadm for everything after. The exercise take
 - [TLS bootstrapping](https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/) --- Deep dive into the bootstrap token protocol
 - [KillerCoda kubeadm scenarios](https://killercoda.com/kubernetes) --- Interactive browser-based kubeadm exercises
 - [KodeKloud CKA course](https://kodekloud.com/courses/certified-kubernetes-administrator-cka/) --- Hands-on labs covering cluster setup
+- [Killercoda Kubernetes Labs](https://killercoda.com/kubernetes) --- Free, browser-based interactive labs for cluster setup and operations
 
 ---
 

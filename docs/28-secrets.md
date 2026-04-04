@@ -286,6 +286,12 @@ volumes:
 
 **Never log secrets.** Ensure admission webhooks, logging sidecars, and debug tools do not capture secret values. Mask sensitive fields in application logs.
 
+## Common Mistakes and Misconceptions
+
+- **"Kubernetes Secrets are encrypted."** By default, Secrets are stored as base64 in etcd — which is encoding, not encryption. You must enable encryption at rest (`EncryptionConfiguration`) or use an external KMS provider.
+- **"Mounting secrets as environment variables is secure."** Environment variables appear in `/proc/<pid>/environ`, in crash dumps, and in logging frameworks that dump the environment. Mount secrets as files instead.
+- **"Sealed Secrets or External Secrets solve everything."** These tools solve the GitOps problem (how to store secrets in Git). They don't solve rotation, access auditing, or least-privilege access. Use them with a proper vault backend.
+
 ## Further Reading
 
 - [Encrypting Secret Data at Rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/) --- Official guide

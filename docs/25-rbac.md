@@ -345,12 +345,19 @@ kubectl who-can delete secrets -n production
 6. OIDC for human users, bound tokens for workloads
 7. Regular audits of who can access secrets and create pods (pod creation implies secret access)
 
+## Common Mistakes and Misconceptions
+
+- **"cluster-admin for everyone is fine in dev."** Bad habits in dev carry to production. Practice least-privilege from the start. Create namespace-scoped roles that match what each team actually needs.
+- **"RBAC denies by default, so I'm secure."** RBAC only controls API access. It doesn't prevent a compromised pod from attacking the network, reading the filesystem, or accessing cloud metadata. RBAC is one layer of defense, not the whole strategy.
+- **"I can see who has access by reading RoleBindings."** Aggregated ClusterRoles, group memberships, and impersonation make the effective permission set non-obvious. Use `kubectl auth can-i --list --as=user` to audit actual permissions.
+
 ## Further Reading
 
 - [RBAC documentation](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) --- Official reference
 - [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) --- API details and examples
 - [Authenticating with OIDC](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#openid-connect-tokens) --- OIDC configuration
 - [Bound Service Account Tokens](https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/) --- Token projection and rotation
+- [RBAC.dev](https://rbac.dev/) --- Interactive RBAC lookup and visualization tool
 
 ---
 

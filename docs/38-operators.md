@@ -324,6 +324,13 @@ Building an operator is not difficult. Building a *good* operator requires disci
 
 6. **Think about failure modes.** What happens when the API server is unreachable? When a child resource is stuck terminating? When two operators fight over the same resource? The answers should be in your code, not in a runbook.
 
+## Common Mistakes and Misconceptions
+
+- **"Every application needs an Operator."** Operators are for stateful, complex applications that need operational automation (databases, message queues). A stateless web service managed by a Deployment does not need an Operator.
+- **"Writing an Operator is straightforward."** Operators encode operational expertise in code. The happy path is simple, but handling every failure mode (partial updates, resource conflicts, cascading failures) correctly takes significant engineering effort.
+- **"Operators are always better than Helm charts."** Operators add a continuously running controller to your cluster. Helm charts are simpler: apply once, done. Use Operators when you need active reconciliation; use Helm when install-time configuration is sufficient.
+- **"All Operators on OperatorHub are production-quality."** OperatorHub lists community and vendor operators with varying maturity levels. Check the capability level (basic install through full lifecycle) and community adoption before deploying to production.
+
 ## Further Reading
 
 - [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) --- the official Kubernetes documentation explaining the operator concept, when to use one, and how operators extend the API.

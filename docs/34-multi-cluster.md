@@ -192,6 +192,12 @@ Combining Cluster API with GitOps gives you a fully declarative multi-cluster li
 
 Most organizations start with GitOps-driven multi-cluster and add service mesh or federation only when they have a concrete cross-cluster routing or scheduling requirement. Cluster API is orthogonal --- it manages infrastructure regardless of the workload management strategy.
 
+## Common Mistakes and Misconceptions
+
+- **"One big cluster is always better than multiple small ones."** Large clusters have larger blast radius, harder upgrades, and more complex RBAC. Many organizations use multiple clusters for environment isolation, team autonomy, and regional locality.
+- **"Multi-cluster means duplicating everything."** GitOps tools (ArgoCD, Flux) and fleet management (Rancher, GKE Fleet) let you manage multiple clusters from a single source of truth. The marginal cost of an additional cluster is primarily compute, not operational overhead.
+- **"Service mesh is required for cross-cluster communication."** DNS-based service discovery, cloud load balancers, or simple ingress routing can connect services across clusters. A mesh adds mTLS and observability but isn't always necessary.
+
 ## Further Reading
 
 - [ArgoCD ApplicationSets](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) --- Multi-cluster GitOps

@@ -108,6 +108,16 @@ CRDs are Kubernetes' answer to the extensibility problem: how do you allow the p
 
 This extensibility was a lesson from Borg. Borg's API was fixed and could only manage the resource types that Google's Borg team had implemented. Adding support for a new workload type required modifying Borg itself. Kubernetes' CRD mechanism democratizes this: anyone can extend the API without forking the project.
 
+## Common Mistakes and Misconceptions
+
+- **"kubectl apply and kubectl create are the same."** `kubectl create` is imperative and fails if the resource already exists. `kubectl apply` is declarative and merges your manifest with the existing resource, making it safe to run repeatedly. In production, always use `apply` for reproducible, idempotent deployments.
+
+- **"I should use kubectl edit in production."** Imperative edits bypass GitOps workflows, code review, and audit trails. Changes made with `kubectl edit` are not tracked in version control and cannot be reproduced. Always use declarative YAML stored in Git and applied through a pipeline.
+
+- **"All Kubernetes resources are namespaced."** Many important resources are cluster-scoped: Nodes, PersistentVolumes, ClusterRoles, ClusterRoleBindings, and Namespaces themselves. Understanding which resources are namespaced and which are cluster-scoped is essential for RBAC and multi-tenancy.
+
+- **"Deleting a resource is instant."** Finalizers can block deletion indefinitely until a controller completes cleanup logic. Pods have a graceful termination period (default 30 seconds) during which they receive SIGTERM before being killed. A resource in "Terminating" state may remain for an extended time.
+
 ## Further Reading
 
 - [Kubernetes API Conventions](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md) -- The definitive guide to how Kubernetes API resources are structured, including naming, versioning, spec/status separation, and metadata conventions.

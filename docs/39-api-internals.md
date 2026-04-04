@@ -240,6 +240,12 @@ Understanding the API internals changes how you build on Kubernetes:
 
 **Authentication is pluggable.** The API server does not care how you prove your identity --- it supports client certificates, OIDC tokens, webhook-based token review, and service account tokens. This flexibility is what enables integration with every corporate identity provider.
 
+## Common Mistakes and Misconceptions
+
+- **"Admission webhooks are fire-and-forget."** A failing webhook can block all resource creation in your cluster. Always configure `failurePolicy: Ignore` for non-critical webhooks and ensure webhook services have high availability.
+- **"Mutating and validating webhooks run in any order."** Mutating webhooks run first (and can run multiple rounds), then validating webhooks run. A validating webhook sees the final mutated object, not the original user submission.
+- **"CRDs are free to create."** Each CRD adds load to the API server: storage in etcd, watch channels, discovery endpoints. Hundreds of CRDs (common with Crossplane providers) measurably increase API server memory and CPU usage.
+
 ## Further Reading
 
 - [Dynamic Admission Control](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) --- the official Kubernetes documentation on mutating and validating admission webhooks, including configuration, failure policies, and reinvocation.

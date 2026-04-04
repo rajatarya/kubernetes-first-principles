@@ -259,6 +259,12 @@ Multi-tenancy is not binary. It is a spectrum from shared namespaces to dedicate
 
 The right answer depends on your threat model, compliance requirements, and operational capacity. Start with namespaces, add vCluster when you hit a namespace limitation, and reach for dedicated clusters only when virtual isolation is insufficient.
 
+## Common Mistakes and Misconceptions
+
+- **"Namespaces provide security isolation."** Namespaces are a grouping mechanism, not a security boundary. Without NetworkPolicies, RBAC, ResourceQuotas, and Pod Security Standards, pods in different namespaces can freely communicate and compete for resources.
+- **"ResourceQuotas prevent noisy neighbors."** ResourceQuotas limit totals but not individual pod sizes. A tenant can create one massive pod consuming the entire quota. Combine quotas with LimitRanges to constrain per-pod resources.
+- **"vCluster is overkill for multi-tenancy."** For strong isolation (e.g., different customers, untrusted workloads), namespace-level controls are often insufficient. vCluster provides full API isolation with lower overhead than separate physical clusters.
+
 ## Further Reading
 
 - [Multi-tenancy Guide](https://kubernetes.io/docs/concepts/security/multi-tenancy/) --- Official Kubernetes multi-tenancy documentation

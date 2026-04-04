@@ -299,6 +299,13 @@ kubectl get events -n my-namespace --field-selector type=Warning
 
 Events are the system's audit trail. When something goes wrong, the event stream usually tells you what happened, when, and why --- if you look quickly enough before the events expire.
 
+## Common Mistakes and Misconceptions
+
+- **"kubectl logs shows everything."** Logs only show stdout/stderr from the current (or previous with `-p`) container. For multi-container pods, specify `-c container-name`. For crashed init containers, use `-c init-container-name`.
+- **"If the pod is Running, it's healthy."** Running means the container process is alive, not that it's serving traffic correctly. Readiness probes determine if a pod receives traffic; a Running pod can be unready.
+- **"kubectl exec is safe in production."** exec gives shell access to running containers, bypassing RBAC audit trails for in-container actions. Use it for debugging but not as a routine operational tool. Audit exec usage.
+- **"Events tell the full story."** Events are garbage-collected after 1 hour by default. For historical debugging, you need persistent logging (Loki, CloudWatch, etc.).
+
 ## Further Reading
 
 - [Kubernetes troubleshooting documentation](https://kubernetes.io/docs/tasks/debug/) --- Official debugging guides for applications, clusters, and services
@@ -308,6 +315,7 @@ Events are the system's audit trail. When something goes wrong, the event stream
 - [KillerCoda debugging scenarios](https://killercoda.com/kubernetes) --- Interactive browser-based troubleshooting labs
 - [Learnk8s troubleshooting flowchart](https://learnk8s.io/troubleshooting-deployments) --- Visual flowchart for debugging Deployments
 - [CNCF Slack #kubernetes-users](https://slack.cncf.io/) --- Community support for Kubernetes debugging
+- [Kubernetes Debugging Exercises](https://github.com/bregman-arie/devops-exercises#kubernetes) --- Practice debugging common Kubernetes issues
 
 ---
 

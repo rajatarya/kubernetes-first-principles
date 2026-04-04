@@ -293,6 +293,12 @@ spec:
 
 This is the foundation for backup workflows. Tools like Velero use CSI snapshots internally.
 
+## Common Mistakes and Misconceptions
+
+- **"All storage classes perform the same."** gp3 vs io2 vs local NVMe have vastly different IOPS, throughput, and cost profiles. Match storage class to workload requirements, especially for databases.
+- **"Cross-AZ traffic is free."** All three major clouds charge $0.01-0.02/GB for cross-AZ data transfer. High-traffic services with pods spread across AZs can accumulate significant costs.
+- **"I should use one big VPC for everything."** Separate VPCs (or at least subnets) for dev/staging/production provide network-level isolation. VPC peering connects them when needed.
+
 ## Further Reading
 
 - [AWS VPC CNI documentation](https://github.com/aws/amazon-vpc-cni-k8s) --- Detailed explanation of ENI-based pod networking

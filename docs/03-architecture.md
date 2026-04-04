@@ -178,6 +178,16 @@ Kube-proxy watches the API server for Service and Endpoint changes and updates t
 
 > **The Controller Pattern is Kubernetes.** If you understand only one thing about Kubernetes' architecture, understand the controller pattern: observe, diff, act, repeat. Every component --- from the scheduler to the kubelet to kube-proxy --- is a controller that watches for state changes and reconciles actual state toward desired state. This single pattern, applied recursively across the entire system, is what makes Kubernetes self-healing, scalable, and extensible.
 
+## Common Mistakes and Misconceptions
+
+- **"The master node runs my workloads."** Control plane nodes are dedicated to cluster management (API server, scheduler, controllers, etcd). Workloads run on worker nodes by default. Running application pods on control plane nodes is possible but strongly discouraged in production because it risks destabilizing the control plane.
+
+- **"etcd is a general-purpose database."** etcd is optimized for small key-value metadata with a hard limit of approximately 1.5 MB per value. It is designed for storing cluster state, not application data. Treating it as an application database will lead to performance degradation and cluster instability.
+
+- **"If the API server goes down, my pods stop."** Running pods continue to execute on their nodes even if the API server is unavailable. The kubelet keeps containers running based on its last known state. What stops is your ability to make changes, schedule new pods, or observe cluster state through the API.
+
+- **"The scheduler continuously moves pods for better balance."** Pods are scheduled once and stay on their assigned node unless they are evicted, deleted, or the node fails. The scheduler does not rebalance running pods. If you need rebalancing, you must use tools like the Descheduler, which evicts pods so the scheduler can place them on better nodes.
+
 ## Further Reading
 
 - [Kubernetes Official Documentation -- Cluster Architecture](https://kubernetes.io/docs/concepts/architecture/) -- The authoritative reference for how control plane and node components fit together, including component-level diagrams.
@@ -187,6 +197,7 @@ Kube-proxy watches the API server for Service and Endpoint changes and updates t
 - [Daniel Smith -- "The Kubernetes API Server: Scalability and Performance" (KubeCon 2019)](https://www.youtube.com/watch?v=Zn-58U1MnSk) -- How the API server handles watch streams, caching, and request routing at scale.
 - [Kubernetes Documentation -- Scheduler Performance Tuning](https://kubernetes.io/docs/concepts/scheduling-eviction/scheduler-perf-tuning/) -- Details on the scheduler's filtering and scoring phases, extension points, and how to tune scheduling behavior.
 - [Lucas Kaldstrom -- "A Deep Dive into Kubernetes Controllers" (KubeCon 2017)](https://www.youtube.com/watch?v=dP_wPGQJn6M) -- An in-depth look at the controller pattern, informers, work queues, and how controllers interact with the API server.
+- [Kubernetes The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way) --- Build a cluster from scratch to understand every component
 
 ---
 

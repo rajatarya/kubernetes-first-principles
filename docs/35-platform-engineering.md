@@ -140,6 +140,12 @@ Add Backstage when you have 10+ services and the catalog becomes valuable. Add C
 
 The goal is to make the most common developer workflows --- deploy, observe, debug, rollback --- take less than 5 minutes and require no Kubernetes-specific knowledge.
 
+## Common Mistakes and Misconceptions
+
+- **"A platform team should build everything from scratch."** The best platforms compose existing tools (ArgoCD, Crossplane, Backstage) with thin glue layers. Building custom versions of solved problems wastes years and creates maintenance burdens.
+- **"If we build it, developers will use it."** Platforms succeed when they're easier than the alternative. If your platform is harder than `kubectl apply`, developers will bypass it. Invest in developer experience and documentation.
+- **"Platform engineering is just DevOps renamed."** DevOps is a culture of shared responsibility. Platform engineering builds self-service products (internal developer platforms) that embed operational best practices. The platform is the product; developers are the customers.
+
 ## Further Reading
 
 - [Backstage Documentation](https://backstage.io/docs/) --- Official Backstage guides

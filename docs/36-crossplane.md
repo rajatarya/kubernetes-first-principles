@@ -211,6 +211,12 @@ Crossplane's long-term vision is the "universal control plane" --- a single Kube
 
 This vision is ambitious and incomplete. Provider coverage is broad but not total. Complex multi-resource dependencies (create VPC, then subnet, then security group, then RDS instance) require careful ordering in Compositions. Error messages from failed cloud API calls can be opaque. But the trajectory is clear: the Kubernetes resource model is becoming the universal interface for infrastructure management, and Crossplane is the primary vehicle for that expansion.
 
+## Common Mistakes and Misconceptions
+
+- **"Crossplane replaces Terraform."** Many organizations use both: Terraform for foundational infrastructure (VPCs, clusters) with manual review, Crossplane for application-level resources (databases, caches) with self-service provisioning. They complement each other.
+- **"Compositions apply changes immediately with no review."** This is actually true and often a surprise. Unlike Terraform's plan/apply workflow, changing a Composition affects all resources using it immediately. Use Composition revisions and staged rollouts.
+- **"Crossplane providers cover every cloud resource."** Coverage is broad but not complete. Check the provider's CRD list before committing to Crossplane for a specific resource. Some niche services may need Terraform or direct API calls.
+
 ## Further Reading
 
 - [Crossplane Documentation](https://docs.crossplane.io/) --- Official guides and reference

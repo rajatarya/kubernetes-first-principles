@@ -195,6 +195,12 @@ The Kubernetes networking stack in 2024+ looks nothing like it did in 2015:
 
 The evolution from Flannel's simple VXLAN overlay to Cilium's eBPF-native stack represents one of the most dramatic technical shifts in the Kubernetes ecosystem. It was driven by scale: the solutions that worked for hundreds of nodes failed at thousands. And it was enabled by a foundational technology shift (eBPF) that changed what was possible inside the Linux kernel.
 
+## Common Mistakes and Misconceptions
+
+- **"eBPF replaces all of iptables immediately."** Cilium's eBPF datapath replaces kube-proxy's iptables rules for service routing, but iptables still exists on the host for other purposes. Migration is incremental.
+- **"I need a service mesh from day one."** Service meshes add complexity (sidecars, mTLS certificate management, control plane). Start without one; add it when you have a concrete need for mTLS, traffic splitting, or observability between services.
+- **"Flannel is obsolete."** Flannel is simpler and lighter than Calico or Cilium. For small clusters that don't need NetworkPolicy, Flannel is a perfectly valid choice.
+
 ## Further Reading
 
 - [Cilium documentation](https://docs.cilium.io/) -- Comprehensive reference for the eBPF-based CNI plugin that has become the dominant networking solution. The "Concepts" section explains how eBPF replaces iptables for service routing, network policy, and observability.

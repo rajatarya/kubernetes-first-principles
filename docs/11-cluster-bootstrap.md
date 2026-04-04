@@ -184,6 +184,12 @@ Who Uses What (2024+)
 
 The evolution of bootstrapping tools mirrors a broader pattern in infrastructure software: complexity moves from the user to the platform. In 2014, bootstrapping a cluster required deep expertise in Linux administration, PKI, and distributed systems. By 2024, it requires a credit card and a cloud provider account. The knowledge is still valuable --- someone has to build and operate those managed services --- but the barrier to entry for Kubernetes users has dropped by orders of magnitude.
 
+## Common Mistakes and Misconceptions
+
+- **"kubeadm is only for learning."** kubeadm is used in production by many organizations. It handles TLS bootstrapping, certificate rotation, and upgrade orchestration. Managed services are easier, but kubeadm is production-grade.
+- **"k3s is not real Kubernetes."** k3s is a certified, conformant Kubernetes distribution. It passes the same conformance tests as full K8s. It just has a smaller binary and uses SQLite instead of etcd by default.
+- **"I should use minikube/kind for production."** These tools are for local development and CI. They run single-node clusters without HA, proper networking, or persistent storage guarantees.
+
 ## Further Reading
 
 - [kubeadm documentation](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/) -- Official reference for the standard cluster bootstrapping tool. Covers `kubeadm init`, `kubeadm join`, certificate management, and upgrade procedures.
