@@ -4,7 +4,7 @@ Deployments treat pods as interchangeable. If pod `web-abc123` dies, the replace
 - A distributed system that uses consistent hashing needs members with stable identities.
 - A clustered cache needs each node to own a predictable shard of data. These workloads need something Deployments cannot provide: **stable identity**.
 
-StatefulSets exist because some pods are not fungible. Like every Kubernetes workload controller, a StatefulSet follows the [controller pattern](03-architecture.md) we covered in Chapter 3 --- observe, diff, act --- but with additional ordering and identity guarantees that the Deployment controller does not provide.
+StatefulSets exist because some pods are not fungible. (For a visual map of how stateful workload concepts relate, see [Appendix B: Mental Models](A2-mental-models.md).) Like every Kubernetes workload controller, a StatefulSet follows the [controller pattern](03-architecture.md) we covered in Chapter 3 --- observe, diff, act --- but with additional ordering and identity guarantees that the Deployment controller does not provide.
 
 ## The Identity Problem
 

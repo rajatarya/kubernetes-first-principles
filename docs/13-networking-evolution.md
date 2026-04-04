@@ -190,7 +190,7 @@ The Kubernetes networking stack in 2024+ looks nothing like it did in 2015:
 - **Service mesh**: consolidating around sidecar-less approaches; Istio Ambient and Cilium Service Mesh
 - **Encryption**: WireGuard-based transparent encryption (Cilium, Calico)
 
-The evolution from Flannel's simple VXLAN overlay to Cilium's eBPF-native stack represents one of the most dramatic technical shifts in the Kubernetes ecosystem. It was driven by scale: the solutions that worked for hundreds of nodes failed at thousands. And it was enabled by a foundational technology shift (eBPF) that changed what was possible inside the Linux kernel.
+The evolution from Flannel's simple VXLAN overlay to Cilium's eBPF-native stack represents one of the most dramatic technical shifts in the Kubernetes ecosystem. It was driven by scale: the solutions that worked for hundreds of nodes failed at thousands. And it was enabled by a foundational technology shift (eBPF) that changed what was possible inside the Linux kernel. For a quick flowchart on choosing a CNI, see [Appendix C: Decision Trees](A3-decision-trees.md).
 
 ## Common Mistakes and Misconceptions
 

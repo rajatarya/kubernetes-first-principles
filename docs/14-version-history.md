@@ -1,5 +1,7 @@
 # Chapter 14: Kubernetes Version History --- A Guided Tour
 
+For a visual timeline showing how the entire ecosystem evolved in parallel, see [Appendix E: Architecture Evolution Timeline](A5-timeline.md).
+
 ```
 Kubernetes Release Timeline: The Inflection Points
 

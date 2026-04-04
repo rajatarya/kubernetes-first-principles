@@ -384,6 +384,8 @@ Apply resources in dependency order: Namespace, ConfigMap, Secret, PVC, Deployme
 - **"Restarting a Deployment means deleting and recreating it."** Use `kubectl rollout restart deployment/<name>` to trigger a rolling restart without downtime or losing the Deployment's history.
 - **"I should use `kubectl run` for everything."** `kubectl run` creates bare pods without a controller. Use Deployments for services (self-healing, rolling updates) and Jobs for batch work.
 
+When things go wrong, see [Appendix D: Troubleshooting Quick Reference](A4-troubleshooting.md) for a mapping of error messages to root causes.
+
 ## Further Reading
 
 - [Kubernetes Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) --- Official Deployment documentation

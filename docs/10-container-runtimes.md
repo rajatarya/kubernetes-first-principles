@@ -170,6 +170,8 @@ The lesson they teach is a design lesson: **define clean interfaces early, and t
 - **"containerd and Docker are completely different."** containerd was extracted from Docker. Docker uses containerd internally. The difference is that K8s talks to containerd directly via CRI, skipping the Docker daemon.
 - **"OCI images built with Docker won't work with containerd."** OCI images are runtime-agnostic. An image built with `docker build` runs identically on containerd, CRI-O, or any OCI-compliant runtime.
 
+For a visual timeline of how container runtimes evolved alongside the broader ecosystem, see [Appendix E: Architecture Evolution Timeline](A5-timeline.md).
+
 ## Further Reading
 
 - [Container Runtime Interface (CRI) specification](https://github.com/kubernetes/cri-api) -- The formal API definition that decoupled Kubernetes from any single container runtime, enabling the pluggable ecosystem described in this chapter.

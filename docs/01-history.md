@@ -102,6 +102,8 @@ Kubernetes was donated to the newly formed Cloud Native Computing Foundation (CN
 
 - **"Kubernetes was the first container orchestrator."** Apache Mesos with Marathon, Fleet, and Docker Swarm all predated or emerged alongside Kubernetes. K8s won the orchestration wars not by being first but through superior API design, extensibility, and community governance.
 
+For a visual overview of how Part 1's concepts connect, see [Appendix B: Mental Models](A2-mental-models.md).
+
 ## Further Reading
 
 - [Large-scale cluster management at Google with Borg](https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/) -- The original 2015 Borg paper from EuroSys, detailing how Google manages billions of containers across its fleet.

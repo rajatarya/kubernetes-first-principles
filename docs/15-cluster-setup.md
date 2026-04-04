@@ -234,6 +234,8 @@ Do *The Hard Way* once, then use kubeadm for everything after. The exercise take
 | Wrong podSubnet | CNI and kubeadm disagree on pod CIDR | Match `podSubnet` in kubeadm config with CNI config |
 | Expired bootstrap token | Workers cannot join after 24h | Generate new token: `kubeadm token create --print-join-command` |
 
+For a comprehensive error-to-fix mapping, see [Appendix D: Troubleshooting Quick Reference](A4-troubleshooting.md).
+
 ## Common Mistakes and Misconceptions
 
 - **"One control plane node is enough for production."** A single control plane is a single point of failure. Production clusters need 3 or 5 control plane nodes for etcd quorum and API server HA.

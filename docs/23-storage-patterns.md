@@ -1,6 +1,6 @@
 # Chapter 23: Persistent Storage Patterns
 
-Storage on Kubernetes is where the abstraction meets physical reality. A pod can be rescheduled to any node in seconds, but a 500GB disk cannot teleport. Persistent storage forces you to think about topology, data lifecycle, and failure modes that stateless workloads let you ignore.
+Storage on Kubernetes is where the abstraction meets physical reality. A pod can be rescheduled to any node in seconds, but a 500GB disk cannot teleport. Persistent storage forces you to think about topology, data lifecycle, and failure modes that stateless workloads let you ignore. For a quick storage decision flowchart, see [Appendix C: Decision Trees](A3-decision-trees.md).
 ## volumeClaimTemplates: The Naming Convention
 
 As covered in Chapter 21, StatefulSets use `volumeClaimTemplates` to create per-pod PVCs. The naming convention is deterministic:

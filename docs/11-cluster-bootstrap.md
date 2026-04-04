@@ -112,7 +112,7 @@ kubeadm init: What Happens
 
 ## The Alternatives: Different Problems, Different Tools
 
-kubeadm solved the bootstrap problem but deliberately left the provisioning problem to others. This created space for tools that combined provisioning and bootstrapping, each optimized for different use cases.
+kubeadm solved the bootstrap problem but deliberately left the provisioning problem to others. This created space for tools that combined provisioning and bootstrapping, each optimized for different use cases. See [Appendix C: Decision Trees](A3-decision-trees.md) for a flowchart to help choose the right bootstrap tool.
 
 ### kops (Kubernetes Operations)
 

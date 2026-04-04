@@ -1,6 +1,6 @@
 # Chapter 19: Debugging Kubernetes
 
-Kubernetes failures are often opaque. A pod does not start, a service does not route traffic, a node disappears --- and the system gives you a status word and expects you to figure out the rest. This chapter builds a systematic debugging methodology and a reference for the most common failure modes.
+Kubernetes failures are often opaque. A pod does not start, a service does not route traffic, a node disappears --- and the system gives you a status word and expects you to figure out the rest. This chapter builds a systematic debugging methodology and a reference for the most common failure modes. For a quick-reference cheat sheet of errors and fixes, see [Appendix D: Troubleshooting Quick Reference](A4-troubleshooting.md).
 
 ## The Debugging Workflow
 

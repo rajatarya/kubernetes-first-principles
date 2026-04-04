@@ -44,6 +44,8 @@
 
 **Every arrow is through the API Server.** There are no direct connections between components. This is the single most important architectural constraint.
 
+If you encounter unfamiliar terms in this chapter, see [Appendix A: Glossary](A1-glossary.md) for quick definitions.
+
 ## Why etcd? The Case for a Consistent, Distributed Key-Value Store
 
 Kubernetes needs to store the desired state of the entire cluster: every pod specification, every service definition, every configuration map. This state must be **consistent** (all readers see the same data), **durable** (data survives machine failures), and **available** (the store can be read and written to even when some machines fail).

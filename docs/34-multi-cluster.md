@@ -2,7 +2,7 @@
 
 A single Kubernetes cluster is a single failure domain. One misconfigured admission webhook can block all deployments. One etcd corruption event can lose all state. One cloud region outage can take everything offline. As organizations move from "we run some things on Kubernetes" to "Kubernetes is our platform," the question shifts from "how do we run a cluster?" to "how do we run many clusters, and how do they relate to each other?"
 
-Multi-cluster is not about redundancy alone. Teams adopt multiple clusters for blast radius reduction, regulatory compliance, geographic latency, team isolation, and environment separation. The challenge is not running multiple clusters --- it is managing them as a coherent system without reintroducing the operational complexity Kubernetes was supposed to eliminate.
+Multi-cluster is not about redundancy alone. Teams adopt multiple clusters for blast radius reduction, regulatory compliance, geographic latency, team isolation, and environment separation. The challenge is not running multiple clusters --- it is managing them as a coherent system without reintroducing the operational complexity Kubernetes was supposed to eliminate. For a visual overview of Part 7's platform engineering concepts, see [Appendix B: Mental Models](A2-mental-models.md).
 
 ## Why Multi-Cluster
 

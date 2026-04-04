@@ -246,6 +246,8 @@ Vault integrates with Kubernetes in three ways:
 
 ### Comparison
 
+See [Appendix C: Decision Trees](A3-decision-trees.md) for a secret management decision flowchart.
+
 | Feature | Sealed Secrets | ESO | Vault |
 |---------|---------------|-----|-------|
 | **Complexity** | Low | Medium | High |

@@ -134,6 +134,8 @@ AKS differentiates primarily on pricing: the control plane is **free** in the Fr
 
 ## When to Choose Each
 
+See also [Appendix C: Decision Trees](A3-decision-trees.md) for a quick decision flowchart.
+
 **Choose GKE when:**
 - You want the most automated, opinionated experience
 - You are already on Google Cloud or are starting fresh
