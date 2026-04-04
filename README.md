@@ -2,7 +2,7 @@
 
 **From First Principles to Production: A Complete Curriculum**
 
-An 80,000-word, 45-chapter open-source textbook that teaches Kubernetes by explaining *why* it was designed the way it was --- not just *how* to use it.
+A 98,000-word, 45-chapter open-source textbook (with 5 appendices) that teaches Kubernetes by explaining *why* it was designed the way it was --- not just *how* to use it. Includes 326 curated external links, 2,500+ lines of ASCII diagrams, decision trees, a troubleshooting quick-reference, and common-mistakes callouts in every chapter.
 
 This book was written for someone who understands Linux, networking, and computing but wants to deeply understand Kubernetes. It covers everything from the historical origins (Google's Borg system) through running GPU-accelerated LLM inference in production.
 
