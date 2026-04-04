@@ -1,0 +1,26 @@
+[book]
+title = "The Ultimate Kubernetes Course"
+authors = ["Rajat Arya"]
+description = "From First Principles to Production: A Complete Curriculum"
+src = "docs"
+language = "en"
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/rajatarya/ultimate-k8s"
+edit-url-template = "https://github.com/rajatarya/ultimate-k8s/edit/main/docs/{path}"
+site-url = "/ultimate-k8s/"
+no-section-label = false
+
+[output.html.search]
+enable = true
+limit-results = 30
+heading-split-level = 2
+
+[output.html.fold]
+enable = true
+level = 1
