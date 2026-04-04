@@ -1,8 +1,19 @@
-# Kubernetes from First Principles
+<table>
+<tr>
+<td width="140" align="center"><img src="docs/assets/kubernetes-logo.png" alt="Kubernetes" width="100"></td>
+<td>
+<h1>Kubernetes from First Principles</h1>
+<h3>Why It Works the Way It Does</h3>
+<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg" alt="License: CC BY-NC-SA 4.0"></a>
+<a href="https://rajatarya.github.io/kubernetes-first-principles/"><img src="https://img.shields.io/badge/Read%20Online-mdBook-blue" alt="Read Online"></a>
+<a href="https://github.com/rajatarya/kubernetes-first-principles/releases"><img src="https://img.shields.io/github/v/release/rajatarya/kubernetes-first-principles" alt="Release"></a>
+</td>
+</tr>
+</table>
 
-**Why It Works the Way It Does**
+<br>
 
-Most Kubernetes resources teach you how to write YAML. This book teaches you why the YAML looks the way it does. 45 chapters covering architecture, security, scaling, platform engineering, and GPU/ML infrastructure --- each traced from the original design problem through the ecosystem's evolution to today's best practice. Written for engineers who know Linux, networking, and how systems work, and want to understand Kubernetes the way they think.
+*Most Kubernetes resources teach you how to write YAML. This book teaches you why the YAML looks the way it does. 45 chapters covering architecture, security, scaling, platform engineering, and GPU/ML infrastructure — each traced from the original design problem through the ecosystem's evolution to today's best practice. Written for engineers who know Linux, networking, and how systems work, and want to understand Kubernetes the way they think.*
 
 ## Start Reading
 
@@ -59,4 +70,6 @@ Found an error? A broken link? A concept that could be explained better? Pull re
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+The book is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Any additional code and supporting materials (e.g., `install.sh`) are licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+Kubernetes is a registered trademark of The Linux Foundation.

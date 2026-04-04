@@ -15,6 +15,8 @@ git-repository-url = "https://github.com/rajatarya/kubernetes-first-principles"
 edit-url-template = "https://github.com/rajatarya/kubernetes-first-principles/edit/main/docs/{path}"
 site-url = "/kubernetes-first-principles/"
 no-section-label = false
+additional-css = ["docs/theme/custom.css"]
+additional-js = ["docs/theme/footer.js"]
 
 [output.html.search]
 enable = true

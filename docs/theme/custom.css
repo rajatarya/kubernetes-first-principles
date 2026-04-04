@@ -1,0 +1,77 @@
+/* Kubernetes-themed color overrides */
+/* Official K8s blue: #326CE5, lighter: #4A85E8, darker: #2756B8 */
+
+/* Sidebar */
+.sidebar {
+    background-color: #1a2744;
+}
+
+.sidebar .sidebar-scrollbox {
+    background-color: #1a2744;
+}
+
+/* Active sidebar link */
+.sidebar .active {
+    color: #6fa8ff;
+}
+
+/* Links throughout the book */
+.content a {
+    color: #326CE5;
+}
+
+.content a:hover {
+    color: #2756B8;
+}
+
+/* Navy theme adjustments (the default) */
+.navy .content a {
+    color: #6fa8ff;
+}
+
+.navy .content a:hover {
+    color: #93bdff;
+}
+
+.navy .sidebar {
+    background-color: #141e33;
+}
+
+.navy .sidebar .active {
+    color: #6fa8ff;
+}
+
+/* Chapter title styling */
+.content h1 {
+    border-bottom: 2px solid #326CE5;
+    padding-bottom: 0.3em;
+}
+
+/* Code blocks - subtle K8s blue tint */
+.navy .content code {
+    background-color: #1a2744;
+}
+
+/* Tables - K8s blue header */
+.content table thead {
+    background-color: #326CE5;
+    color: white;
+}
+
+.content table thead th {
+    border-color: #2756B8;
+}
+
+.navy .content table thead {
+    background-color: #1e3a6e;
+}
+
+/* Menu bar accent */
+#menu-bar {
+    border-bottom: 2px solid #326CE5;
+}
+
+/* Search highlight */
+.content mark {
+    background-color: rgba(50, 108, 229, 0.3);
+}

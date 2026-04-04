@@ -1,6 +1,18 @@
-# Kubernetes from First Principles
+<table>
+<tr>
+<td width="140" align="center"><img src="assets/kubernetes-logo.png" alt="Kubernetes" width="100"></td>
+<td>
+<h1>Kubernetes from First Principles</h1>
+<h3>Why It Works the Way It Does</h3>
+</td>
+</tr>
+</table>
 
-**Why It Works the Way It Does**
+<br>
+
+*Most Kubernetes resources teach you how to write YAML. This book teaches you why the YAML looks the way it does. 45 chapters — each traced from the original design problem through the ecosystem's evolution to today's best practice.*
+
+## About
 
 This is an eight-part book that takes you from "why does Kubernetes exist?" to "I'm running GPU-accelerated ML workloads in production across multiple clusters." It is written for engineers who understand Linux, networking, and how systems work --- and want to understand Kubernetes deeply, not just follow tutorials.
 

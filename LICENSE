@@ -1,3 +1,26 @@
+# License
+
+## Book Content
+
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+
+Copyright (c) 2026 Rajat Arya
+
+You are free to:
+- **Share** — copy and redistribute the material in any medium or format
+- **Adapt** — remix, transform, and build upon the material
+
+Under the following terms:
+- **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made.
+- **NonCommercial** — You may not use the material for commercial purposes.
+- **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the same license.
+
+Full license text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+## Code and Supporting Materials
+
+Any additional code and supporting materials (e.g., `install.sh`, configuration examples) are licensed under the MIT License.
+
 MIT License
 
 Copyright (c) 2026 Rajat Arya
@@ -19,3 +42,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Trademarks
+
+Kubernetes is a registered trademark of The Linux Foundation. The Kubernetes
+logo is used in this book for educational and informational purposes in
+accordance with The Linux Foundation's trademark usage guidelines. This book
+is not endorsed by or affiliated with The Linux Foundation or the Cloud Native
+Computing Foundation.

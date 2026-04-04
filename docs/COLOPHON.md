@@ -64,7 +64,9 @@ Every error documented in the troubleshooting sections of the README and Chapter
 
 ## License
 
-This work is published under the MIT License. See [LICENSE](../LICENSE) for details.
+The book is licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Any additional code and supporting materials (e.g., `install.sh`) are licensed under the MIT License. See [LICENSE](../LICENSE) for details.
+
+Kubernetes is a registered trademark of The Linux Foundation.
 
 ## Contributing
 
