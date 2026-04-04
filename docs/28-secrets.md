@@ -298,7 +298,7 @@ volumes:
 - [Encrypting Secret Data at Rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/) --- Official guide
 - [KMS v2 documentation](https://kubernetes.io/docs/tasks/administer-cluster/kms-provider/) --- KMS plugin setup
 - [External Secrets Operator](https://external-secrets.io/) --- Multi-provider secrets sync
-- [Sealed Secrets](https://sealed-secrets.netlify.app/) --- Git-safe encrypted secrets
+- [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) --- Git-safe encrypted secrets
 - [Vault Kubernetes integration](https://developer.hashicorp.com/vault/docs/platform/k8s) --- Agent, CSI, VSO
 
 ---

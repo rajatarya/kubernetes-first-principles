@@ -104,9 +104,9 @@ This composability is both Kubernetes' greatest strength and its greatest source
 - [CNCF Project Maturity Levels](https://www.cncf.io/projects/) -- Explanation of the Sandbox, Incubating, and Graduated tiers, along with a full list of CNCF projects and their current status.
 - [Introducing Operators (CoreOS, 2016)](https://web.archive.org/web/2023/https://coreos.com/blog/introducing-operators.html) -- The original blog post by Brandon Philips that introduced the Operator pattern, explaining why encoding operational knowledge in code is a natural extension of Kubernetes controllers.
 - [CNCF Annual Survey Results](https://www.cncf.io/reports/) -- Yearly survey data on Kubernetes adoption rates, ecosystem tool usage, and deployment patterns across organizations worldwide.
-- [KubeCon + CloudNativeCon Talk Recordings](https://www.youtube.com/c/CloudNativeComputingFoundation/playlists) -- Full archives of KubeCon presentations covering operators, Helm, service meshes, and every other corner of the ecosystem.
+- [KubeCon + CloudNativeCon Talk Recordings](https://www.youtube.com/@cncf/playlists) -- Full archives of KubeCon presentations covering operators, Helm, service meshes, and every other corner of the ecosystem.
 - [Helm Documentation](https://helm.sh/docs/) -- Official docs for the most widely used Kubernetes package manager, covering chart authoring, templating, release management, and repository hosting.
-- [Istio vs. Linkerd vs. Cilium Service Mesh Comparison](https://www.cncf.io/blog/2023/06/14/service-mesh-comparison/) -- CNCF blog post comparing the major service mesh implementations, their architectures, performance characteristics, and ideal use cases.
+- [Kubernetes Service Mesh: A Comparison of Istio, Linkerd and Consul (Platform9)](https://platform9.com/blog/kubernetes-service-mesh-a-comparison-of-istio-linkerd-and-consul/) -- Detailed comparison of the major service mesh implementations across 16 factors, covering architectures, performance characteristics, and ideal use cases.
 
 ---
 

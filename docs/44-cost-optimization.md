@@ -214,7 +214,7 @@ The goal is not to minimize cost --- it is to maximize the value per dollar.
 
 ## Further Reading
 
-- [Kubecost Documentation](https://docs.kubecost.com/) --- real-time Kubernetes cost monitoring with allocation by namespace, label, and deployment, plus recommendations for right-sizing and savings.
+- [OpenCost Documentation](https://www.opencost.io/docs) --- the CNCF open-source standard for real-time Kubernetes cost monitoring with allocation by namespace, label, and deployment.
 - [OpenCost Project](https://www.opencost.io/) --- the CNCF sandbox project for Kubernetes cost monitoring, providing a vendor-neutral open-source specification and implementation for cost allocation.
 - [FinOps Foundation](https://www.finops.org/) --- the industry body defining FinOps practices, frameworks, and maturity models for managing cloud costs across engineering and finance teams.
 - [AWS: Best Practices for EC2 Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-best-practices.html) --- AWS guidance on diversifying instance types, handling interruptions, and using Spot with EKS node groups and Karpenter.

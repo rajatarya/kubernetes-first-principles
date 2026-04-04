@@ -74,6 +74,77 @@ Consider what happens when you apply a Deployment object:
                               └────────────────────┘
 ```
 
+The following sequence diagram shows the temporal flow --- notice that every component communicates only through the API server:
+
+```
+DEPLOYMENT CREATION: SEQUENCE OF EVENTS
+────────────────────────────────────────
+
+  User          API Server       etcd        Deployment    ReplicaSet    Scheduler     Kubelet      Endpoint
+ (kubectl)                                   Controller    Controller                  (per node)   Controller
+    │               │              │              │              │            │             │             │
+    │  POST /apis/  │              │              │              │            │             │             │
+    │  apps/v1/     │              │              │              │            │             │             │
+    │  deployments  │              │              │              │            │             │             │
+    ├──────────────▶│              │              │              │            │             │             │
+    │               │  store       │              │              │            │             │             │
+    │               │  Deployment  │              │              │            │             │             │
+    │               ├─────────────▶│              │              │            │             │             │
+    │   201 Created │              │              │              │            │             │             │
+    │◀──────────────┤              │              │              │            │             │             │
+    │               │              │  watch:      │              │            │             │             │
+    │               │              │  new Deploy  │              │            │             │             │
+    │               │              ├─────────────▶│              │            │             │             │
+    │               │              │              │              │            │             │             │
+    │               │  create      │  compare:    │              │            │             │             │
+    │               │  ReplicaSet  │  0 RS exist  │              │            │             │             │
+    │               │◀─────────────┤  need 1      │              │            │             │             │
+    │               │  store RS    │              │              │            │             │             │
+    │               ├─────────────▶│              │              │            │             │             │
+    │               │              │              │  watch:      │            │             │             │
+    │               │              │              │  new RS      │            │             │             │
+    │               │              │              ├─────────────▶│            │             │             │
+    │               │              │              │              │            │             │             │
+    │               │  create      │              │  compare:    │            │             │             │
+    │               │  3 Pods      │              │  0 pods,     │            │             │             │
+    │               │◀─────────────┤──────────────┤  need 3      │            │             │             │
+    │               │  store Pods  │              │              │            │             │             │
+    │               ├─────────────▶│              │              │            │             │             │
+    │               │              │              │              │  watch:    │             │             │
+    │               │              │              │              │  3 unbound │             │             │
+    │               │              │              │              │  Pods      │             │             │
+    │               │              │              │              ├───────────▶│             │             │
+    │               │              │              │              │            │             │             │
+    │               │  update Pod  │              │              │  assign    │             │             │
+    │               │  .spec.      │              │              │  nodeName  │             │             │
+    │               │  nodeName    │              │              │  per Pod   │             │             │
+    │               │◀─────────────┤──────────────┤──────────────┤────────────┤             │             │
+    │               ├─────────────▶│              │              │            │             │             │
+    │               │              │              │              │            │  watch:     │             │
+    │               │              │              │              │            │  Pod bound  │             │
+    │               │              │              │              │            │  to my node │             │
+    │               │              │              │              │            ├────────────▶│             │
+    │               │              │              │              │            │             │             │
+    │               │              │              │              │            │  start      │             │
+    │               │              │              │              │            │  containers │             │
+    │               │              │              │              │            │  via CRI    │             │
+    │               │              │              │              │            │             │             │
+    │               │  update Pod  │              │              │            │  report     │             │
+    │               │  .status     │              │              │            │  status:    │             │
+    │               │  (Running)   │              │              │            │  Running,IP │             │
+    │               │◀─────────────┤──────────────┤──────────────┤────────────┤─────────────┤             │
+    │               ├─────────────▶│              │              │            │             │             │
+    │               │              │              │              │            │             │  watch:     │
+    │               │              │              │              │            │             │  Pod Ready  │
+    │               │              │              │              │            │             ├────────────▶│
+    │               │              │              │              │            │             │             │
+    │               │  update      │              │              │            │             │  add Pod IP │
+    │               │  Endpoints   │              │              │            │             │  to Service │
+    │               │◀─────────────┤──────────────┤──────────────┤────────────┤─────────────┤─────────────┤
+    │               ├─────────────▶│              │              │            │             │             │
+    │               │              │              │              │            │             │             │
+```
+
 Here's the same flow in words:
 
 1. The **API server** validates the Deployment and stores it in etcd.
@@ -125,7 +196,7 @@ This extensibility was a lesson from Borg, whose fixed API required modifying th
 - [Writing Controllers -- Official Kubernetes Sample Controller](https://github.com/kubernetes/sample-controller) -- A minimal but complete example of writing a custom controller using client-go, demonstrating informers, work queues, and the reconciliation loop.
 - [client-go Examples](https://github.com/kubernetes/client-go/tree/master/examples) -- Practical examples of interacting with the Kubernetes API from Go: creating resources, setting up watches, using dynamic clients, and leader election.
 - [Michael Hausenblas & Stefan Schimanski -- "Programming Kubernetes" (O'Reilly)](https://www.oreilly.com/library/view/programming-kubernetes/9781492047094/) -- The most comprehensive book on the Kubernetes API machinery, custom resources, and controller development patterns.
-- [Stefan Schimanski -- "Kubernetes API Deepdive" (KubeCon 2019)](https://www.youtube.com/watch?v=U50Xa1eFzAo) -- A talk covering API request lifecycle, content negotiation, API discovery, and the watch protocol in depth.
+- [Stefan Schimanski & Antoine Pelisse -- "Deep Dive Into API Machinery" (KubeCon 2019)](https://www.youtube.com/watch?v=qTm-g3vtVOE) --- Detailed walkthrough of API versioning, conversion webhooks, and the request lifecycle.
 - [Kubernetes Documentation -- Custom Resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) -- Official docs on CRDs, structural schemas, validation, versioning, and conversion webhooks for extending the API.
 
 ---

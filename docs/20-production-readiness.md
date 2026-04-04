@@ -458,10 +458,10 @@ Before declaring a cluster production-ready, verify:
 - [Velero documentation](https://velero.io/docs/) --- Backup and restore for Kubernetes
 - [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) --- Official PSS reference
 - [Trivy](https://aquasecurity.github.io/trivy/) --- Container image vulnerability scanner
-- [Kubecost](https://www.kubecost.com/) --- Kubernetes cost monitoring and optimization
+- [OpenCost](https://www.opencost.io/) --- CNCF project for Kubernetes cost monitoring and optimization
 - [Chaos Mesh](https://chaos-mesh.org/) --- CNCF chaos engineering for Kubernetes
 - [CNCF Slack](https://slack.cncf.io/) --- Community channels for Kubernetes operations
-- [KubeCon talks playlist](https://www.youtube.com/@caborhood/playlists) --- Real-world production Kubernetes talks
+- [KubeCon talks playlist](https://www.youtube.com/@cncf/playlists) --- Real-world production Kubernetes talks
 - [EKS Best Practices Guide](https://aws.github.io/aws-eks-best-practices/) --- Production checklist specific to EKS
 - [GKE hardening guide](https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your-cluster) --- Security best practices for GKE
 

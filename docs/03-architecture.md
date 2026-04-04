@@ -193,10 +193,10 @@ Kube-proxy watches the API server for Service and Endpoint changes and updates t
 - [Kubernetes Official Documentation -- Cluster Architecture](https://kubernetes.io/docs/concepts/architecture/) -- The authoritative reference for how control plane and node components fit together, including component-level diagrams.
 - [etcd Documentation](https://etcd.io/docs/) -- Documentation for the distributed key-value store at the heart of Kubernetes' state management, covering Raft consensus, watch mechanics, and operational best practices.
 - [Kelsey Hightower -- Kubernetes The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way) -- A tutorial that walks through bootstrapping a Kubernetes cluster from scratch, component by component, providing deep understanding of how each piece interacts.
-- [Joe Beda -- "Kubernetes API Server Deep Dive" (KubeCon 2018)](https://www.youtube.com/watch?v=09BVc8pxnM4) -- A detailed walkthrough of the API server's internal pipeline: authentication, authorization, admission control, validation, and storage.
-- [Daniel Smith -- "The Kubernetes API Server: Scalability and Performance" (KubeCon 2019)](https://www.youtube.com/watch?v=Zn-58U1MnSk) -- How the API server handles watch streams, caching, and request routing at scale.
+- [Joe Beda -- "The Road to More Usable Kubernetes" (KubeCon 2017)](https://www.youtube.com/watch?v=QQsq2Ny5a4A) --- Co-founder of Kubernetes discusses the design decisions and usability goals behind the system.
+- [Daniel Smith -- "The Kubernetes Control Plane for Busy People Who Like Pictures" (KubeCon EU 2019)](https://www.youtube.com/watch?v=zCXiXKMqnuE) --- Accessible visual walkthrough of how the control plane components interact.
 - [Kubernetes Documentation -- Scheduler Performance Tuning](https://kubernetes.io/docs/concepts/scheduling-eviction/scheduler-perf-tuning/) -- Details on the scheduler's filtering and scoring phases, extension points, and how to tune scheduling behavior.
-- [Lucas Kaldstrom -- "A Deep Dive into Kubernetes Controllers" (KubeCon 2017)](https://www.youtube.com/watch?v=dP_wPGQJn6M) -- An in-depth look at the controller pattern, informers, work queues, and how controllers interact with the API server.
+- [Daniel Smith -- "A Vision For API Machinery" (KubeCon 2018)](https://www.youtube.com/watch?v=u6weI_3WVTM) --- Google engineer on the architecture and future direction of the Kubernetes API server.
 
 ---
 

@@ -52,7 +52,7 @@ This is why Kubernetes controllers are built around Informers that maintain a ca
 - [Kubernetes Design Proposals Archive](https://github.com/kubernetes/design-proposals-archive) -- Historical archive of early Kubernetes design documents that shaped the API, controllers, and extensibility model before the KEP process was established.
 - [James Urquhart, "Flow Architectures" (O'Reilly, 2021)](https://www.oreilly.com/library/view/flow-architectures/9781492075882/) -- Explores event-driven and declarative flow-based systems, providing broader context for why Kubernetes' reconciliation-based approach is part of a larger trend in distributed system design.
 - [Kubernetes API Conventions](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md) -- The official guide to Kubernetes API design: spec vs. status, metadata conventions, and the principles that make the API consistent and extensible.
-- [The Kubernetes Resource Model (Brian Grant, KubeCon)](https://www.youtube.com/watch?v=o1EvMfLHAVE) -- Talk by one of Kubernetes' principal architects explaining the declarative resource model and why it was designed the way it was.
+- [Brian Grant -- "What is Kubernetes?" (KubeCon 2017)](https://www.youtube.com/watch?v=cHkXOeP8rQ0) --- Principal Engineer at Google on Kubernetes' design philosophy, resource model, and architectural principles.
 
 ---
 

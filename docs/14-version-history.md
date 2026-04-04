@@ -180,7 +180,7 @@ The version history also reveals the disciplined API lifecycle that makes Kubern
 - [Kubernetes Enhancement Proposals (KEP) process](https://github.com/kubernetes/enhancements/blob/master/keps/README.md) -- How new features go from idea to implementation. Understanding KEPs explains why features take multiple releases to mature and how the community coordinates large changes.
 - [SIG Release](https://github.com/kubernetes/sig-release) -- The Special Interest Group responsible for the release process, cadence, and tooling. The README and meeting notes provide insight into how the three-releases-per-year cadence is managed.
 - [Kubernetes CHANGELOG on GitHub](https://github.com/kubernetes/kubernetes/tree/master/CHANGELOG) -- The raw changelogs for every release, useful for detailed investigation of specific changes, bug fixes, and API modifications.
-- ["Kubernetes Release Cadence: Why We Ship Three Times a Year" (Kubernetes blog)](https://kubernetes.io/blog/2020/12/18/kubernetes-release-cadence/) -- Explains the reasoning behind the release schedule and how it balances stability with velocity.
+- ["Kubernetes Release Cadence Change: Here's What You Need To Know" (Kubernetes blog)](https://kubernetes.io/blog/2021/07/20/new-kubernetes-release-cadence/) -- Explains the move from four to three releases per year and how the new cadence balances stability with velocity.
 - [API Version Lifecycle documentation](https://kubernetes.io/docs/reference/using-api/#api-versioning) -- Official reference for understanding alpha, beta, and GA API stages, which directly maps to the feature maturation pattern described in this chapter.
 
 ---

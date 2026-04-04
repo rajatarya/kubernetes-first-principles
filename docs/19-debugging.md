@@ -327,7 +327,7 @@ Events are the system's audit trail. When something goes wrong, the event stream
 - [Pod lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/) --- Pod phases, conditions, and container states
 - [nicolaka/netshoot](https://github.com/nicolaka/netshoot) --- Docker image with network debugging tools for ephemeral containers
 - [KillerCoda debugging scenarios](https://killercoda.com/kubernetes) --- Interactive browser-based troubleshooting labs
-- [Learnk8s troubleshooting flowchart](https://learnk8s.io/troubleshooting-deployments) --- Visual flowchart for debugging Deployments
+- [Learnk8s troubleshooting flowchart](https://learnkube.com/troubleshooting-deployments) --- Visual flowchart for debugging Deployments
 - [CNCF Slack #kubernetes-users](https://slack.cncf.io/) --- Community support for Kubernetes debugging
 - [Kubernetes Debugging Exercises](https://github.com/bregman-arie/devops-exercises#kubernetes) --- Practice debugging common Kubernetes issues
 
