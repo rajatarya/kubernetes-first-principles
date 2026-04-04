@@ -169,6 +169,16 @@ Reading the version history as a narrative rather than a changelog reveals a cle
 
 The version history also reveals the disciplined API lifecycle that makes Kubernetes trustworthy as a platform. Features progress through alpha (disabled by default, may change or be removed), beta (enabled by default, API may change), and GA (stable, backward compatible, will not be removed). This lifecycle gives users clear signals about what is safe to depend on and gives the community space to iterate on APIs before committing to them permanently.
 
+## Further Reading
+
+- [Kubernetes Release Notes (official)](https://kubernetes.io/releases/) -- The canonical list of all Kubernetes releases with links to changelogs, release notes, and upgrade guides. Start here to understand what changed in any specific version.
+- [Kubernetes Deprecation Policy](https://kubernetes.io/docs/reference/using-api/deprecation-policy/) -- The formal rules governing how APIs and features are deprecated and removed, including the minimum version guarantees for GA, beta, and alpha APIs.
+- [Kubernetes Enhancement Proposals (KEP) process](https://github.com/kubernetes/enhancements/blob/master/keps/README.md) -- How new features go from idea to implementation. Understanding KEPs explains why features take multiple releases to mature and how the community coordinates large changes.
+- [SIG Release](https://github.com/kubernetes/sig-release) -- The Special Interest Group responsible for the release process, cadence, and tooling. The README and meeting notes provide insight into how the three-releases-per-year cadence is managed.
+- [Kubernetes CHANGELOG on GitHub](https://github.com/kubernetes/kubernetes/tree/master/CHANGELOG) -- The raw changelogs for every release, useful for detailed investigation of specific changes, bug fixes, and API modifications.
+- ["Kubernetes Release Cadence: Why We Ship Three Times a Year" (Kubernetes blog)](https://kubernetes.io/blog/2020/12/18/kubernetes-release-cadence/) -- Explains the reasoning behind the release schedule and how it balances stability with velocity.
+- [API Version Lifecycle documentation](https://kubernetes.io/docs/reference/using-api/#api-versioning) -- Official reference for understanding alpha, beta, and GA API stages, which directly maps to the feature maturation pattern described in this chapter.
+
 ---
 
 *This concludes Part 2: The Tooling Ecosystem. You now understand how the tools around Kubernetes evolved and why they look the way they do today. Part 3 takes all of this context and puts it into practice --- setting up real clusters, deploying real workloads, and learning to debug when things go wrong.*

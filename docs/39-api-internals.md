@@ -240,6 +240,16 @@ Understanding the API internals changes how you build on Kubernetes:
 
 **Authentication is pluggable.** The API server does not care how you prove your identity --- it supports client certificates, OIDC tokens, webhook-based token review, and service account tokens. This flexibility is what enables integration with every corporate identity provider.
 
+## Further Reading
+
+- [Dynamic Admission Control](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) --- the official Kubernetes documentation on mutating and validating admission webhooks, including configuration, failure policies, and reinvocation.
+- [Webhook Configuration Reference](https://kubernetes.io/docs/reference/access-authn-authz/webhook/) --- details on configuring webhook authentication and authorization backends, including token review and subject access review webhooks.
+- [API Aggregation Layer](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/apiserver-aggregation/) --- how to extend the Kubernetes API with your own API server registered via APIService objects, including when to use aggregation versus CRDs.
+- [Versions in CustomResourceDefinitions](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definition-versioning/) --- how CRD versioning works, including storage versions, conversion webhooks, and strategies for evolving your API without breaking clients.
+- [Extending the Kubernetes API](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/) --- an overview comparing CRDs and aggregated API servers, covering the tradeoffs and use cases for each extension mechanism.
+- [The Life of a Kubernetes API Request](https://www.youtube.com/watch?v=ryeINNfVOi8) --- a KubeCon talk that traces a request through authentication, authorization, admission, validation, and storage, visualizing the full request pipeline.
+- [API Priority and Fairness](https://kubernetes.io/docs/concepts/cluster-administration/flow-control/) --- the official documentation on APF, covering FlowSchemas, PriorityLevelConfigurations, and how the API server prevents any single client from starving others.
+
 ---
 
 **Next:** [etcd Operations](40-etcd-ops.md) --- the database that stores everything, and how to keep it healthy.

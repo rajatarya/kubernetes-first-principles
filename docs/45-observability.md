@@ -276,6 +276,17 @@ Observability infrastructure is itself a system that can fail. Monitor:
 
 An observability system that silently drops data during the incident you need to debug is worse than no observability at all, because it gives you confidence that is not warranted.
 
+## Further Reading
+
+- [Prometheus Documentation](https://prometheus.io/docs/) --- the CNCF graduated project for metrics collection and alerting, covering PromQL, service discovery, recording rules, and alerting configuration.
+- [OpenTelemetry Documentation](https://opentelemetry.io/docs/) --- the CNCF observability framework unifying traces, metrics, and logs with auto-instrumentation, SDKs, and the Collector pipeline.
+- [OpenTelemetry Collector Documentation](https://opentelemetry.io/docs/collector/) --- detailed reference for configuring receivers, processors, exporters, and connectors in the OTel Collector, including the Target Allocator for Prometheus scraping.
+- [Grafana Documentation](https://grafana.com/docs/grafana/latest/) --- the visualization platform for building dashboards across Prometheus, Loki, Tempo, and other data sources.
+- [Grafana Loki Documentation](https://grafana.com/docs/loki/latest/) --- the log aggregation system designed for cost-effective storage with label-based indexing rather than full-text indexing.
+- [Jaeger Documentation](https://www.jaegertracing.io/docs/) --- the CNCF graduated distributed tracing platform for monitoring and troubleshooting microservice architectures.
+- [kube-prometheus-stack (GitHub)](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) --- the Helm chart bundling Prometheus Operator, Grafana, Alertmanager, node-exporter, and pre-built Kubernetes dashboards and recording rules.
+- [Kubernetes SIG Instrumentation](https://github.com/kubernetes/community/tree/master/sig-instrumentation) --- the upstream SIG responsible for Kubernetes metrics, structured logging, tracing standards, and the metrics stability framework.
+
 ---
 
 **Back to:** [Table of Contents (README.md)](README.md)

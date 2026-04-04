@@ -85,6 +85,16 @@ The result is that Kubernetes is not a platform; it is a **platform for building
 
 This composability is both Kubernetes' greatest strength and its greatest source of complexity. The bare Kubernetes API is relatively simple; the ecosystem built on top of it is vast and sometimes overwhelming. Understanding that this is by design --- that Kubernetes provides the kernel, not the full operating system --- is essential to understanding the Kubernetes landscape.
 
+## Further Reading
+
+- [CNCF Landscape](https://landscape.cncf.io/) -- Interactive map of the entire cloud-native ecosystem, categorized by function (orchestration, observability, service mesh, etc.), with funding and maturity data.
+- [CNCF Project Maturity Levels](https://www.cncf.io/projects/) -- Explanation of the Sandbox, Incubating, and Graduated tiers, along with a full list of CNCF projects and their current status.
+- [Introducing Operators (CoreOS, 2016)](https://web.archive.org/web/2023/https://coreos.com/blog/introducing-operators.html) -- The original blog post by Brandon Philips that introduced the Operator pattern, explaining why encoding operational knowledge in code is a natural extension of Kubernetes controllers.
+- [CNCF Annual Survey Results](https://www.cncf.io/reports/) -- Yearly survey data on Kubernetes adoption rates, ecosystem tool usage, and deployment patterns across organizations worldwide.
+- [KubeCon + CloudNativeCon Talk Recordings](https://www.youtube.com/c/CloudNativeComputingFoundation/playlists) -- Full archives of KubeCon presentations covering operators, Helm, service meshes, and every other corner of the ecosystem.
+- [Helm Documentation](https://helm.sh/docs/) -- Official docs for the most widely used Kubernetes package manager, covering chart authoring, templating, release management, and repository hosting.
+- [Istio vs. Linkerd vs. Cilium Service Mesh Comparison](https://www.cncf.io/blog/2023/06/14/service-mesh-comparison/) -- CNCF blog post comparing the major service mesh implementations, their architectures, performance characteristics, and ideal use cases.
+
 ---
 
 Next: [Key Design Principles](07-design-principles.md)

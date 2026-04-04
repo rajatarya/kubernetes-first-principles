@@ -108,6 +108,16 @@ CRDs are Kubernetes' answer to the extensibility problem: how do you allow the p
 
 This extensibility was a lesson from Borg. Borg's API was fixed and could only manage the resource types that Google's Borg team had implemented. Adding support for a new workload type required modifying Borg itself. Kubernetes' CRD mechanism democratizes this: anyone can extend the API without forking the project.
 
+## Further Reading
+
+- [Kubernetes API Conventions](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md) -- The definitive guide to how Kubernetes API resources are structured, including naming, versioning, spec/status separation, and metadata conventions.
+- [Kubernetes API Machinery (apimachinery)](https://github.com/kubernetes/apimachinery) -- The Go library underpinning the Kubernetes API: Group-Version-Resource (GVR), Group-Version-Kind (GVK), runtime.Object, scheme registration, and serialization.
+- [Writing Controllers -- Official Kubernetes Sample Controller](https://github.com/kubernetes/sample-controller) -- A minimal but complete example of writing a custom controller using client-go, demonstrating informers, work queues, and the reconciliation loop.
+- [client-go Examples](https://github.com/kubernetes/client-go/tree/master/examples) -- Practical examples of interacting with the Kubernetes API from Go: creating resources, setting up watches, using dynamic clients, and leader election.
+- [Michael Hausenblas & Stefan Schimanski -- "Programming Kubernetes" (O'Reilly)](https://www.oreilly.com/library/view/programming-kubernetes/9781492047094/) -- The most comprehensive book on the Kubernetes API machinery, custom resources, and controller development patterns.
+- [Stefan Schimanski -- "Kubernetes API Deepdive" (KubeCon 2019)](https://www.youtube.com/watch?v=U50Xa1eFzAo) -- A talk covering API request lifecycle, content negotiation, API discovery, and the watch protocol in depth.
+- [Kubernetes Documentation -- Custom Resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) -- Official docs on CRDs, structural schemas, validation, versioning, and conversion webhooks for extending the API.
+
 ---
 
 Next: [The Networking Model](05-networking.md)

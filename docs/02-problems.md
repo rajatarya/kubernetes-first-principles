@@ -75,6 +75,16 @@ This is not merely a philosophical preference. The imperative model breaks down 
 | Scalability | Requires operator attention proportional to scale | Controller workload scales, but operator intent stays constant |
 | Composition | Commands must be carefully ordered | Controllers reconcile independently and concurrently |
 
+## Further Reading
+
+- [The Twelve-Factor App](https://12factor.net/) -- Adam Wiggins' methodology for building software-as-a-service applications. Kubernetes' design embodies many of these factors, particularly port binding, concurrency via process model, disposability, and dev/prod parity.
+- [Martin Fowler -- Microservices: a definition of this new architectural term](https://martinfowler.com/articles/microservices.html) -- The canonical articulation of the microservices architecture pattern and the operational challenges (deployment, monitoring, failure handling) that Kubernetes was designed to solve.
+- [Netflix TechBlog -- Chaos Engineering](https://netflixtechblog.com/tagged/chaos-engineering) -- Netflix's pioneering work on deliberately injecting failures to test system resilience, directly motivating the self-healing and fault-tolerance properties Kubernetes provides.
+- [Google SRE Book -- Chapter 7: The Evolution of Automation at Google](https://sre.google/sre-book/automation-at-google/) -- How Google evolved from manual operations to fully autonomous systems, providing context for why Kubernetes automates deployment, scaling, and recovery.
+- [Kelsey Hightower -- "Kubernetes for Sysadmins" (PuppetConf 2016)](https://www.youtube.com/watch?v=HlAXp0-M6SY) -- A practical demonstration of the problems Kubernetes solves for operations teams, from a leading practitioner.
+- [Google SRE Book -- Chapter 24: Distributed Periodic Scheduling with Cron](https://sre.google/sre-book/distributed-periodic-scheduling/) -- How distributed scheduling of workloads works in practice at scale, illustrating the bin packing and scheduling challenges Kubernetes addresses.
+- [James Lewis & Martin Fowler -- Microservices Trade-Offs](https://martinfowler.com/articles/microservice-trade-offs.html) -- A balanced look at the costs and benefits of microservices, helping contextualize which problems Kubernetes genuinely solves versus which it shifts.
+
 ---
 
 Next: [Architecture from First Principles](03-architecture.md)

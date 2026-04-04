@@ -239,6 +239,16 @@ After a restore, the cluster will be in the state captured by the snapshot. Any 
 
 If only one member has failed (and quorum is maintained), do not restore from a snapshot. Instead, remove the failed member, provision a new one, and add it to the cluster. The Raft protocol will replicate the current state to the new member automatically.
 
+## Further Reading
+
+- [etcd Documentation](https://etcd.io/docs/latest/) --- the official etcd docs covering installation, configuration, clustering, authentication, and the client API.
+- [etcd Performance](https://etcd.io/docs/latest/op-guide/performance/) --- benchmarking methodology and tuning guidance for etcd, including disk I/O recommendations, network latency requirements, and how to interpret benchmark results.
+- [etcd Disaster Recovery](https://etcd.io/docs/latest/op-guide/recovery/) --- step-by-step procedures for recovering an etcd cluster from snapshot backups, including single-member and multi-member restore workflows.
+- [etcd FAQ](https://etcd.io/docs/latest/faq/) --- answers to common operational questions about etcd, including cluster sizing, data size limits, request size limits, and performance expectations.
+- [Operating etcd Clusters for Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/) --- the Kubernetes-specific guide for setting up, backing up, and upgrading etcd, including TLS configuration and snapshot best practices.
+- [etcd-operator (archived)](https://github.com/coreos/etcd-operator) --- the original CoreOS operator for managing etcd clusters on Kubernetes, now archived but valuable as a reference for understanding automated etcd lifecycle management.
+- [Auger](https://github.com/etcd-io/auger) --- a tool for directly decoding and inspecting Kubernetes objects stored in etcd, useful for debugging and understanding how the API server serializes resources.
+
 ---
 
 **Next:** [GPU Workloads and AI/ML on Kubernetes](41-gpu-ml.md) --- how GPUs are exposed to the scheduler, shared between workloads, and orchestrated for distributed training.

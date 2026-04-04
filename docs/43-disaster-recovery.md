@@ -238,6 +238,16 @@ A complete disaster recovery strategy for Kubernetes looks like this:
 
 The cost of this infrastructure is a fraction of the cost of an unrecoverable outage. The investment is not in the tools --- Velero is open source, etcd snapshots are built in --- but in the discipline of testing and maintaining the procedures.
 
+## Further Reading
+
+- [Velero Documentation](https://velero.io/docs/) --- the open-source tool for backing up and restoring Kubernetes cluster resources and persistent volumes, including scheduled backups, storage provider plugins, and restore workflows.
+- [Kubernetes Documentation: Operating etcd Clusters](https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/) --- the official guide covering etcd backup and restore procedures, snapshot management, and cluster upgrade strategies.
+- [Kubernetes Documentation: Backing Up an etcd Cluster](https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster) --- step-by-step instructions for taking etcd snapshots with etcdctl and restoring from them.
+- [CNCF: Kubernetes Backup and Disaster Recovery Best Practices](https://www.cncf.io/blog/2023/11/01/kubernetes-backup-and-disaster-recovery-best-practices/) --- CNCF guidance on building a comprehensive backup strategy including RTO/RPO planning, multi-cluster considerations, and testing procedures.
+- [AWS EKS Best Practices: Disaster Recovery](https://aws.github.io/aws-eks-best-practices/reliability/docs/application/) --- AWS-specific patterns for multi-region EKS deployments, cross-region replication, and failover automation.
+- [Google Cloud: Disaster Recovery Planning Guide](https://cloud.google.com/architecture/dr-scenarios-planning-guide) --- Google's framework for DR planning including cold, warm, and hot standby patterns applicable to GKE and hybrid deployments.
+- [Kubernetes SIG Cluster Lifecycle](https://github.com/kubernetes/community/tree/master/sig-cluster-lifecycle) --- the upstream SIG responsible for cluster provisioning, upgrades, and lifecycle tooling that underpins recovery automation.
+
 ---
 
 **Next:** [Cost Optimization](44-cost-optimization.md) --- making sure all this infrastructure is not more expensive than it needs to be.

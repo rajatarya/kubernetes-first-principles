@@ -132,6 +132,16 @@ Network Policies are implemented by the CNI plugin (not all plugins support them
 | Pod-to-Service (service discovery) | Service abstraction with ClusterIP | kube-proxy/CNI programs iptables/IPVS rules for load balancing |
 | External-to-Service | NodePort, LoadBalancer, Ingress | Expose services externally via port mapping, cloud LB, or L7 routing |
 
+## Further Reading
+
+- [Kubernetes Networking Model](https://kubernetes.io/docs/concepts/cluster-administration/networking/) -- Official documentation explaining the fundamental requirement that every pod gets a unique IP and can communicate with every other pod without NAT.
+- [CNI Specification](https://www.cni.dev/docs/spec/) -- The Container Network Interface spec that defines how network plugins integrate with container runtimes; essential for understanding how Calico, Cilium, Flannel, and others plug in.
+- [Life of a Packet in Kubernetes (KubeCon talk by Ricardo Katz)](https://www.youtube.com/watch?v=0Omvgd7Hg1I) -- KubeCon presentation tracing a network packet from a client through Services, kube-proxy, and CNI to a destination pod.
+- [CoreDNS Documentation](https://coredns.io/manual/toc/) -- Reference for the default DNS server in Kubernetes, covering service discovery, custom DNS entries, and plugin-based extensibility.
+- [iptables vs. IPVS for kube-proxy](https://www.tigera.io/blog/comparing-kube-proxy-modes-iptables-or-ipvs/) -- Tigera blog post comparing the two kube-proxy modes, including performance benchmarks and guidance on when to switch to IPVS.
+- [Kubernetes Networking Deep Dive (KubeCon talk by Laurent Bernaille & Bowei Du)](https://www.youtube.com/watch?v=tq9ng_Nz9j8) -- In-depth walkthrough of how pod networking, Services, and DNS work together under the hood.
+- [Gateway API Documentation](https://gateway-api.sigs.k8s.io/) -- The next-generation Kubernetes API for L7 routing, replacing Ingress with a more expressive and role-oriented model.
+
 ---
 
 Next: [The Ecosystem](06-ecosystem.md)

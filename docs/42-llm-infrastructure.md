@@ -445,6 +445,17 @@ Use vLLM directly when you need full control over serving configuration, run non
 
 For HuggingFace infrastructure specifically, the typical pattern is: vLLM for the Inference API (maximum model coverage, rapid updates) and NIM for dedicated enterprise deployments where a fixed set of models must run at peak performance.
 
+## Further Reading
+
+- [vLLM Documentation and GitHub](https://github.com/vllm-project/vllm) --- the open-source inference engine covering PagedAttention, continuous batching, tensor parallelism, and supported model architectures.
+- [KServe Documentation](https://kserve.github.io/kserve/) --- the Kubernetes-native model inference platform, including its InferenceService CRD, model mesh, and autoscaling configuration.
+- [llm-d GitHub Repository](https://github.com/llm-d/llm-d) --- the Kubernetes-native LLM serving stack with disaggregated prefill/decode, KV-cache-aware routing, and LoRA adapter management.
+- [LeaderWorkerSet Documentation](https://github.com/kubernetes-sigs/lws) --- the Kubernetes SIG-Apps project for deploying multi-node inference workloads where one leader coordinates multiple workers for tensor and pipeline parallelism.
+- [NVIDIA Triton Inference Server Documentation](https://docs.nvidia.com/triton-inference-server/) --- NVIDIA's production inference server covering model ensembles, dynamic batching, and multi-framework support.
+- [Text Generation Inference (TGI) by Hugging Face](https://huggingface.co/docs/text-generation-inference/) --- Hugging Face's optimized inference server with flash attention, quantization, watermarking, and grammar-constrained generation.
+- [Efficient Memory Management for Large Language Model Serving with PagedAttention (paper)](https://arxiv.org/abs/2309.06180) --- the foundational paper on PagedAttention that enables vLLM's near-optimal KV cache memory management.
+- [Anyscale: How Continuous Batching Enables 23x Throughput](https://www.anyscale.com/blog/continuous-batching-llm-inference) --- a practical explanation of why continuous (iteration-level) batching dramatically outperforms static batching for LLM serving.
+
 ---
 
 **Next:** [Disaster Recovery](43-disaster-recovery.md) --- cluster backup, etcd snapshots, multi-region strategies, and the procedures you test before you need them.

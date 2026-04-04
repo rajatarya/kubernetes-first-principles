@@ -94,6 +94,16 @@ Kubernetes was donated to the newly formed Cloud Native Computing Foundation (CN
 
 > **The Borg Lineage**: Kubernetes (Greek: helmsman) was originally codenamed "Project Seven" --- a reference to Seven of Nine from Star Trek, a Borg who became an individual. The name is a deliberate allusion to Kubernetes' origins in Google's Borg system, while signaling that it had been liberated from Google's proprietary infrastructure to become something independent.
 
+## Further Reading
+
+- [Large-scale cluster management at Google with Borg](https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/) -- The original 2015 Borg paper from EuroSys, detailing how Google manages billions of containers across its fleet.
+- [Omega: flexible, scalable schedulers for large compute clusters](https://research.google/pubs/omega-flexible-scalable-schedulers-for-large-compute-clusters/) -- The 2013 Omega paper introducing shared-state scheduling with optimistic concurrency control.
+- [Borg, Omega, and Kubernetes: Lessons learned from three container-management systems over a decade](https://queue.acm.org/detail.cfm?id=2898444) -- A 2016 ACM Queue retrospective by Burns, Grant, Oppenheimer, Brewer, and Wilkes tracing the lineage from Borg through Omega to Kubernetes.
+- [Kubernetes first commit on GitHub (June 2014)](https://github.com/kubernetes/kubernetes/commit/2c4b3a562ce34cddc3f8218a2c4d11c7310e6d56) -- The initial commit that started the open-source project, useful for understanding the original scope and design intent.
+- [Brendan Burns -- "Kubernetes: The Path to Cloud Native" (GOTO 2018)](https://www.youtube.com/watch?v=_vHTaIJm9uY) -- A talk by one of Kubernetes' co-founders on the design philosophy and lessons from Google's internal systems.
+- [Google: Borg -- The Predecessor to Kubernetes (Google Cloud Blog)](https://cloud.google.com/blog/products/containers-kubernetes/from-google-to-the-world-the-kubernetes-origin-story) -- Google's own account of how internal cluster management evolved into a public project.
+- [Solomon Hykes announces Docker (PyCon 2013 lightning talk)](https://www.youtube.com/watch?v=wW9CAH9nSLs) -- The five-minute lightning talk that introduced Docker to the world and catalyzed the container ecosystem that Kubernetes was built to orchestrate.
+
 ---
 
 Next: [The Problems Kubernetes Solves](02-problems.md)

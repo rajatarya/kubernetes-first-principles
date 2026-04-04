@@ -208,6 +208,16 @@ Tools and automation are necessary but not sufficient. Cost optimization sticks 
 
 The goal is not to minimize cost --- it is to maximize the value per dollar. A service that costs $50,000/month and handles 10 million requests is not expensive. A service that costs $500/month and handles zero requests is infinitely expensive.
 
+## Further Reading
+
+- [Kubecost Documentation](https://docs.kubecost.com/) --- real-time Kubernetes cost monitoring with allocation by namespace, label, and deployment, plus recommendations for right-sizing and savings.
+- [OpenCost Project](https://www.opencost.io/) --- the CNCF sandbox project for Kubernetes cost monitoring, providing a vendor-neutral open-source specification and implementation for cost allocation.
+- [FinOps Foundation](https://www.finops.org/) --- the industry body defining FinOps practices, frameworks, and maturity models for managing cloud costs across engineering and finance teams.
+- [AWS: Best Practices for EC2 Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-best-practices.html) --- AWS guidance on diversifying instance types, handling interruptions, and using Spot with EKS node groups and Karpenter.
+- [GKE Cost Optimization Guide](https://cloud.google.com/kubernetes-engine/docs/best-practices/cost-optimization) --- Google's recommendations for GKE right-sizing, cluster autoscaling, committed use discounts, and Spot VMs.
+- [Kubernetes Documentation: Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) --- the official reference for requests, limits, QoS classes, and LimitRanges that form the foundation of cost control.
+- [Goldilocks by Fairwind](https://github.com/FairwindsOps/goldilocks) --- an open-source tool that runs VPA in recommendation mode and presents a dashboard of right-sizing suggestions per workload.
+
 ---
 
 **Next:** [Observability with OpenTelemetry](45-observability.md) --- making sure you can see what is happening inside all these workloads.

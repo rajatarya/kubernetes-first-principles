@@ -324,6 +324,16 @@ Building an operator is not difficult. Building a *good* operator requires disci
 
 6. **Think about failure modes.** What happens when the API server is unreachable? When a child resource is stuck terminating? When two operators fight over the same resource? The answers should be in your code, not in a runbook.
 
+## Further Reading
+
+- [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) --- the official Kubernetes documentation explaining the operator concept, when to use one, and how operators extend the API.
+- [Operator SDK documentation](https://sdk.operatorframework.io/docs/) --- the full guide for building operators with the Operator SDK, covering Go, Ansible, and Helm-based operators.
+- [The Kubebuilder Book](https://book.kubebuilder.io/) --- a comprehensive tutorial that walks through building a controller from scratch using kubebuilder, including CRD design, webhook configuration, and testing.
+- [OperatorHub.io](https://operatorhub.io/) --- a catalog of community and vendor operators you can install in your cluster, useful for understanding what problems operators solve in practice.
+- [Introducing Operators](https://web.archive.org/web/2024/https://coreos.com/blog/introducing-operators.html) --- the original CoreOS blog post by Brandon Philips that coined the term "operator" and explained the motivation behind encoding operations knowledge in software.
+- [controller-runtime documentation](https://pkg.go.dev/sigs.k8s.io/controller-runtime) --- API reference for the Go library that underpins both kubebuilder and Operator SDK, covering the Manager, Controller, Reconciler, and client interfaces.
+- [Programming Kubernetes (O'Reilly)](https://www.oreilly.com/library/view/programming-kubernetes/9781492047094/) --- a book by Michael Hausenblas and Stefan Schimanski that covers the Kubernetes API machinery, custom resources, and operator development in depth.
+
 ---
 
 **Next:** [The Kubernetes API Internals](39-api-internals.md) --- how requests flow through admission, what aggregated API servers are, and how API priority and fairness protects the control plane.

@@ -379,6 +379,17 @@ The default Kubernetes scheduler spreads pods across nodes. For GPU workloads, *
 5. **Scale-to-zero** for inference endpoints with no traffic (via KServe or KEDA).
 6. **Preemption policies** to let high-priority training preempt low-priority batch jobs.
 
+## Further Reading
+
+- [NVIDIA GPU Operator Documentation](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html) --- the complete guide to deploying and managing the GPU Operator, which automates driver installation, container runtime configuration, device plugin deployment, and GPU monitoring.
+- [Device Plugins](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/) --- the official Kubernetes documentation on the device plugin framework, explaining how hardware vendors expose accelerators, FPGAs, and other devices to the kubelet.
+- [Dynamic Resource Allocation KEP](https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/4381-dra-structured-parameters) --- the Kubernetes Enhancement Proposal for DRA with structured parameters, replacing the opaque device plugin model with a richer, scheduler-integrated resource claim system.
+- [NVIDIA Multi-Instance GPU User Guide](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/) --- how to partition A100 and H100 GPUs into isolated MIG instances with dedicated compute, memory, and cache, including supported profiles and configuration procedures.
+- [Kubeflow Documentation](https://www.kubeflow.org/docs/) --- the full guide to the Kubeflow ML platform, covering pipelines, training operators (TFJob, PyTorchJob, MPIJob), model serving with KServe, and experiment tracking.
+- [KubeRay Documentation](https://docs.ray.io/en/latest/cluster/kubernetes/index.html) --- deploying and managing Ray clusters on Kubernetes for distributed training, hyperparameter tuning, and Ray Serve inference workloads.
+- [Volcano Scheduler](https://volcano.sh/en/docs/) --- documentation for the batch scheduling system designed for high-performance and ML workloads, supporting gang scheduling, fair-share queuing, and resource reservation.
+- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html) --- the low-level runtime that makes GPUs accessible inside containers, including installation, configuration, and CDI (Container Device Interface) support.
+
 ---
 
 **Next:** [Chapter 42: Running LLMs on Kubernetes](42-llm-infrastructure.md)

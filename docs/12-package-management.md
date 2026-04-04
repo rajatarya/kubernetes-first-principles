@@ -185,6 +185,16 @@ The significance of GitOps is not the specific tools --- it is the operational m
 
 GitOps is the logical endpoint of the declarative, desired-state model that runs through all of Kubernetes' design. Kubernetes says "declare the desired state and let controllers reconcile." GitOps says "store the desired state in Git and let a controller reconcile." It is the same pattern, applied at a higher level of abstraction.
 
+## Further Reading
+
+- [Helm documentation](https://helm.sh/docs/) -- Official reference for Helm, covering chart structure, templating, release management, and the Helm SDK. Start with the "Chart Developer Guide" for understanding how charts are built.
+- [Kustomize documentation](https://kubectl.docs.kubernetes.io/references/kustomize/) -- The template-free customization tool built into kubectl. The "Examples" section demonstrates the overlay pattern for managing environment-specific configurations.
+- [Helm Chart Best Practices Guide](https://helm.sh/docs/chart_best_practices/) -- Official guidelines for writing production-quality Helm charts, covering values design, template conventions, labels, and dependency management.
+- [Artifact Hub](https://artifacthub.io/) -- The CNCF's central repository for discovering Helm charts, OPA policies, and other Kubernetes packages. Browse to understand the breadth of the ecosystem and how charts are published and versioned.
+- ["Helm vs Kustomize: How to deploy your applications in 2024" (Kostis Kapelonis)](https://codefresh.io/blog/helm-vs-kustomize-guide/) -- A practical comparison of the two dominant approaches, covering when to use each and how to combine them.
+- [cdk8s documentation](https://cdk8s.io/docs/latest/) -- AWS's framework for defining Kubernetes manifests using general-purpose programming languages (TypeScript, Python, Go, Java). Represents the "code over YAML" approach to configuration.
+- ["Stop Using Helm" and the counterarguments](https://blog.container-solutions.com/stop-using-helm) -- A provocative critique of Helm's templating approach, useful for understanding the trade-offs that led to alternatives like Kustomize and cdk8s.
+
 ---
 
 **Next:** [Chapter 13: The Networking Stack Evolution](13-networking-evolution.md)

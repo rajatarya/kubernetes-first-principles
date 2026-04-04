@@ -178,6 +178,16 @@ Kube-proxy watches the API server for Service and Endpoint changes and updates t
 
 > **The Controller Pattern is Kubernetes.** If you understand only one thing about Kubernetes' architecture, understand the controller pattern: observe, diff, act, repeat. Every component --- from the scheduler to the kubelet to kube-proxy --- is a controller that watches for state changes and reconciles actual state toward desired state. This single pattern, applied recursively across the entire system, is what makes Kubernetes self-healing, scalable, and extensible.
 
+## Further Reading
+
+- [Kubernetes Official Documentation -- Cluster Architecture](https://kubernetes.io/docs/concepts/architecture/) -- The authoritative reference for how control plane and node components fit together, including component-level diagrams.
+- [etcd Documentation](https://etcd.io/docs/) -- Documentation for the distributed key-value store at the heart of Kubernetes' state management, covering Raft consensus, watch mechanics, and operational best practices.
+- [Kelsey Hightower -- Kubernetes The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way) -- A tutorial that walks through bootstrapping a Kubernetes cluster from scratch, component by component, providing deep understanding of how each piece interacts.
+- [Joe Beda -- "Kubernetes API Server Deep Dive" (KubeCon 2018)](https://www.youtube.com/watch?v=09BVc8pxnM4) -- A detailed walkthrough of the API server's internal pipeline: authentication, authorization, admission control, validation, and storage.
+- [Daniel Smith -- "The Kubernetes API Server: Scalability and Performance" (KubeCon 2019)](https://www.youtube.com/watch?v=Zn-58U1MnSk) -- How the API server handles watch streams, caching, and request routing at scale.
+- [Kubernetes Documentation -- Scheduler Performance Tuning](https://kubernetes.io/docs/concepts/scheduling-eviction/scheduler-perf-tuning/) -- Details on the scheduler's filtering and scoring phases, extension points, and how to tune scheduling behavior.
+- [Lucas Kaldstrom -- "A Deep Dive into Kubernetes Controllers" (KubeCon 2017)](https://www.youtube.com/watch?v=dP_wPGQJn6M) -- An in-depth look at the controller pattern, informers, work queues, and how controllers interact with the API server.
+
 ---
 
 Next: [The API Model](04-api-model.md)

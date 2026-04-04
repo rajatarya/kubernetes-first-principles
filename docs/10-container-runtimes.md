@@ -164,6 +164,16 @@ The Current Ecosystem (2024+)
 
 The container runtime wars are effectively over. The lesson they teach is a design lesson: **define clean interfaces early, and the ecosystem will sort itself out.** CRI turned the container runtime from a hardwired dependency into a pluggable component, and the result was a healthier ecosystem where runtimes could compete on merit without requiring changes to Kubernetes core. The removal of dockershim, despite the community anxiety it caused, was the natural conclusion of a process that began six years earlier with the introduction of CRI.
 
+## Further Reading
+
+- [Container Runtime Interface (CRI) specification](https://github.com/kubernetes/cri-api) -- The formal API definition that decoupled Kubernetes from any single container runtime, enabling the pluggable ecosystem described in this chapter.
+- [containerd documentation](https://containerd.io/docs/) -- Official docs for the dominant container runtime, covering architecture, configuration, and the plugin system that makes containerd extensible beyond Kubernetes.
+- [CRI-O documentation](https://cri-o.io/) -- The lightweight, Kubernetes-dedicated runtime used by OpenShift. Useful for understanding the "do one thing well" design philosophy contrasted with containerd's broader scope.
+- [KEP-2221: Dockershim Removal](https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/2221-remove-dockershim) -- The Kubernetes Enhancement Proposal that formalized the dockershim removal, including the rationale, migration plan, and community discussion.
+- ["Don't Panic: Kubernetes and Docker" (Kubernetes blog)](https://kubernetes.io/blog/2020/12/02/dont-panic-kubernetes-and-docker/) -- The official blog post that clarified the Docker deprecation, explaining why Docker images still work and what actually changed. Essential reading for understanding the community communication around this transition.
+- [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec) -- The standard that defines how a container runtime starts and manages containers at the lowest level. Understanding this spec clarifies the relationship between high-level runtimes (containerd, CRI-O) and low-level runtimes (runc).
+- [runc GitHub repository](https://github.com/opencontainers/runc) -- The reference implementation of the OCI runtime spec and the low-level runtime that actually creates containers for both containerd and CRI-O. Reading the README provides a clear picture of what happens at the bottom of the runtime stack.
+
 ---
 
 **Next:** [Chapter 11: Bootstrapping a Cluster --- From kube-up.sh to kubeadm](11-cluster-bootstrap.md)

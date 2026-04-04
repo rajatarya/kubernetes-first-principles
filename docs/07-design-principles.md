@@ -39,6 +39,15 @@ This is why Kubernetes controllers are built around Informers that maintain a ca
 
 > **Level-Triggered Design**: Kubernetes controllers react to the current state of the world ("there are 2 pods but 3 desired"), not to individual events ("a pod was deleted"). This makes them robust against missed events, disconnections, and restarts. If a controller misses an event, it will still observe the state discrepancy on its next reconciliation cycle and take corrective action.
 
+## Further Reading
+
+- [Level Triggering and Reconciliation in Kubernetes (Hackernoon)](https://hackernoon.com/level-triggering-and-reconciliation-in-kubernetes-1f17fe30333d) -- Essential article explaining why Kubernetes controllers are level-triggered rather than edge-triggered, and how this design choice makes the system resilient to missed events.
+- [Kubernetes Enhancement Proposals (KEPs)](https://github.com/kubernetes/enhancements/tree/master/keps) -- The formal process for proposing, discussing, and tracking significant changes to Kubernetes; reading KEPs is the best way to understand the reasoning behind design decisions.
+- [Kubernetes Design Proposals Archive](https://github.com/kubernetes/design-proposals-archive) -- Historical archive of early Kubernetes design documents that shaped the API, controllers, and extensibility model before the KEP process was established.
+- [James Urquhart, "Flow Architectures" (O'Reilly, 2021)](https://www.oreilly.com/library/view/flow-architectures/9781492075882/) -- Explores event-driven and declarative flow-based systems, providing broader context for why Kubernetes' reconciliation-based approach is part of a larger trend in distributed system design.
+- [Kubernetes API Conventions](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md) -- The official guide to Kubernetes API design: spec vs. status, metadata conventions, and the principles that make the API consistent and extensible.
+- [The Kubernetes Resource Model (Brian Grant, KubeCon)](https://www.youtube.com/watch?v=o1EvMfLHAVE) -- Talk by one of Kubernetes' principal architects explaining the declarative resource model and why it was designed the way it was.
+
 ---
 
 Next: [Why Kubernetes Won](08-why-k8s-won.md)
