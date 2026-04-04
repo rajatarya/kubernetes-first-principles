@@ -1,6 +1,6 @@
 # Chapter 33: Resource Tuning Deep Dive
 
-Kubernetes resource management appears simple on the surface: set `requests` and `limits` for CPU and memory, and the scheduler handles the rest. Underneath, these values translate directly into Linux kernel mechanisms --- cgroup parameters that throttle CPU access and kill processes that exceed memory bounds. Getting these values wrong causes throttling on idle nodes, random OOM kills, and wasted capacity at scale. Understanding resource tuning from first principles requires understanding the kernel mechanisms themselves.
+CPU requests and limits translate directly into Linux cgroup parameters. Getting them wrong causes throttling on idle nodes, random OOM kills, and wasted capacity at scale. Understanding resource tuning from first principles requires understanding the kernel mechanisms themselves.
 
 ## CFS Quota Mechanics
 
@@ -154,10 +154,12 @@ On multi-socket servers, memory access times vary depending on which CPU socket 
 
 The **Topology Manager** is a kubelet component that coordinates resource allocation across CPU Manager, Memory Manager, and Device Manager to ensure aligned NUMA placement. It operates in four policies:
 
-- **none:** No topology alignment (default).
-- **best-effort:** Prefer aligned allocation but allow misalignment.
-- **restricted:** Require aligned allocation; reject pods that cannot be aligned.
-- **single-numa-node:** All resources must come from a single NUMA node.
+| Policy | Behavior |
+|---|---|
+| **none** | No topology alignment (default). |
+| **best-effort** | Prefer aligned allocation but allow misalignment. |
+| **restricted** | Require aligned allocation; reject pods that cannot be aligned. |
+| **single-numa-node** | All resources must come from a single NUMA node. |
 
 Topology Manager only affects Guaranteed QoS pods. Burstable and BestEffort pods always get the default behavior.
 

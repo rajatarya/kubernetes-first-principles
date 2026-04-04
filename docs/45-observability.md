@@ -1,16 +1,14 @@
 # Chapter 45: Observability with OpenTelemetry
 
-Running a Kubernetes cluster without observability is like driving at night with the headlights off. You know you are moving, but you cannot see what is ahead, you cannot explain what just happened, and when something goes wrong, your only diagnostic tool is hope.
-
 Observability is the ability to understand the internal state of a system by examining its external outputs. In a Kubernetes environment, those outputs are **metrics** (numerical measurements over time), **logs** (discrete events with context), and **traces** (the path of a request through multiple services). These are the three pillars, and OpenTelemetry is the open standard that unifies how they are collected, processed, and exported.
 
 ## The Three Pillars
 
-**Metrics** answer "what is happening right now and how does it compare to the past?" CPU utilization, request latency percentiles, error rates, queue depths. Metrics are cheap to store, fast to query, and excellent for dashboards and alerting. They are terrible for debugging specific requests.
-
-**Logs** answer "what happened in this specific component at this specific time?" A stack trace, a SQL query that failed, a configuration value that was loaded. Logs are rich in context but expensive to store and slow to search at scale. They are excellent for debugging but terrible for detecting trends.
-
-**Traces** answer "what was the path of this specific request through the system?" A user clicks checkout, which calls the cart service, which calls inventory, which calls the database. A trace captures the timing and outcome of each hop. Traces are essential for debugging latency in distributed systems and nearly useless for anything else.
+| Signal | Answers | Strength | Limitation |
+|---|---|---|---|
+| **Metrics** | What is happening right now and how does it compare to the past? (CPU utilization, request latency percentiles, error rates, queue depths) | Cheap to store, fast to query, excellent for dashboards and alerting | Terrible for debugging specific requests |
+| **Logs** | What happened in this specific component at this specific time? (stack traces, failed SQL queries, loaded configuration values) | Rich in context, excellent for debugging | Expensive to store and slow to search at scale; terrible for detecting trends |
+| **Traces** | What was the path of this specific request through the system? (timing and outcome of each hop across services) | Essential for debugging latency in distributed systems | Nearly useless for trend detection or component-level debugging |
 
 No single pillar is sufficient. Effective observability requires all three, correlated so you can move from a metric anomaly to the relevant traces to the specific log lines that explain the root cause.
 
@@ -82,7 +80,7 @@ OTEL COLLECTOR DEPLOYMENT PATTERNS
 
 **Gateway** centralizes collection into a single deployment. Use this as a second tier behind agents (agent → gateway → backend) for cross-cutting processing like tail sampling, enrichment, or routing to multiple backends. Do not use a gateway as the sole collector tier --- it creates a single point of failure.
 
-The production pattern most teams arrive at is **Agent + Gateway**: DaemonSet collectors on every node forward to a gateway deployment that handles sampling and export.
+The production pattern is **Agent + Gateway**: node-level agents forward to a gateway for sampling and export.
 
 ## The LGTM Stack
 
@@ -217,8 +215,6 @@ SIGNAL CORRELATION FLOW
   └──────────────────────────────────────────────────┘
 ```
 
-Without correlation, you have three independent systems. With it, you have a single diagnostic workflow that can trace a user-visible symptom to its root cause in minutes.
-
 ## Production Lessons
 
 Teams that have deployed OTel in production at scale converge on a common set of lessons:
@@ -278,7 +274,6 @@ An observability system that silently drops data during the incident you need to
 
 ## Common Mistakes and Misconceptions
 
-- **"Metrics, logs, and traces are three separate systems."** They're three facets of the same system behavior. Correlate them: a metric alert should link to relevant logs and traces. OpenTelemetry is unifying the collection of all three.
 - **"Prometheus can store data forever."** Prometheus is designed for real-time monitoring with limited retention (default 15 days). For long-term storage, use Thanos, Cortex, or Grafana Mimir as a remote write backend.
 - **"More metrics are always better."** High-cardinality metrics (per-user, per-request-id labels) can overwhelm Prometheus and explode storage costs. Be intentional about labels. Cardinality is the primary cost driver in metrics systems.
 - **"Logging everything to stdout is sufficient."** Unstructured logs are hard to query. Use structured logging (JSON) with consistent fields (request_id, user_id, trace_id). This makes log aggregation systems (Loki, Elasticsearch) actually useful.

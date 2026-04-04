@@ -1,6 +1,6 @@
 # Chapter 39: The Kubernetes API Internals
 
-Every interaction with a Kubernetes cluster --- every `kubectl apply`, every controller reconciliation, every kubelet heartbeat --- is an HTTP request to the API server. Understanding how that request is processed, what gates it passes through, and how the API server itself can be extended is essential for anyone building platform infrastructure on Kubernetes.
+Every interaction with a Kubernetes cluster --- every `kubectl apply`, every controller reconciliation, every kubelet heartbeat --- is an HTTP request to the API server.
 
 This chapter covers the internal request lifecycle, API versioning mechanics, aggregated API servers, admission webhooks, conversion webhooks, and the priority and fairness system that prevents any single tenant from overwhelming the control plane.
 
@@ -24,7 +24,7 @@ The version in the group name (`v1`, `v2`) is the *API version*, not the softwar
 
 ## The API Request Lifecycle
 
-Every request to the API server passes through a series of stages. Understanding this pipeline is crucial for debugging webhook issues, authorization failures, and performance problems.
+Every request to the API server passes through a series of stages.
 
 ```
 API REQUEST LIFECYCLE
@@ -105,7 +105,7 @@ spec:
 
 When a client requests `kubectl top pods`, the API server sees that `metrics.k8s.io` is handled by the metrics-server Service and proxies the request there. Authentication and authorization still happen at the front door --- the aggregated server receives the request with identity headers already set.
 
-Aggregated API servers are powerful but operationally heavy. They require their own storage, their own availability guarantees, and careful certificate management. For most use cases, CRDs are the simpler extension mechanism. Use aggregated APIs when you need custom storage backends, custom admission logic baked into the server, or sub-resource behaviors that CRDs cannot express.
+They require their own storage, their own availability guarantees, and careful certificate management. For most use cases, CRDs are the simpler extension mechanism. Use aggregated APIs when you need custom storage backends, custom admission logic baked into the server, or sub-resource behaviors that CRDs cannot express.
 
 ## Admission Webhooks
 
@@ -238,8 +238,7 @@ Understanding the API internals changes how you build on Kubernetes:
 
 **APF protects the control plane from you.** If your operator lists all pods in a 10,000-pod cluster every 30 seconds, APF will eventually throttle it. Use informer caches, label selectors, and field selectors to minimize API server load.
 
-**Authentication is pluggable.** The API server does not care how you prove your identity --- it supports client certificates, OIDC tokens, webhook-based token review, and service account tokens. This flexibility is what enables integration with every corporate identity provider.
-
+**Authentication is pluggable.** The API server does not care how you prove your identity --- it supports client certificates, OIDC tokens, webhook-based token review, and service account tokens.
 ## Common Mistakes and Misconceptions
 
 - **"Admission webhooks are fire-and-forget."** A failing webhook can block all resource creation in your cluster. Always configure `failurePolicy: Ignore` for non-critical webhooks and ensure webhook services have high availability.

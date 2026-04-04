@@ -1,6 +1,6 @@
 # Chapter 15: Setting Up a Cluster from Scratch
 
-Every Kubernetes cluster begins as a collection of Linux machines that know nothing about each other. Something must generate the certificates, write the configuration files, start the control plane processes, and establish the trust relationships that let workers join. Understanding this process --- not just running a script, but knowing what each step does and why --- is the difference between operating a cluster and truly understanding one.
+Every Kubernetes cluster begins as a collection of Linux machines that know nothing about each other. Something must generate the certificates, write the configuration files, start the control plane processes, and establish the trust relationships that let workers join.
 
 ## What kubeadm Actually Does
 
@@ -32,7 +32,7 @@ Let us walk through each phase in detail.
 
 Before touching anything, kubeadm validates that the system meets the minimum requirements. This includes:
 
-- **Swap is disabled.** The kubelet refuses to start if swap is enabled (by default) because the scheduler's resource accounting assumes memory limits are hard limits. If a container is limited to 256 MiB but the kernel swaps some of its memory to disk, the container uses more resources than the scheduler allocated. This breaks bin-packing guarantees.
+- **Swap is disabled.** The kubelet refuses to start if swap is enabled (by default) because the scheduler's resource accounting assumes no swap; swap breaks memory limit enforcement.
 - **Required ports are available.** The API server needs port 6443, etcd needs 2379-2380, the scheduler needs 10259, the controller manager needs 10257. If another process occupies these ports, the control plane cannot start.
 - **Container runtime is reachable.** kubeadm checks for a CRI-compatible runtime (containerd or CRI-O) at the expected socket path.
 - **cgroup driver matches.** The kubelet and the container runtime must agree on whether to use `cgroupfs` or `systemd` as the cgroup driver. A mismatch causes containers to start in the wrong cgroup hierarchy, breaking resource accounting. Since Kubernetes 1.22, `systemd` is the recommended default.
@@ -204,7 +204,7 @@ The `controlPlaneEndpoint` is critical for HA clusters. It should point to a loa
 
 ## Kubernetes the Hard Way
 
-Kelsey Hightower's *Kubernetes the Hard Way* is a 13-lab exercise that provisions a cluster by hand, without kubeadm. It is the single best way to understand what kubeadm hides. The labs (updated for v1.32.x) walk you through:
+Kelsey Hightower's *Kubernetes the Hard Way* is a 13-lab exercise that provisions a cluster by hand, without kubeadm. The labs (updated for v1.32.x) walk you through:
 
 1. Generating every certificate by hand (you will appreciate kubeadm's Phase 2 after this)
 2. Writing every kubeconfig file manually
@@ -248,7 +248,7 @@ Do *The Hard Way* once, then use kubeadm for everything after. The exercise take
 - [TLS bootstrapping](https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/) --- Deep dive into the bootstrap token protocol
 - [KillerCoda kubeadm scenarios](https://killercoda.com/kubernetes) --- Interactive browser-based kubeadm exercises
 - [KodeKloud CKA course](https://kodekloud.com/courses/certified-kubernetes-administrator-cka/) --- Hands-on labs covering cluster setup
-- [Killercoda Kubernetes Labs](https://killercoda.com/kubernetes) --- Free, browser-based interactive labs for cluster setup and operations
+
 
 ---
 

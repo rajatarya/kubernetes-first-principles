@@ -234,7 +234,7 @@ spec:
 
 ### HashiCorp Vault
 
-Vault is the most full-featured secrets management system. It provides dynamic secret generation (short-lived database credentials created on demand), PKI certificate issuance, transit encryption (encrypt data without exposing keys), and detailed audit logging.
+Vault provides dynamic secret generation (short-lived database credentials created on demand), PKI certificate issuance, transit encryption (encrypt data without exposing keys), and detailed audit logging.
 
 Vault integrates with Kubernetes in three ways:
 
@@ -289,7 +289,6 @@ volumes:
 ## Common Mistakes and Misconceptions
 
 - **"Kubernetes Secrets are encrypted."** By default, Secrets are stored as base64 in etcd — which is encoding, not encryption. You must enable encryption at rest (`EncryptionConfiguration`) or use an external KMS provider.
-- **"Mounting secrets as environment variables is secure."** Environment variables appear in `/proc/<pid>/environ`, in crash dumps, and in logging frameworks that dump the environment. Mount secrets as files instead.
 - **"Sealed Secrets or External Secrets solve everything."** These tools solve the GitOps problem (how to store secrets in Git). They don't solve rotation, access auditing, or least-privilege access. Use them with a proper vault backend.
 
 ## Further Reading

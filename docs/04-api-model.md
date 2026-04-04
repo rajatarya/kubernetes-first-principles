@@ -35,7 +35,7 @@ The choice of YAML specifically (rather than JSON, TOML, or a custom DSL) was pr
 
 ## Reconciliation Loops: The Engine of Self-Healing
 
-The reconciliation loop is the mechanism by which Kubernetes achieves its declarative guarantees. Every controller runs a reconciliation loop, and understanding how these loops compose is essential to understanding Kubernetes' behavior.
+The reconciliation loop is the mechanism by which Kubernetes achieves its declarative guarantees.
 
 Consider what happens when you apply a Deployment object:
 
@@ -106,7 +106,7 @@ But a CRD alone is just data storage. The magic happens when you pair a CRD with
 
 CRDs are Kubernetes' answer to the extensibility problem: how do you allow the platform to manage new types of resources without modifying Kubernetes itself? By making the API server a **generic, extensible state store** with a standard interface, Kubernetes enables an ecosystem of operators that teach the system how to manage everything from databases to message queues to machine learning pipelines.
 
-This extensibility was a lesson from Borg. Borg's API was fixed and could only manage the resource types that Google's Borg team had implemented. Adding support for a new workload type required modifying Borg itself. Kubernetes' CRD mechanism democratizes this: anyone can extend the API without forking the project.
+This extensibility was a lesson from Borg, whose fixed API required modifying the system itself to support new workload types. Kubernetes' CRD mechanism democratizes this: anyone can extend the API without forking the project.
 
 ## Common Mistakes and Misconceptions
 

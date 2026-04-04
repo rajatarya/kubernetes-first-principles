@@ -1,7 +1,6 @@
 # Chapter 24: Jobs and CronJobs
 
-Not every workload is a long-running service. Some workloads run to completion: a database migration, a batch data transformation, an ML training run, a nightly report. Deployments and StatefulSets are the wrong abstraction for these workloads because they try to keep pods running forever. A Deployment that manages a data migration would restart it after completion, running the migration in an infinite loop.
-
+Not every workload is a long-running service. Some workloads run to completion: a database migration, a batch data transformation, an ML training run, a nightly report. Deployments and StatefulSets are the wrong abstraction for these workloads because they try to keep pods running forever.
 Jobs and CronJobs are Kubernetes's answer to batch and scheduled workloads. A Job creates one or more pods, runs them to completion, and then stops. A CronJob creates Jobs on a schedule. The concepts are simple, but the details --- completion modes, parallelism, failure handling, and concurrency policies --- matter enormously for production reliability.
 
 ## Jobs: Run to Completion
@@ -270,7 +269,7 @@ Examples:
 
 ### timeZone
 
-Before v1.25, CronJobs used the kube-controller-manager's local timezone, which was usually UTC but not always. The `timeZone` field (stable since v1.27) lets you specify the timezone explicitly. Always set this. "Every day at 2 AM" is meaningless without a timezone.
+Before v1.25, CronJobs used the kube-controller-manager's local timezone, which was usually UTC but not always. The `timeZone` field (stable since v1.27) lets you specify the timezone explicitly. "Every day at 2 AM" is meaningless without a timezone.
 
 ### concurrencyPolicy
 

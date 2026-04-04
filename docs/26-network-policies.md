@@ -1,8 +1,6 @@
 # Chapter 26: Network Policies
 
-By default, every pod in a Kubernetes cluster can talk to every other pod. There are no firewalls, no access control lists, no segmentation. A pod in the `accounting` namespace can reach a pod in `production` without restriction. A compromised pod can scan the entire cluster network, connect to databases, and exfiltrate data to the internet. This is the networking equivalent of giving every employee a master key to every room in the building.
-
-Network Policies are Kubernetes's mechanism for controlling traffic between pods. They are the cluster's internal firewall, and understanding them from first principles requires understanding three things: the default-open model they override, the additive-only logic they use, and the CNI dependency that determines whether they actually work.
+By default, every pod can reach every other pod --- no firewalls, no segmentation. A compromised pod can reach databases, scan the cluster network, and exfiltrate data.
 
 ## The Fundamental Model
 
@@ -89,8 +87,6 @@ spec:
 ```
 
 ### Allow DNS Egress (Critical)
-
-DNS is the number one cause of Network Policy failures. When you deny egress, pods cannot resolve service names, and every application breaks in confusing ways --- timeouts rather than connection refused, because DNS queries silently disappear.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -247,7 +243,7 @@ The difference is a single `-` character (a new list item). Combined selectors a
 
 ## CNI Support: The Enforcement Gap
 
-Network Policies are a Kubernetes API object. Any cluster accepts them. But **enforcing** them requires a CNI plugin that implements the NetworkPolicy specification. If your CNI does not support Network Policies, the policy objects exist in etcd but have zero effect on traffic. This is a silent failure --- no warning, no error, no indication that your security rules are not being enforced.
+Network Policies are a Kubernetes API object. Any cluster accepts them. But **enforcing** them requires a CNI plugin that implements the NetworkPolicy specification. If your CNI does not support Network Policies, policies exist in etcd but are silently ignored --- no warning, no effect on traffic.
 
 | CNI Plugin | Network Policy Support | Notes |
 |------------|----------------------|-------|
@@ -329,7 +325,7 @@ For these capabilities, use your CNI's extended policy CRDs. Calico's GlobalNetw
 
 - **"Pods are isolated by default."** The opposite: all pods can reach all other pods by default. You must explicitly create NetworkPolicies to restrict traffic. No policy = fully open.
 - **"A NetworkPolicy on ingress also blocks egress."** Ingress and egress are independent. A policy selecting only ingress rules does not restrict outbound traffic. You need separate egress rules.
-- **"My CNI supports NetworkPolicy."** Not all CNIs do. Flannel does not enforce NetworkPolicies. You need Calico, Cilium, or another policy-aware CNI. Apply a policy and test it — don't assume.
+- **"My CNI supports NetworkPolicy."** See the CNI support table above. Always verify enforcement with a test connection.
 - **"NetworkPolicies work across namespaces automatically."** You must use `namespaceSelector` to allow cross-namespace traffic. A policy only applies to pods in its own namespace.
 
 ## Further Reading

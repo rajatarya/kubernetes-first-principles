@@ -1,15 +1,11 @@
 # Chapter 9: References and Further Reading
 
-The following references are foundational to understanding Kubernetes' design and intellectual history.
-
 ## Foundational Papers
 
-These academic and industry papers provide the theoretical foundation for Kubernetes' design:
-
-**Large-scale cluster management at Google with Borg** (Verma et al., EuroSys 2015) --- The landmark paper describing Google's Borg system, which directly inspired Kubernetes. Covers the declarative job specification, bin packing scheduler, naming service, and lessons learned from a decade of production use. Essential reading for understanding why Kubernetes works the way it does.
+**Large-scale cluster management at Google with Borg** (Verma et al., EuroSys 2015) --- The landmark paper describing Google's Borg system, which directly inspired Kubernetes. Covers the declarative job specification, bin packing scheduler, naming service, and lessons learned from a decade of production use.
 - https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/
 
-**Borg, Omega, and Kubernetes** (Burns, Grant, Oppenheimer, Tune, Wilkes, ACM Queue 2016) --- A retrospective by the architects of all three systems, explicitly discussing the lessons learned from Borg and Omega that were applied to Kubernetes. This is perhaps the single most important reference for understanding Kubernetes' design rationale.
+**Borg, Omega, and Kubernetes** (Burns, Grant, Oppenheimer, Tune, Wilkes, ACM Queue 2016) --- A retrospective by the architects of all three systems, explicitly discussing the lessons learned from Borg and Omega that were applied to Kubernetes.
 - https://research.google/pubs/borg-omega-and-kubernetes/
 
 **Omega: flexible, scalable schedulers for large compute clusters** (Schwarzkopf et al., EuroSys 2013) --- Describes Google's Omega scheduling system and its shared-state, optimistic-concurrency approach, which influenced Kubernetes' multi-controller architecture.

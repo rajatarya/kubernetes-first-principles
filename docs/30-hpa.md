@@ -2,8 +2,7 @@
 
 A deployment with a fixed replica count is a bet that traffic will stay constant. Traffic never stays constant. If you guess too low, pods become overloaded and latency spikes. If you guess too high, you pay for idle compute around the clock. The Horizontal Pod Autoscaler (HPA) replaces this guessing game with a feedback loop: measure demand, compute the right number of replicas, and adjust --- continuously.
 
-Understanding HPA from first principles requires understanding the algorithm it uses, the metrics it consumes, how to extend it beyond built-in metrics, and the tuning knobs that prevent it from behaving erratically. At its core, the HPA is another instance of the [reconciliation loop](04-api-model.md) we described in Chapter 4: it observes current state (metrics), compares it to desired state (target utilization), and acts to close the gap.
-
+Understanding HPA from first principles requires understanding the algorithm it uses, the metrics it consumes, how to extend it beyond built-in metrics, and the tuning knobs that prevent it from behaving erratically.
 ## The Scaling Algorithm
 
 The HPA controller runs a control loop every 15 seconds (configurable via `--horizontal-pod-autoscaler-sync-period`). Each iteration executes a single formula:
@@ -269,10 +268,10 @@ spec:
 
 ## Common Mistakes and Misconceptions
 
-- **"HPA reacts instantly to traffic spikes."** HPA checks metrics every 15 seconds (default), then applies stabilization windows and cooldown periods. End-to-end reaction time is typically 1-2 minutes. For faster response, use KEDA or custom metrics with shorter intervals.
+- **"HPA reacts instantly to traffic spikes."** End-to-end reaction time is 1--2 minutes due to metrics lag and stabilization windows (see above).
 - **"I can use HPA and VPA together on CPU."** HPA and VPA both try to act on CPU metrics, creating a conflict. Use HPA for horizontal scaling on CPU/memory and VPA only for non-HPA-targeted resources, or use the VPA recommendation-only mode alongside HPA.
 - **"Setting target CPU utilization to 50% wastes resources."** 50% target means HPA scales up when average utilization exceeds 50%. This headroom absorbs traffic spikes during the scaling delay. Setting it to 90% means pods are overloaded before new ones arrive.
-- **"HPA works without resource requests."** HPA computes utilization as a percentage of requests. Without requests, the utilization percentage is undefined, and CPU/memory-based HPA cannot function.
+- **"HPA works without resource requests."** Utilization is computed as a percentage of requests; without them, CPU/memory-based HPA cannot function (see above).
 
 ## Further Reading
 

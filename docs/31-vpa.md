@@ -1,6 +1,6 @@
 # Chapter 31: Vertical Pod Autoscaler and Right-Sizing
 
-The Horizontal Pod Autoscaler adjusts the number of pods. The Vertical Pod Autoscaler (VPA) adjusts the size of each pod --- its CPU and memory requests and limits. These are fundamentally different problems. Adding more pods is easy; changing a running pod's resource allocation historically required restarting it. This constraint shaped VPA's design from the beginning, and only in Kubernetes 1.35 did in-place pod resize finally reach general availability, after more than six years of development.
+The Vertical Pod Autoscaler (VPA) adjusts pod resource requests and limits rather than replica count --- a harder problem because changing resources historically required restarting the pod. This constraint shaped VPA's design from the beginning, and only in Kubernetes 1.35 did in-place pod resize finally reach general availability, after more than six years of development.
 
 Understanding VPA requires understanding why right-sizing matters, how VPA's three modes work, the new in-place resize mechanism, the critical interaction between VPA and HPA, and the practical workflow for using VPA in production.
 

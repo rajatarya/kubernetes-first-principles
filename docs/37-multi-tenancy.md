@@ -125,8 +125,6 @@ NAMESPACE ISOLATION MODEL
 
 ### Limitations of Namespace Isolation
 
-Namespaces share the Kubernetes control plane. This means:
-
 - **CRDs are cluster-scoped.** One tenant's CRD installation affects all tenants. A buggy CRD controller can crash the API server for everyone.
 - **Cluster-scoped resources cannot be isolated.** ClusterRoles, PriorityClasses, IngressClasses, and StorageClasses are visible to all tenants.
 - **Node-level resources are shared.** Tenants share the Linux kernel, container runtime, and host filesystem. A container escape vulnerability gives access to all pods on the node.
@@ -230,19 +228,6 @@ vCLUSTER ISOLATION MODEL
 
 ## When Namespaces Are Not Enough
 
-Use namespace isolation when:
-- Tenants are internal teams within the same organization
-- Tenants do not need to install CRDs
-- Tenants do not need cluster-admin privileges
-- A shared admission policy is acceptable
-
-Use vCluster when:
-- Tenants need CRD isolation (different operators, different CRD versions)
-- Tenants need cluster-admin (for CI/CD testing, development environments)
-- You are building a SaaS platform where customers get their own "cluster"
-- Different tenants need different Kubernetes versions
-- Compliance requires demonstrable control plane isolation
-
 Use separate physical clusters when:
 - Tenants are mutually untrusted and require node-level isolation
 - Compliance mandates physical separation (some PCI-DSS interpretations)
@@ -262,7 +247,6 @@ The right answer depends on your threat model, compliance requirements, and oper
 ## Common Mistakes and Misconceptions
 
 - **"Namespaces provide security isolation."** Namespaces are a grouping mechanism, not a security boundary. Without NetworkPolicies, RBAC, ResourceQuotas, and Pod Security Standards, pods in different namespaces can freely communicate and compete for resources.
-- **"ResourceQuotas prevent noisy neighbors."** ResourceQuotas limit totals but not individual pod sizes. A tenant can create one massive pod consuming the entire quota. Combine quotas with LimitRanges to constrain per-pod resources.
 - **"vCluster is overkill for multi-tenancy."** For strong isolation (e.g., different customers, untrusted workloads), namespace-level controls are often insufficient. vCluster provides full API isolation with lower overhead than separate physical clusters.
 
 ## Further Reading

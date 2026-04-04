@@ -47,7 +47,7 @@ Consider the problem of running a PostgreSQL database on Kubernetes. Kubernetes 
 
 A human DBA knows all of these things. An Operator encodes this knowledge into code. The Operator defines a CRD (e.g., `PostgresCluster`) and a controller that watches for `PostgresCluster` objects and reconciles them by creating and managing the underlying Kubernetes resources (StatefulSets, Services, ConfigMaps, PersistentVolumeClaims, CronJobs for backups, etc.).
 
-The Operator pattern is powerful because it **composes with Kubernetes' existing primitives**. The Operator does not bypass Kubernetes; it uses the same API, the same controllers, the same reconciliation loops. It simply adds a higher-level abstraction that understands the semantics of a specific application.
+The Operator pattern is powerful because it composes with Kubernetes' existing primitives --- the same API, controllers, and reconciliation loops --- adding only the domain-specific logic on top.
 
 Operators exist for virtually every stateful application: databases (PostgreSQL, MySQL, MongoDB, CockroachDB, Cassandra), message queues (Kafka, RabbitMQ), monitoring systems (Prometheus), and many more. The OperatorHub.io registry catalogs hundreds of them.
 
@@ -77,11 +77,16 @@ However, service meshes add significant complexity: they increase resource consu
 
 ## Why the Ecosystem Exists: Kubernetes as a Platform for Platforms
 
-The common thread across Operators, Helm, and service meshes is that Kubernetes is deliberately **incomplete**. It provides primitives (pods, services, deployments, CRDs) and extension mechanisms (controllers, admission webhooks, CNI, CRI, CSI) but does not attempt to solve every problem itself.
+The common thread across Operators, Helm, and service meshes is that Kubernetes is deliberately **incomplete**. It provides primitives (pods, services, deployments, CRDs) and extension mechanisms (controllers, admission webhooks, CNI, CRI, CSI) but does not attempt to solve every problem itself --- a lesson from Borg, which tried to be everything and became too tightly coupled to evolve. Kubernetes instead adopted the Unix philosophy: do one thing well, and compose with other tools.
 
-This is a conscious architectural decision, directly learned from Borg's evolution. Borg tried to be everything: it included its own configuration language, its own monitoring system, its own logging infrastructure. Over time, these components became tightly coupled and difficult to evolve independently. Kubernetes instead adopted the Unix philosophy: do one thing well, and compose with other tools.
+The result is that Kubernetes is not a platform; it is a **platform for building platforms**. Organizations build their own internal developer platforms on top of Kubernetes, combining:
 
-The result is that Kubernetes is not a platform; it is a **platform for building platforms**. Organizations build their own internal developer platforms on top of Kubernetes, combining Kubernetes with Operators for stateful services, Helm or Kustomize for packaging, a service mesh or CNI-level features for security, ArgoCD or Flux for GitOps, Prometheus and Grafana for monitoring, and custom CRDs and controllers for their domain-specific needs.
+- Operators for stateful services
+- Helm or Kustomize for packaging
+- A service mesh or CNI-level features for security
+- ArgoCD or Flux for GitOps
+- Prometheus and Grafana for monitoring
+- Custom CRDs and controllers for domain-specific needs
 
 This composability is both Kubernetes' greatest strength and its greatest source of complexity. The bare Kubernetes API is relatively simple; the ecosystem built on top of it is vast and sometimes overwhelming. Understanding that this is by design --- that Kubernetes provides the kernel, not the full operating system --- is essential to understanding the Kubernetes landscape.
 

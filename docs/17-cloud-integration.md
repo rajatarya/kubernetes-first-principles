@@ -4,7 +4,7 @@ Kubernetes defines abstractions --- Services, PersistentVolumes, Ingress --- but
 
 ## How Pod Networking Maps to Cloud Networking
 
-In Chapter 5, we established that every pod gets its own IP and all pods can reach all other pods without NAT. In a cloud environment, this flat network must be implemented on top of the cloud's virtual networking layer. Each cloud takes a different approach, and the choice has real consequences for performance, pod density, and network policy enforcement.
+Recall the flat network model from Chapter 5: every pod gets a unique IP, reachable without NAT.
 
 ### AWS VPC CNI: Pods as First-Class VPC Citizens
 
@@ -58,9 +58,7 @@ The IPAMD (IP Address Management Daemon) runs on each node as part of the VPC CN
 
 ### GKE Alias IPs: VPC-Native Pods
 
-GKE's VPC-native mode uses **Alias IP ranges**. Each node is assigned a secondary IP range (e.g., a /24 from the pod CIDR), and pods receive IPs from this range. These are real VPC IPs routable within the GCP VPC.
-
-The mechanism is different from AWS (no ENI concept), but the result is similar: pod IPs are part of the VPC address space, and VPC firewall rules and routes work natively. GKE allocates IP ranges at the node level, which avoids the per-instance-type density limits that constrain AWS.
+GKE's Alias IP model (described in Chapter 16) gives each node a secondary VPC range; pods draw IPs from it without overlay.
 
 ### On-Premises: Why Overlay Networks Are Necessary
 

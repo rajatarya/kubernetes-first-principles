@@ -1,7 +1,5 @@
 # Chapter 3: Architecture from First Principles
 
-Every major architectural decision in Kubernetes can be explained as a response to a specific problem. This chapter traces the reasoning behind the most important decisions.
-
 ## The Big Picture
 
 ```
@@ -50,7 +48,7 @@ Every major architectural decision in Kubernetes can be explained as a response 
 
 Kubernetes needs to store the desired state of the entire cluster: every pod specification, every service definition, every configuration map. This state must be **consistent** (all readers see the same data), **durable** (data survives machine failures), and **available** (the store can be read and written to even when some machines fail).
 
-The CAP theorem tells us that a distributed system can provide at most two of three properties: Consistency, Availability, and Partition tolerance. Since network partitions are inevitable in real systems, the choice is between consistency and availability. Kubernetes chose **consistency over availability** (CP). This is the right choice for a cluster management system: it is better to temporarily refuse writes than to allow conflicting writes that could result in two different controllers making contradictory scheduling decisions.
+The CAP theorem forces a choice between consistency and availability (since network partitions are inevitable), and Kubernetes chose consistency. This is the right choice for a cluster management system: it is better to temporarily refuse writes than to allow conflicting writes that could result in two different controllers making contradictory scheduling decisions.
 
 etcd implements the Raft consensus algorithm, which provides strong consistency (linearizability) across a cluster of typically 3 or 5 nodes. Every write must be acknowledged by a majority of nodes before it is committed. This means etcd can tolerate the failure of (N-1)/2 nodes in a cluster of N nodes: a 3-node cluster can lose 1 node, a 5-node cluster can lose 2.
 
@@ -126,13 +124,13 @@ Kubernetes runs dozens of controllers, each responsible for a specific aspect of
               └─────────────────────────────────┘
 ```
 
-The genius of this pattern is **decomposition**. Each controller is simple, responsible for only one concern, and operates independently of the others. The Deployment controller does not know about nodes, networking, or storage. The ReplicaSet controller does not know about rolling updates. Each controller reads from and writes to the API server, and the API server provides the shared state that coordinates them.
+The genius of this pattern is **decomposition**. Each controller handles exactly one concern. The Deployment controller knows nothing about nodes or networking; the ReplicaSet controller knows nothing about rolling updates. Each controller reads from and writes to the API server, and the API server provides the shared state that coordinates them.
 
 This decomposition also provides **fault tolerance**. If the Deployment controller crashes and restarts, it simply reads the current state from the API server and resumes reconciling. No state is lost because the controller is stateless --- all state is in the API server (and ultimately in etcd). This is why Kubernetes components can be restarted at any time without corruption.
 
 ## The Watch Mechanism: Event-Driven Efficiency
 
-Controllers need to know when things change. The naive approach is polling: periodically read all objects of a given type and check for changes. This is wasteful and introduces latency proportional to the polling interval.
+Controllers need to know when things change. Polling --- periodically reading all objects --- is wasteful and slow, introducing latency proportional to the polling interval.
 
 Kubernetes uses a **watch mechanism** instead. A controller opens a long-lived HTTP connection to the API server and says, "notify me of any changes to Deployment objects." The API server, in turn, watches etcd for changes and fans out notifications to all watching clients. This is event-driven: controllers react to changes immediately rather than discovering them on a polling interval.
 
@@ -197,7 +195,6 @@ Kube-proxy watches the API server for Service and Endpoint changes and updates t
 - [Daniel Smith -- "The Kubernetes API Server: Scalability and Performance" (KubeCon 2019)](https://www.youtube.com/watch?v=Zn-58U1MnSk) -- How the API server handles watch streams, caching, and request routing at scale.
 - [Kubernetes Documentation -- Scheduler Performance Tuning](https://kubernetes.io/docs/concepts/scheduling-eviction/scheduler-perf-tuning/) -- Details on the scheduler's filtering and scoring phases, extension points, and how to tune scheduling behavior.
 - [Lucas Kaldstrom -- "A Deep Dive into Kubernetes Controllers" (KubeCon 2017)](https://www.youtube.com/watch?v=dP_wPGQJn6M) -- An in-depth look at the controller pattern, informers, work queues, and how controllers interact with the API server.
-- [Kubernetes The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way) --- Build a cluster from scratch to understand every component
 
 ---
 

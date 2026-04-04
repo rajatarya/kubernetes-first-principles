@@ -1,6 +1,6 @@
 # Chapter 18: Your First Workloads
 
-This chapter is hands-on. Every YAML example is complete --- you can apply it to a running cluster and observe the result. But this is not a tutorial that asks you to type commands without understanding them. Each exercise explains *what* each field does and *why* it exists.
+This chapter is hands-on. Every YAML example is complete --- you can apply it to a running cluster and observe the result.
 
 ## Exercise 1: Deployment + Service
 
@@ -215,7 +215,7 @@ stringData:                    # stringData accepts plain text (base64 encoded o
 
 **Mount as volumes, not environment variables.** This is a best practice for two reasons:
 
-1. Volume mounts can be updated without restarting the pod (if `subPath` is not used). Environment variables are frozen at container start.
+1. Volume mounts can be updated without restarting the pod (if `subPath` is not used).
 2. Environment variables are exposed in `kubectl describe pod`, process listings, and crash dumps. Volume-mounted files are more contained.
 
 ```yaml
@@ -394,7 +394,7 @@ Apply resources in dependency order: Namespace, ConfigMap, Secret, PVC, Deployme
 - [KillerCoda interactive labs](https://killercoda.com/kubernetes) --- Browser-based exercises for Deployments, Services, and Ingress
 - [KodeKloud CKAD course](https://kodekloud.com/courses/certified-kubernetes-application-developer-ckad/) --- Hands-on application deployment labs
 - [Kubernetes Basics Tutorial](https://kubernetes.io/docs/tutorials/kubernetes-basics/) --- Official interactive tutorial for deploying your first app
-- [Killercoda Kubernetes Labs](https://killercoda.com/kubernetes) --- Browser-based interactive scenarios for hands-on practice
+
 
 ---
 

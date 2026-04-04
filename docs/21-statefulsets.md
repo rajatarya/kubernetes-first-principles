@@ -1,6 +1,8 @@
 # Chapter 21: StatefulSets Deep Dive
 
-Deployments treat pods as interchangeable. If pod `web-abc123` dies, the replacement `web-def456` is identical in every way that matters --- same image, same configuration, same role. This works beautifully for stateless applications where any instance can handle any request. But some workloads are not interchangeable. A database replica cannot simply replace the primary without coordination. A distributed system that uses consistent hashing needs members with stable identities. A clustered cache needs each node to own a predictable shard of data. These workloads need something Deployments cannot provide: **stable identity**.
+Deployments treat pods as interchangeable. If pod `web-abc123` dies, the replacement `web-def456` is identical in every way that matters --- same image, same configuration, same role. This works beautifully for stateless applications where any instance can handle any request. But some workloads are not interchangeable. - A database replica cannot simply replace the primary without coordination.
+- A distributed system that uses consistent hashing needs members with stable identities.
+- A clustered cache needs each node to own a predictable shard of data. These workloads need something Deployments cannot provide: **stable identity**.
 
 StatefulSets exist because some pods are not fungible. Like every Kubernetes workload controller, a StatefulSet follows the [controller pattern](03-architecture.md) we covered in Chapter 3 --- observe, diff, act --- but with additional ordering and identity guarantees that the Deployment controller does not provide.
 
@@ -60,7 +62,7 @@ The cost of these guarantees is operational complexity. StatefulSets are harder 
 
 ## Headless Services and Stable DNS
 
-A normal ClusterIP Service creates a virtual IP that load-balances across all matching pods. Clients connect to the Service and reach a random pod. A **headless Service** (one with `clusterIP: None`) does not create a virtual IP. Instead, it creates individual DNS records for each pod in the StatefulSet.
+A normal ClusterIP Service creates a virtual IP that load-balances requests across all matching pods. A **headless Service** (one with `clusterIP: None`) does not create a virtual IP. Instead, it creates individual DNS records for each pod in the StatefulSet.
 
 ```yaml
 apiVersion: v1
@@ -105,9 +107,9 @@ replicas: 3        clusterIP: None
 
 The DNS naming convention is: `<pod-name>.<service-name>.<namespace>.svc.cluster.local`
 
-This is why the headless Service name matters and why it must match the `serviceName` field in the StatefulSet spec. The combination of a stable pod name (`db-0`) and a stable DNS entry (`db-0.db.default.svc.cluster.local`) gives each pod a persistent network identity that survives restarts, rescheduling, and node failures.
+The combination of a stable pod name (`db-0`) and a stable DNS entry (`db-0.db.default.svc.cluster.local`) gives each pod a persistent network identity that survives restarts, rescheduling, and node failures.
 
-This is critical for database clusters. A PostgreSQL replica can be configured to always connect to `db-0.db.default.svc.cluster.local` as its primary, regardless of which node `db-0` happens to be running on or what IP address it currently has.
+A PostgreSQL replica can be configured to always connect to `db-0.db.default.svc.cluster.local` as its primary, regardless of which node `db-0` happens to be running on or what IP address it currently has.
 
 ## The StatefulSet Spec
 

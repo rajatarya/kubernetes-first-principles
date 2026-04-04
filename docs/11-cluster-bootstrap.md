@@ -120,7 +120,7 @@ kubeadm solved the bootstrap problem but deliberately left the provisioning prob
 
 kops was opinionated and comprehensive. It stored cluster state in a cloud storage bucket (S3 on AWS) and could perform rolling updates, upgrade Kubernetes versions, and resize clusters. For AWS users who wanted a production-grade, self-managed Kubernetes cluster without a managed service, kops was often the best choice.
 
-The tradeoff was scope. kops did so much that understanding what it was doing --- and debugging it when things went wrong --- required understanding both AWS infrastructure and Kubernetes internals. It was also tightly coupled to specific cloud providers, primarily AWS, with later support for GCE and OpenStack.
+The tradeoff: kops' breadth makes it powerful on AWS but tightly coupled to cloud-provider APIs and harder to debug than kubeadm.
 
 ### kubespray
 
@@ -162,11 +162,11 @@ kind was fast (cluster creation in under a minute), lightweight (no VMs required
 
 The most significant development in cluster bootstrapping was the emergence of managed Kubernetes services that made bootstrapping irrelevant for a large portion of users.
 
-**Google Kubernetes Engine (GKE)**, launched in 2015, was the first. Google managed the control plane --- etcd, API server, controller manager, scheduler --- as a service. Users only managed worker nodes (and later, with Autopilot mode, not even that). GKE's early availability gave it a lasting advantage: it had years of operational experience that competitors could not quickly replicate.
+**Google Kubernetes Engine (GKE)**, launched in 2015, was the first. Google managed the control plane as a service. Users only managed worker nodes (and later, with Autopilot mode, not even that). GKE's early availability gave it a lasting advantage: it had years of operational experience that competitors could not quickly replicate.
 
 **Azure Kubernetes Service (AKS)** launched in 2017, and **Amazon Elastic Kubernetes Service (EKS)** launched in 2018. AWS was notably late to the Kubernetes party, having bet heavily on its own orchestration system (ECS) before market demand forced its hand. EKS's eventual success validated Kubernetes as the industry standard: when the largest cloud provider builds a managed service for your project, you have won.
 
-By the mid-2020s, managed Kubernetes services account for the majority of production Kubernetes usage. For many organizations, the question "how do I bootstrap a Kubernetes cluster?" has been replaced by "which managed service should I use?" The bootstrapping tools --- kubeadm, kops, kubespray --- remain essential for on-premises deployments, specialized environments, and educational purposes, but the center of gravity has shifted decisively toward managed services.
+By the mid-2020s, managed Kubernetes services account for the majority of production Kubernetes usage. The bootstrapping tools --- kubeadm, kops, kubespray --- remain essential for on-premises deployments, specialized environments, and educational purposes, but the center of gravity has shifted decisively toward managed services.
 
 ```
 Who Uses What (2024+)

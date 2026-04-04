@@ -2,7 +2,7 @@
 
 ## The Fundamental Networking Problem
 
-Kubernetes' networking model is one of its most distinctive design decisions, and it is the source of much confusion for newcomers. To understand why Kubernetes networking works the way it does, you must first understand the alternative it rejected.
+Kubernetes' networking model is most easily understood by contrast with the Docker port-mapping model it rejected.
 
 ## Docker Port-Mapping vs. Kubernetes Flat Network
 
@@ -37,13 +37,12 @@ In the default Docker networking model, containers share the host's network name
 - Port allocation must be coordinated across all containers on a host to avoid conflicts.
 - Applications must be aware of port mapping, or an intermediary must translate.
 
-This model breaks a fundamental assumption of network programming: that you know your own address. A container that binds to port 80 thinks it is listening on port 80, but external clients reach it on port 32768. This impedance mismatch complicates service discovery, load balancing, and application configuration.
-
-Google's experience with Borg confirmed that port-mapping models create cascading complexity. In Borg's early design, tasks were assigned random ports, and a naming service (BNS) provided the mapping from logical names to host:port pairs. This worked but was a constant source of operational friction: every application had to be port-aware, load balancers needed frequent updates, and debugging network issues required understanding the port-mapping layer.
+This model breaks a fundamental assumption of network programming: that you know your own address. A container that binds to port 80 thinks it is listening on port 80, but external clients reach it on port 32768.
+Google's experience with Borg --- which used a naming service (BNS) to map logical names to host:port pairs --- confirmed that port-mapping models create cascading operational friction.
 
 ## Kubernetes' Flat Networking Model
 
-Kubernetes takes a radically different approach. Its networking model has three fundamental rules:
+Its networking model has three fundamental rules:
 
 1. **Every Pod gets its own IP address.** No port mapping. No NAT between pods. A pod that binds to port 80 is reachable on port 80 at its pod IP.
 2. **All pods can communicate with all other pods without NAT.** Any pod can reach any other pod using the other pod's IP address, regardless of which node either pod is on.
@@ -51,8 +50,7 @@ Kubernetes takes a radically different approach. Its networking model has three 
 
 This is sometimes called the **flat networking model** because from the perspective of pods, the network is flat: every pod is directly reachable from every other pod. There are no layers of NAT or port mapping to navigate.
 
-Why is this model superior? Because it **preserves the assumptions of traditional network programming**. Applications do not need to know about port mapping. They bind to the port they expect. They connect to other services at their expected ports. DNS, load balancers, and monitoring tools work as expected. The mental model is: "pods are like VMs on a flat network." This dramatically simplifies application development and debugging.
-
+Why is this model superior? Because it **preserves the assumptions of traditional network programming**. Applications do not need to know about port mapping. They bind to the port they expect. They connect to other services at their expected ports. DNS, load balancers, and monitoring tools work as expected. The mental model is: "pods are like VMs on a flat network."
 ## How the Flat Network Is Implemented: CNI
 
 Kubernetes does not implement networking itself. Instead, it defines the **Container Network Interface (CNI)** specification: a standard API that networking plugins must implement. The CNI plugin is responsible for:

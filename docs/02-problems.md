@@ -1,12 +1,16 @@
 # Chapter 2: The Problems Kubernetes Solves
 
-Kubernetes exists because running containerized applications at scale presents a set of interrelated problems that no individual tool solves. Understanding these problems is essential to understanding why Kubernetes is designed the way it is.
+Kubernetes exists because running containerized applications at scale presents a set of interrelated problems that no individual tool solves.
 
 ## The Bin Packing Problem
 
 At its most fundamental, Kubernetes solves a **resource allocation problem**. You have N machines, each with some amount of CPU, memory, and other resources. You have M workloads, each requiring some amount of those resources. How do you assign workloads to machines to maximize utilization while respecting constraints?
 
-This is a variant of the NP-hard bin packing problem. In the general case, finding the optimal solution is computationally intractable. But good heuristics exist, and Kubernetes' scheduler implements several of them. The key insight is that **centralized, automated scheduling dramatically outperforms human scheduling**. When humans decide where to place workloads, they tend to be conservative (over-provisioning resources to avoid contention), forgetful (leaving old workloads running on machines long after they should have been decommissioned), and inconsistent (different operators making different decisions for similar workloads).
+This is a variant of the NP-hard bin packing problem. In the general case, finding the optimal solution is computationally intractable. But good heuristics exist, and Kubernetes' scheduler implements several of them. The key insight is that **centralized, automated scheduling dramatically outperforms human scheduling**. When humans decide where to place workloads, they tend to be:
+
+- **Conservative** --- over-provisioning resources to avoid contention
+- **Forgetful** --- leaving old workloads running on machines long after they should have been decommissioned
+- **Inconsistent** --- different operators making different decisions for similar workloads
 
 Borg's experience demonstrated that automated bin packing could improve cluster utilization from the 5-15% typical of manually managed environments to 60-70%. Even modest improvements in utilization translate to enormous cost savings at scale: Google's fleet comprises millions of machines, so a 1% improvement in utilization saves tens of thousands of servers.
 
@@ -44,7 +48,7 @@ The **self-healing problem** is: how do you build a system that automatically de
 - **Node failure detection**: The control plane detects when a node stops reporting (via the node controller watching heartbeats) and automatically reschedules its pods onto healthy nodes.
 - **Replica maintenance**: If a Deployment specifies 3 replicas and one pod dies, the Deployment controller automatically creates a replacement.
 
-The key insight is that self-healing requires a **control loop**: continuously compare the actual state of the system to the desired state, and take action to reconcile any differences. This is the **reconciliation loop**, and it is the central architectural pattern of Kubernetes.
+The key insight is that self-healing requires a **control loop**: continuously compare the actual state of the system to the desired state, and take action to reconcile any differences. This is the **reconciliation loop** --- the central architectural pattern of Kubernetes, used by every controller from the scheduler to the kubelet.
 
 ## The Desired State Model vs. Imperative Commands
 

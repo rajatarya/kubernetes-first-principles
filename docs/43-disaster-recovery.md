@@ -2,8 +2,6 @@
 
 A Kubernetes cluster is not a single thing that fails in a single way. The control plane can fail while workloads keep running. A namespace can be accidentally deleted while the rest of the cluster is fine. An entire region can go dark. Disaster recovery for Kubernetes requires thinking in layers: the cluster state layer and the workload layer, each with its own backup strategy, its own restore procedure, and its own failure modes.
 
-The uncomfortable truth is that most teams discover their backup strategy is incomplete during the disaster, not before it. This chapter lays out a principled approach to ensuring you can recover, and more importantly, that you know you can recover because you have tested it.
-
 ## Two-Layer Backup Strategy
 
 Kubernetes disaster recovery operates on two distinct layers, and you need both.
@@ -190,7 +188,7 @@ MULTI-REGION STRATEGY COMPARISON
 
 ## Testing Recovery
 
-A backup you have not tested is just wishful thinking. This is not a platitude --- it is the single most important lesson in disaster recovery. Teams routinely discover during an actual incident that:
+Testing restores is not optional --- an untested backup procedure is an untested promise. Teams routinely discover during an actual incident that:
 
 - The backup credentials have rotated and the backup job has been silently failing for weeks.
 - The etcd snapshot is from the wrong cluster (staging, not production).
@@ -235,8 +233,6 @@ A complete disaster recovery strategy for Kubernetes looks like this:
 4. **Monthly restore drills** that exercise both etcd restore and Velero restore paths.
 5. **Runbooks** that have been used successfully in a drill within the last quarter.
 6. **Monitoring and alerting** on backup job success/failure, backup age, and storage health.
-
-The cost of this infrastructure is a fraction of the cost of an unrecoverable outage. The investment is not in the tools --- Velero is open source, etcd snapshots are built in --- but in the discipline of testing and maintaining the procedures.
 
 ## Common Mistakes and Misconceptions
 

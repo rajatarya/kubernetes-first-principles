@@ -1,7 +1,6 @@
 # Chapter 22: Databases on Kubernetes
 
-"Should we run our database on Kubernetes?" is one of the most debated questions in the Kubernetes community, and the debate persists because the answer is genuinely nuanced. It depends on what database, what workload, what team, and what alternatives exist. This chapter gives you the framework to make that decision honestly, without the hype that surrounds Kubernetes operators or the fear that keeps teams from exploring the option.
-
+"Should we run our database on Kubernetes?" is one of the most debated questions in the Kubernetes community, and the debate persists because the answer is genuinely nuanced. It depends on what database, what workload, what team, and what alternatives exist.
 ## The Great Debate
 
 The argument against databases on Kubernetes is simple: databases are the most important component in most architectures, and Kubernetes was designed for stateless, ephemeral workloads. Pods get rescheduled. Nodes fail. Network partitions happen. Storage has latency. Every one of these events is routine for a web server and potentially catastrophic for a database.
@@ -66,7 +65,7 @@ PostgreSQL has the most mature operator ecosystem on Kubernetes.
 
 ## What Makes Database Operators Hard
 
-Running a database is not just "deploy the binary and connect." A production database requires a constellation of supporting capabilities that an operator must handle:
+A production database operator must handle:
 
 ```
 OPERATOR RECONCILIATION LOOP
@@ -134,7 +133,7 @@ Each of these responsibilities is a failure mode:
 
 ## The Real Cost of Self-Managing
 
-When evaluating "run it on K8s" vs "use a managed service," teams often compare only the compute cost. The real comparison is:
+The real comparison is:
 
 | Cost Factor | Managed Service | Kubernetes Operator |
 |-------------|----------------|-------------------|

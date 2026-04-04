@@ -140,8 +140,6 @@ Today, organizations running at scale increasingly use Cilium or Calico's eBPF d
 
 ## Service Mesh Evolution
 
-The networking discussion would be incomplete without service meshes, which added a new layer of functionality --- and complexity --- to Kubernetes networking.
-
 **Istio**, jointly developed by Google, IBM, and Lyft and announced in 2017, was the first major service mesh for Kubernetes. Istio's architecture injected an **Envoy sidecar proxy** into every pod. All traffic to and from the pod passed through this proxy, which could enforce mTLS (mutual TLS), collect metrics, perform traffic routing, implement circuit breakers, and enforce access policies.
 
 ```
@@ -177,8 +175,7 @@ Sidecar Mesh vs. Sidecar-less Mesh
 
 The sidecar approach was powerful but expensive. Each sidecar consumed memory (50-100 MB per pod was common for Envoy), added latency (traffic traversed two proxies for each hop), and increased the complexity of the pod lifecycle (the sidecar had to start before the application, and shutting down required careful ordering). In a cluster with 10,000 pods, the sidecar overhead was 500 GB to 1 TB of memory just for the mesh infrastructure.
 
-**Linkerd**, created by Buoyant in 2017, was the lighter-weight alternative. Linkerd's Rust-based proxy (linkerd2-proxy) consumed significantly less memory than Envoy and focused on a smaller, well-defined feature set: mTLS, observability, and reliability features. Linkerd's philosophy was that a service mesh should be simple enough that any operator could understand and debug it.
-
+**Linkerd**, created by Buoyant in 2017, was the lighter-weight alternative. Linkerd's Rust-based proxy (linkerd2-proxy) consumed significantly less memory than Envoy and focused on a smaller, well-defined feature set: mTLS, observability, and reliability features. 
 The most significant recent trend is the **sidecar-less mesh**. Cilium Service Mesh uses eBPF programs in the kernel to provide mTLS, L7 policy, and observability without any sidecar proxies. Istio's Ambient Mesh mode uses per-node ztunnel proxies for L4 features (mTLS, L4 policy) and optional waypoint proxies for L7 features, eliminating the per-pod sidecar overhead.
 
 The sidecar-less approach reflects a broader realization: much of what sidecars do can be done more efficiently at the node level or in the kernel. The sidecar was an architectural choice driven by the constraints of 2017 (limited eBPF support, no per-node proxy infrastructure). As the infrastructure has evolved, the architecture is evolving with it.

@@ -1,7 +1,5 @@
 # Chapter 14: Kubernetes Version History --- A Guided Tour
 
-Kubernetes has shipped a new minor release roughly every four months since its inception. Most releases are incremental --- bug fixes, performance improvements, promotions from alpha to beta to GA. But some releases fundamentally changed how people used Kubernetes or forced the ecosystem to adapt. This chapter traces the releases that mattered and explains why they mattered.
-
 ```
 Kubernetes Release Timeline: The Inflection Points
 
@@ -23,7 +21,7 @@ Kubernetes Release Timeline: The Inflection Points
 
 ## v1.0 (July 2015): The Starting Line
 
-Kubernetes 1.0 was released at OSCON 2015 alongside the announcement that Google was donating the project to the newly formed Cloud Native Computing Foundation (CNCF). This was a strategic masterstroke. By placing Kubernetes under vendor-neutral governance, Google ensured that competitors would contribute rather than fork. AWS, Microsoft, Red Hat, IBM, and dozens of others could participate without feeling that they were building Google's product.
+Kubernetes 1.0 was released at OSCON 2015 alongside the announcement that Google was donating the project to the newly formed Cloud Native Computing Foundation (CNCF). The CNCF donation (covered in Chapter 8) gave competitors reason to contribute rather than fork.
 
 The 1.0 release was sparse by modern standards. It had Pods, ReplicationControllers (the precursor to ReplicaSets and Deployments), Services, and Secrets. There were no Deployments, no StatefulSets, no RBAC, no CRDs. The scheduler was basic. Networking was primitive. But the core architectural decisions were already in place: the declarative API model, the reconciliation loop pattern, etcd as the state store, and the API server as the single point of access.
 
@@ -33,7 +31,7 @@ The significance of 1.0 was not its feature set but its **commitment to stabilit
 
 Kubernetes 1.2 introduced three features that transformed it from a promising experiment into something you could actually run in production.
 
-**ConfigMaps** provided a way to inject configuration data into pods without baking it into the container image. Before ConfigMaps, you had two options: environment variables (limited and inflexible) or mounting Secrets (semantically wrong for non-secret configuration). ConfigMaps completed the separation of configuration from code that containers promised.
+**ConfigMaps** provided a way to inject configuration data into pods without baking it into the container image. Before ConfigMaps, you had two options: environment variables (limited and inflexible) or mounting Secrets (semantically wrong for non-secret configuration).
 
 **DaemonSets** ensured that a specific pod ran on every node (or a selected subset of nodes). This was essential for infrastructure agents: log collectors, monitoring agents, network plugins, storage drivers. Without DaemonSets, operators had to manually ensure these agents were running on every node and handle new nodes joining the cluster.
 
@@ -41,9 +39,7 @@ Kubernetes 1.2 introduced three features that transformed it from a promising ex
 
 ## v1.3 (July 2016): The State Problem
 
-**PetSets** (later renamed StatefulSets) appeared in alpha, tackling the hardest problem in container orchestration: stateful workloads. Databases, message queues, and distributed storage systems need stable network identities, stable storage, and ordered deployment and scaling. A MySQL replica cannot just be restarted with a random hostname and a fresh disk.
-
-PetSets provided stable, unique network identifiers (pod-0, pod-1, pod-2), stable persistent storage (each pod gets its own PersistentVolumeClaim), and ordered, graceful deployment and scaling (pod-0 starts before pod-1, and scaling down removes the highest-numbered pod first).
+PetSets (later StatefulSets) provided stable network identities, per-pod persistent storage, and ordered scaling --- the features stateful workloads need that Deployments do not provide.
 
 The name "PetSets" reflected the "pets vs. cattle" metaphor that dominated DevOps thinking: stateless containers were "cattle" (identical, replaceable) while stateful services were "pets" (unique, requiring individual care). The rename to StatefulSets in 1.5 was driven by the community's desire for a more descriptive, less metaphorical name.
 
@@ -81,7 +77,7 @@ The significance of CRDs cannot be overstated. They enabled the "operator patter
 
 ## v1.9 (December 2017): The Apps API Stabilizes
 
-This release marked the moment Kubernetes' core workload APIs became stable. **Deployments, ReplicaSets, StatefulSets, and DaemonSets all reached GA** under the apps/v1 API group. This was the release where the community said: "these APIs are stable, we will not break them, you can build production systems on them."
+This release marked the moment Kubernetes' core workload APIs became stable. **Deployments, ReplicaSets, StatefulSets, and DaemonSets all reached GA** under the apps/v1 API group.
 
 The **Container Storage Interface (CSI)** appeared in alpha. CSI would do for storage what CRI did for container runtimes and CNI did for networking: define a standard interface so storage providers could be plugged in without modifying Kubernetes core code. Before CSI, storage drivers were compiled into Kubernetes, meaning a new storage provider required a change to the Kubernetes codebase. CSI decoupled storage from the Kubernetes release cycle.
 

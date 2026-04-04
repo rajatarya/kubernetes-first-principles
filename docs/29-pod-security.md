@@ -20,8 +20,6 @@ Without pod security controls, every container is one exploit away from full nod
 
 ## The Three Profiles
 
-Pod Security Standards define three profiles with increasing levels of restriction.
-
 ### Controls Matrix
 
 | Control | Privileged | Baseline | Restricted |
@@ -325,6 +323,6 @@ RECOMMENDED PSA CONFIGURATION
 
 ---
 
-*This concludes Part 5: Security Deep Dive. You now have the tools to control who can do what (RBAC), which pods can talk to which (Network Policies), what images are allowed to run (Supply Chain Security), how secrets are managed, and what system calls containers are permitted to make. Part 6 shifts from securing workloads to scaling them --- autoscaling pods, right-sizing resources, and scaling the nodes underneath.*
+*Part 6 shifts from securing workloads to scaling them.*
 
 Next: [Horizontal Pod Autoscaler](30-hpa.md)

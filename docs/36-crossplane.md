@@ -1,8 +1,6 @@
 # Chapter 36: Crossplane: Infrastructure as CRDs
 
-Kubernetes has a powerful reconciliation engine: you declare a desired state, controllers watch for drift, and they continuously work to make reality match the declaration. This engine is not limited to pods and services. Crossplane extends it to any cloud resource --- databases, storage buckets, DNS records, IAM roles, VPCs --- by representing each as a Kubernetes Custom Resource.
-
-The core insight is simple: if the Kubernetes API server and its reconciliation loop can manage containers, it can manage anything. A PostgreSQL database is just another resource with a desired state (engine version, storage size, backup retention) and an actual state (running, available, failed). Crossplane provides the machinery to reconcile between them.
+Crossplane extends Kubernetes' reconciliation engine to any cloud resource --- databases, storage buckets, DNS records, IAM roles --- by representing each as a Kubernetes Custom Resource.
 
 ## The Architecture
 
@@ -209,11 +207,11 @@ Both Crossplane and Terraform manage cloud infrastructure declaratively. The dif
 
 Crossplane's long-term vision is the "universal control plane" --- a single Kubernetes API server that manages everything: containers, cloud resources, SaaS services, and internal tooling. Instead of developers learning kubectl for Kubernetes, the AWS console for cloud resources, and a CI tool's web interface for pipelines, they interact with a single API that accepts declarative manifests for all of it.
 
-This vision is ambitious and incomplete. Provider coverage is broad but not total. Complex multi-resource dependencies (create VPC, then subnet, then security group, then RDS instance) require careful ordering in Compositions. Error messages from failed cloud API calls can be opaque. But the trajectory is clear: the Kubernetes resource model is becoming the universal interface for infrastructure management, and Crossplane is the primary vehicle for that expansion.
+Provider coverage is broad but not total. Complex multi-resource dependencies (create VPC, then subnet, then security group, then RDS instance) require careful ordering in Compositions. Error messages from failed cloud API calls can be opaque. But the trajectory is clear: the Kubernetes resource model is becoming the universal interface for infrastructure management, and Crossplane is the primary vehicle for that expansion.
 
 ## Common Mistakes and Misconceptions
 
-- **"Crossplane replaces Terraform."** Many organizations use both: Terraform for foundational infrastructure (VPCs, clusters) with manual review, Crossplane for application-level resources (databases, caches) with self-service provisioning. They complement each other.
+- **"Crossplane replaces Terraform."** See the comparison table above. Many organizations use both: Terraform for foundational infrastructure, Crossplane for application-level self-service.
 - **"Compositions apply changes immediately with no review."** This is actually true and often a surprise. Unlike Terraform's plan/apply workflow, changing a Composition affects all resources using it immediately. Use Composition revisions and staged rollouts.
 - **"Crossplane providers cover every cloud resource."** Coverage is broad but not complete. Check the provider's CRD list before committing to Crossplane for a specific resource. Some niche services may need Terraform or direct API calls.
 

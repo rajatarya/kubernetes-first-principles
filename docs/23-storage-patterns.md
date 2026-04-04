@@ -1,7 +1,6 @@
 # Chapter 23: Persistent Storage Patterns
 
-Storage on Kubernetes is where the abstraction meets physical reality. A pod can be rescheduled to any node in seconds, but a 500GB disk cannot teleport. Persistent storage forces you to think about topology, data lifecycle, and failure modes that stateless workloads let you ignore. This chapter covers the patterns that make persistent storage work in production: naming conventions, reclaim policies, topology awareness, resize, the critical relationship between StatefulSets and PVCs, and a layered backup strategy that actually protects your data.
-
+Storage on Kubernetes is where the abstraction meets physical reality. A pod can be rescheduled to any node in seconds, but a 500GB disk cannot teleport. Persistent storage forces you to think about topology, data lifecycle, and failure modes that stateless workloads let you ignore.
 ## volumeClaimTemplates: The Naming Convention
 
 As covered in Chapter 21, StatefulSets use `volumeClaimTemplates` to create per-pod PVCs. The naming convention is deterministic:
@@ -136,7 +135,7 @@ Important constraints:
 
 ## The PVC Lifecycle on Scale-Down
 
-This is the most operationally surprising behavior of StatefulSets and worth repeating with emphasis. When you scale down a StatefulSet, the pods are deleted but the PVCs are not:
+When you scale down a StatefulSet, the pods are deleted but the PVCs are not:
 
 ```
 PVC LIFECYCLE ON SCALE-DOWN
@@ -183,7 +182,7 @@ Step 3: Scale back to replicas=5
   All previous data is intact.
 ```
 
-This behavior is by design. It protects against accidental data loss during scale-down. But it has operational implications:
+Operational implications:
 
 1. **Cost**: Orphaned PVCs consume storage and incur charges. Monitor with `kubectl get pvc` and cloud billing tools.
 2. **Stale data**: If you scale down, modify the application, and scale back up, the reattached pods may have stale data that does not match the current application state.

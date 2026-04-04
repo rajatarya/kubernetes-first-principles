@@ -1,10 +1,8 @@
 # Chapter 7: Key Design Principles
 
-Kubernetes' design reflects a set of principles that are worth making explicit, as they explain many of the system's characteristics.
-
 ## Declarative Over Imperative
 
-As discussed extensively in previous chapters, Kubernetes favors declaring desired state over issuing commands. This principle pervades every level of the system, from the API (objects have spec and status, not a command queue) to the controllers (which reconcile rather than execute) to the tooling (kubectl apply rather than kubectl run).
+Kubernetes favors declaring desired state over issuing commands. This principle pervades every level of the system, from the API (objects have spec and status, not a command queue) to the controllers (which reconcile rather than execute) to the tooling (kubectl apply rather than kubectl run).
 
 ## Control Loops Over Orchestration
 
@@ -45,7 +43,7 @@ This is why Kubernetes controllers are built around Informers that maintain a ca
 
 - **"Controllers run once when you apply a change."** Controllers run in continuous loops, not as one-shot handlers. They watch for any drift from desired state, whether caused by your changes, hardware failures, resource pressure, or other controllers. A controller that only ran once would miss all subsequent drift.
 
-- **"Level-triggered and event-triggered are equally reliable."** Level-triggered design is fundamentally more reliable in distributed systems. If a controller misses an event (due to a restart, network partition, or watch disconnection), an event-triggered system loses that information. A level-triggered system simply observes the current state on the next reconciliation and corrects the discrepancy regardless of what events were missed.
+- **Writing event-driven controllers instead of level-triggered ones.** Controllers that react to individual events rather than reconciling against current state break when events are missed. A level-triggered controller simply observes the current state on the next reconciliation and converges regardless of what events it missed.
 
 ## Further Reading
 

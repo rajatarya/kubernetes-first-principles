@@ -2,7 +2,11 @@
 
 ## The Competitive Landscape
 
-Kubernetes was not the only container orchestration system. Docker Swarm (2015) offered a simpler, Docker-native orchestration experience. Apache Mesos (2009) with Marathon provided a battle-tested, two-level scheduling architecture used at Twitter, Airbnb, and Apple. Nomad (2015) from HashiCorp offered a simpler, more flexible orchestrator that could manage containers, VMs, and standalone binaries.
+Kubernetes was not the only container orchestration system:
+
+- **Docker Swarm** (2015) offered a simpler, Docker-native orchestration experience.
+- **Apache Mesos** (2009) with Marathon provided a battle-tested, two-level scheduling architecture used at Twitter, Airbnb, and Apple.
+- **Nomad** (2015) from HashiCorp offered a simpler, more flexible orchestrator that could manage containers, VMs, and standalone binaries.
 
 So why did Kubernetes win? Several factors:
 
@@ -10,7 +14,7 @@ So why did Kubernetes win? Several factors:
 
 **2. The declarative model.** Kubernetes' commitment to declarative, reconciliation-based state management was more robust than Swarm's imperative commands or Mesos' framework-specific APIs. The declarative model enabled GitOps, automated testing of infrastructure changes, and reliable self-healing.
 
-**3. The extensibility model.** CRDs and custom controllers allowed the community to extend Kubernetes without forking it. This created a flywheel: the more people extended Kubernetes, the more capable it became, which attracted more users, who created more extensions. Docker Swarm and Mesos lacked this extensibility mechanism.
+**3. The extensibility model.** CRDs and custom controllers allowed the community to extend Kubernetes without forking it. This created a virtuous cycle that Docker Swarm and Mesos, lacking this extensibility, could not match.
 
 **4. Vendor neutrality.** By donating Kubernetes to the CNCF and designing it to run on any infrastructure, Google ensured that no single vendor controlled the project. This convinced AWS, Azure, and every other cloud provider to offer managed Kubernetes services, creating a universal standard. Docker Swarm was controlled by Docker, Inc., and Mesos was associated with Mesosphere (later D2iQ).
 
@@ -49,7 +53,7 @@ Kubernetes' ultimate contribution is not the code (which will be replaced someda
 
 - **"Kubernetes won because it's the simplest."** Kubernetes won despite its complexity, not because of simplicity. The decisive factors were API extensibility (CRDs and custom controllers), vendor-neutral governance through the CNCF, and the ecosystem flywheel these created. Simpler alternatives like Docker Swarm lost because they lacked these properties.
 
-- **"Docker Swarm failed because Docker was bad."** Swarm's user experience was widely praised as simpler and more intuitive than Kubernetes. Swarm lost because Kubernetes' extension model (CRDs, Operators, admission webhooks) attracted far more ecosystem investment, creating a virtuous cycle that Swarm's closed architecture could not match.
+- **"Docker Swarm failed because Docker was bad."** Swarm's user experience was widely praised as simpler and more intuitive than Kubernetes. Swarm lost on ecosystem breadth, not on technical quality or user experience.
 
 - **"There are no alternatives to Kubernetes."** HashiCorp Nomad, AWS ECS, and various platform-as-a-service offerings (Cloud Run, Fly.io, Railway) are valid alternatives for many workloads. Kubernetes is the right choice for complex, multi-service, multi-team environments at scale, but not every application needs what Kubernetes provides.
 

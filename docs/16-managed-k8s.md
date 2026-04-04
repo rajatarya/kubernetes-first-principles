@@ -1,6 +1,6 @@
 # Chapter 16: Managed Kubernetes: EKS, GKE, and AKS
 
-Running your own control plane is an excellent way to learn Kubernetes. It is a terrible way to run production workloads. The control plane --- etcd, the API server, the controller manager, the scheduler --- requires careful backup, monitoring, upgrade orchestration, and high-availability configuration. Managed Kubernetes services take this burden off your team so you can focus on what runs *on* the cluster rather than what runs *the* cluster.
+Running your own control plane is an excellent way to learn Kubernetes. For most teams, managed services reduce operational overhead significantly. The control plane --- etcd, the API server, the controller manager, the scheduler --- requires careful backup, monitoring, upgrade orchestration, and high-availability configuration. Managed Kubernetes services take this burden off your team so you can focus on what runs *on* the cluster rather than what runs *the* cluster.
 
 But "managed" does not mean "fully operated." Every cloud provider draws the line differently between what they manage and what remains your responsibility. Understanding exactly where that line falls is essential for making an informed choice.
 
@@ -34,13 +34,11 @@ MANAGED KUBERNETES: WHO MANAGES WHAT?
     the worker nodes and their sizing      │    the provider patches node OS
 ```
 
-All three major providers manage the control plane: they run the API server, etcd, controller manager, and scheduler in a highly available configuration that you never directly access. You interact with the API server through a managed endpoint. etcd is backed up automatically. Control plane upgrades are handled by the provider (though you still decide *when* to upgrade).
-
 What remains your responsibility in all cases: your application workloads, your RBAC policies, your network policies, your storage configuration, your monitoring, your cost management.
 
 ## GKE: Google Kubernetes Engine
 
-GKE is the most mature managed Kubernetes service. Google invented Kubernetes from Borg, and GKE reflects that lineage --- it is typically the first to adopt new Kubernetes features and the most opinionated about best practices.
+GKE is the most mature managed Kubernetes service. GKE is typically the first to adopt new Kubernetes features and the most opinionated about best practices.
 
 **Networking.** GKE uses a **VPC-native** networking model with **Alias IPs**. Each node is allocated a secondary IP range from the VPC. Pods receive IPs from this secondary range. These are real VPC IPs --- they are routable within the VPC without overlay networks or encapsulation. This means VPC firewall rules, routes, and VPC peering work natively with pod IPs.
 
@@ -98,7 +96,7 @@ This is a critical capacity planning consideration. If you run many small pods, 
 
 ## AKS: Azure Kubernetes Service
 
-AKS differentiates primarily on pricing: the control plane is **free** in the Free tier. You pay only for the worker node VMs. This makes AKS the cheapest option for development and testing clusters.
+AKS differentiates primarily on pricing: the control plane is **free** in the Free tier. You pay only for the worker node VMs.
 
 **Networking.** AKS offers two networking models. **kubenet** is a basic overlay network where pods get IPs from a virtual network that is not routable in the VPC (Azure calls it VNet). **Azure CNI** assigns pods real VNet IPs, similar to AWS VPC CNI and GKE Alias IPs. Azure CNI Overlay is a newer option that provides Azure CNI features without consuming VNet IPs for every pod.
 

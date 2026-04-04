@@ -4,8 +4,6 @@ Kubernetes gives you the building blocks of a platform. It does not give you a p
 
 This is not an abstraction for its own sake. It is a response to a measurable problem: developer cognitive load. When deploying a service requires editing Kubernetes manifests, Terraform modules, CI pipelines, monitoring dashboards, and alerting rules across multiple repositories, developers spend more time on infrastructure plumbing than on the product they are building. Platform engineering inverts this by providing opinionated, pre-built paths that handle the infrastructure automatically.
 
-Gartner projected that 80% of software engineering organizations would establish platform teams by 2026. The question is no longer whether to build an internal platform, but how.
-
 ## The Platform Layers
 
 An internal developer platform is a stack of tools, each handling a layer of the infrastructure problem. The typical production stack looks like this:
@@ -117,8 +115,6 @@ Platform engineering is a product discipline, not an infrastructure discipline. 
 **Provide escape hatches.** Golden paths should be the default, not a prison. When a team needs something non-standard (a GPU workload, a non-HTTP service, a custom CRD), the platform should not block them. The platform reduces friction for the 90% case; the 10% case gets manual support.
 
 ## Anti-Patterns
-
-**Building too much too early.** Many platform teams try to abstract everything from day one. Start with the highest-friction developer workflows (deploy a new service, view logs, check deployment status) and expand from there.
 
 **Leaky abstractions.** If the platform hides Kubernetes but developers still need to debug Kubernetes when things go wrong, the abstraction has not reduced cognitive load --- it has added a layer. Good platforms either make the underlying system invisible (developers never need to know it is Kubernetes) or transparent (developers can drill down when they choose to).
 

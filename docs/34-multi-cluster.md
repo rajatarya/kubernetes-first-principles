@@ -6,15 +6,11 @@ Multi-cluster is not about redundancy alone. Teams adopt multiple clusters for b
 
 ## Why Multi-Cluster
 
-**Blast radius.** A single cluster means a single blast radius. A bad CRD upgrade, a runaway controller, or an API server overload affects every workload. Multiple clusters contain failures: if the staging cluster breaks, production continues unaffected.
-
-**Compliance and data sovereignty.** GDPR, HIPAA, and similar regulations may require that data stays within specific geographic regions. Running a cluster per region, with workloads that process local data, is often simpler than building cross-region data controls within a single cluster.
-
-**Latency.** A cluster in `us-east-1` cannot serve users in Tokyo with sub-50ms latency. Multi-cluster with geographic distribution puts compute close to users.
-
-**Team isolation.** Large organizations may need hard isolation between teams --- separate API servers, separate RBAC configurations, separate upgrade schedules. Namespaces provide soft isolation; separate clusters provide hard isolation.
-
-**Upgrade cadence.** Different workloads may need different Kubernetes versions. Running version N in production and N+1 in staging lets teams validate upgrades before rolling them out.
+- **Blast radius** --- Multiple clusters contain failures so a bad upgrade in staging does not take down production.
+- **Compliance and data sovereignty** --- Regulations like GDPR and HIPAA may require per-region clusters to keep data local.
+- **Latency** --- Geographic distribution puts compute close to users.
+- **Team isolation** --- Separate clusters provide hard isolation (API servers, RBAC, upgrade schedules) beyond what namespaces offer.
+- **Upgrade cadence** --- Running version N in production and N+1 in staging lets teams validate upgrades before rollout.
 
 ## Approach 1: Independent Clusters
 
@@ -101,7 +97,7 @@ spec:
 
 The ApplicationSet generator iterates over all clusters registered in ArgoCD that match the label selector, creates one Application per cluster, and injects cluster-specific values. A single Git commit can roll out a change to every production cluster worldwide.
 
-This approach provides strong consistency guarantees (Git is the source of truth), auditability (every change is a commit), and rollback (revert the commit). It does not, however, provide cross-cluster service discovery or traffic management.
+This approach does not, however, provide cross-cluster service discovery or traffic management.
 
 ## Approach 3: Federation
 
@@ -195,7 +191,6 @@ Most organizations start with GitOps-driven multi-cluster and add service mesh o
 ## Common Mistakes and Misconceptions
 
 - **"One big cluster is always better than multiple small ones."** Large clusters have larger blast radius, harder upgrades, and more complex RBAC. Many organizations use multiple clusters for environment isolation, team autonomy, and regional locality.
-- **"Multi-cluster means duplicating everything."** GitOps tools (ArgoCD, Flux) and fleet management (Rancher, GKE Fleet) let you manage multiple clusters from a single source of truth. The marginal cost of an additional cluster is primarily compute, not operational overhead.
 - **"Service mesh is required for cross-cluster communication."** DNS-based service discovery, cloud load balancers, or simple ingress routing can connect services across clusters. A mesh adds mTLS and observability but isn't always necessary.
 
 ## Further Reading

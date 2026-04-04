@@ -1,7 +1,6 @@
 # Chapter 20: Production Readiness
 
-A cluster that runs workloads is not the same as a cluster that is ready for production. Production readiness is a checklist of capabilities that, taken together, ensure your cluster is observable, secure, recoverable, and cost-efficient. This chapter covers each capability, the tools that implement it, and the principles behind the choices.
-
+A cluster that runs workloads is not the same as a cluster that is ready for production. Production readiness is a checklist of capabilities that, taken together, ensure your cluster is observable, secure, recoverable, and cost-efficient.
 ## The Production Readiness Checklist
 
 ```
@@ -141,7 +140,7 @@ Key RBAC principles:
 
 ### NetworkPolicies: Default Deny
 
-By default, every pod can communicate with every other pod in the cluster. This is convenient but insecure. A compromised pod can reach the entire cluster network.
+By default, every pod can communicate with every other pod --- a compromised pod can reach the entire cluster network.
 
 Start with a **default-deny** policy in every namespace, then explicitly allow the traffic you need:
 
@@ -374,9 +373,7 @@ spec:
 
 ### QoS Classes Revisited
 
-As covered in Chapter 18, set requests equal to limits for critical workloads to achieve **Guaranteed** QoS. This ensures your most important pods are the last to be evicted under memory pressure.
-
-For batch workloads and non-critical services, **Burstable** QoS (requests < limits) allows efficient resource sharing. Never deploy production workloads with no requests or limits (**BestEffort**) --- they will be the first to be evicted.
+Guaranteed QoS (requests = limits) ensures critical pods are evicted last; Burstable QoS (requests < limits) allows efficient sharing for batch workloads. Avoid BestEffort --- see Chapter 18 for detail.
 
 ## Cost Management
 

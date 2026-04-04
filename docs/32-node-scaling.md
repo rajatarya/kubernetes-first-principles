@@ -1,6 +1,6 @@
 # Chapter 32: Node Scaling: Cluster Autoscaler and Karpenter
 
-Pod autoscalers adjust the number or size of pods. But pods run on nodes, and if every node is full, new pods stay `Pending` forever. Node scaling closes this gap: when pods cannot be scheduled due to insufficient cluster capacity, the system must provision new nodes. When nodes sit idle, it must remove them.
+When pods cannot be scheduled due to insufficient cluster capacity, the system must provision new nodes. When nodes sit idle, it must remove them.
 
 Two tools dominate this space: the **Cluster Autoscaler**, which has been the standard since 2016, and **Karpenter**, which rethinks node provisioning from first principles. Understanding both requires understanding why one emerged to replace the other and the architectural difference that makes Karpenter faster, cheaper, and simpler.
 
@@ -180,13 +180,8 @@ spec:
 
 For most AWS-based clusters starting today, Karpenter is the better default. Its consolidation alone typically reduces node costs by 20--35% compared to Cluster Autoscaler with static node groups.
 
-## The Broader Pattern
-
-Both Cluster Autoscaler and Karpenter solve the same problem: translating pod-level demand into infrastructure-level capacity. The architectural lesson is clear. Intermediary abstractions (node groups) that seemed like necessary simplifications became the bottleneck. Karpenter's insight was to remove that indirection and let the scheduler's output (pending pods with specific resource requirements) drive infrastructure decisions directly. This pattern --- eliminating indirection layers to reduce latency and improve optimization --- appears repeatedly in the evolution of cloud-native infrastructure.
-
 ## Common Mistakes and Misconceptions
 
-- **"Karpenter and Cluster Autoscaler are interchangeable."** Karpenter provisions individual right-sized nodes; CA scales pre-defined node groups. Karpenter is architecturally superior but only supports AWS (GA) and Azure (preview). Use CA on GCP and other clouds.
 - **"Cluster Autoscaler scales down immediately."** CA waits 10 minutes (default `scale-down-delay-after-add`) before considering a node for removal, then checks if pods can be moved safely. Scale-down is intentionally conservative.
 - **"Spot/preemptible instances are unreliable for anything."** With proper pod disruption budgets, multiple instance types, and spread across availability zones, spot instances work well for stateless services. Karpenter handles spot interruptions by proactively replacing nodes.
 

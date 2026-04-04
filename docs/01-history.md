@@ -23,7 +23,7 @@ Timeline: The Road to Container Orchestration
 
 ## The Bare Metal Era: One Application, One Server
 
-The story of Kubernetes begins long before containers. In the earliest days of server computing, the deployment model was brutally simple: one application ran on one physical server. This model had the virtue of simplicity and isolation --- if an application misbehaved, it could not affect others --- but it was catastrophically wasteful. Most servers ran at 5-15% average CPU utilization. Organizations maintained vast fleets of underutilized machines, each dedicated to a single workload, each requiring its own power, cooling, network connectivity, and physical maintenance.
+In the earliest days of server computing, one application ran on one physical server --- simple, isolated, but catastrophically wasteful. Most servers ran at 5-15% average CPU utilization. Organizations maintained vast fleets of underutilized machines, each dedicated to a single workload, each requiring its own power, cooling, network connectivity, and physical maintenance.
 
 The fundamental problem was **resource fragmentation**. You could not easily share a physical machine between two applications because there was no reliable mechanism to prevent one application from consuming all available CPU, memory, or disk I/O and starving the other. Operating system process isolation was insufficient: processes could interfere with each other through shared filesystems, port conflicts, library version conflicts, and resource exhaustion. The result was an era of enormous waste, where the primary cost driver was not compute but rather the operational overhead of managing vast numbers of barely-utilized machines.
 
@@ -41,7 +41,7 @@ The late 2000s and early 2010s saw the rise of configuration management tools --
 
 This was a crucial intellectual contribution that directly influenced Kubernetes: the **desired state model**. Instead of writing imperative scripts that said "install package X, then start service Y, then modify file Z," configuration management tools let you declare "package X should be present, service Y should be running, file Z should contain these contents" and let the tool figure out how to get there. This declarative approach was more robust because it was **idempotent** --- you could run the tool multiple times and get the same result, regardless of the starting state.
 
-But configuration management operated at the wrong level of abstraction for the emerging world of containerized microservices. These tools managed individual servers, not distributed applications. They could ensure that a particular server had the right software installed, but they could not easily reason about a distributed application that spanned dozens of servers, needed to be updated without downtime, and had to automatically recover from server failures. The unit of management was the machine, not the application.
+But configuration management operated at the wrong level of abstraction for the emerging world of containerized microservices. They could ensure that a particular server had the right software installed, but they could not easily reason about a distributed application that spanned dozens of servers, needed to be updated without downtime, and had to automatically recover from server failures. The unit of management was the machine, not the application.
 
 ## The Container Revolution: Docker and the Shipping Container Metaphor
 
@@ -83,7 +83,7 @@ This shared-state, optimistic-concurrency approach influenced Kubernetes' design
 
 Kubernetes was born in mid-2014 at Google, created by Joe Beda, Brendan Burns, and Craig McLuckie, with significant contributions from Brian Grant, Tim Hockin, and many others. It was explicitly designed to be an open-source, vendor-neutral system that embodied the lessons of Borg and Omega without carrying their technical debt.
 
-The founders made a crucial strategic decision: rather than simply open-sourcing Borg (which was deeply entangled with Google's internal infrastructure), they built a new system from scratch that captured Borg's design principles but was designed to run anywhere. This meant:
+The founders made a crucial strategic decision: Rather than open-sourcing Borg, they built a clean-room redesign designed to run anywhere. This meant:
 
 - Using standard open-source components (etcd for storage, instead of Google's proprietary Chubby/Colossus)
 - Supporting multiple container runtimes (not just Google's internal runtime)

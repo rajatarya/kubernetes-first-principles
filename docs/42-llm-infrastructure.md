@@ -1,6 +1,6 @@
 # Chapter 42: Running LLMs on Kubernetes
 
-Serving a large language model is not the same problem as serving a web application. A web app handles requests independently in milliseconds with megabytes of memory. An LLM loads 50-400 GB of weights into GPU memory, processes requests through billions of sequential matrix multiplications, generates tokens one at a time, and must manage a KV cache that grows with every token. The infrastructure required --- specialized inference servers, GPU-aware autoscaling, multi-node parallelism, model caching, and intelligent routing --- is an entire stack that did not exist three years ago. This chapter covers every layer.
+Serving a large language model is not the same problem as serving a web application. A web app handles requests independently in milliseconds with megabytes of memory. An LLM loads 50-400 GB of weights into GPU memory, processes requests through billions of sequential matrix multiplications, generates tokens one at a time, and must manage a KV cache that grows with every token. The infrastructure required --- specialized inference servers, GPU-aware autoscaling, multi-node parallelism, model caching, and intelligent routing --- demands a purpose-built stack.
 
 ## ML Inference on Kubernetes
 
@@ -73,7 +73,7 @@ Together, these deliver **up to 24x throughput improvement** over naive serving.
 
 Autoscaling GPU inference is fundamentally different from autoscaling web services.
 
-**GPU utilization is a misleading metric.** A GPU running vLLM at 95% utilization might be handling 10 requests/sec or 200 requests/sec --- utilization stays pinned high as long as *any* work is being done. Scaling on GPU utilization is like scaling a web server on CPU utilization when it is running an infinite loop in the background: the metric tells you the hardware is busy, not whether users are getting good service.
+**GPU utilization is a misleading metric.** A GPU running vLLM at 95% utilization might be handling 10 requests/sec or 200 requests/sec --- utilization stays pinned high as long as *any* work is being done. GPU utilization stays pinned high as long as any work is in-flight --- it does not indicate whether users are getting good latency.
 
 **The right metrics to scale on:**
 
@@ -369,8 +369,7 @@ Google's [Hyperdisk ML](https://cloud.google.com/kubernetes-engine/docs/how-to/p
 
 ### Text Generation Inference (TGI)
 
-[TGI](https://github.com/huggingface/text-generation-inference) was the first production-grade open-source LLM inference server. It pioneered several techniques now considered industry standard: continuous batching, flash attention integration, tensor parallelism, quantization support (GPTQ, AWQ, EETQ), and speculative decoding. TGI proved that a purpose-built inference server could dramatically outperform naive PyTorch serving.
-
+[TGI](https://github.com/huggingface/text-generation-inference) was the first production-grade open-source LLM inference server. It pioneered several techniques now considered industry standard: continuous batching, flash attention integration, tensor parallelism, quantization support (GPTQ, AWQ, EETQ), and speculative decoding.
 As of December 2025, the HuggingFace team recommends vLLM or SGLang for new LLM serving deployments. TGI remains in maintenance mode for existing users. If you are currently running TGI in production, it continues to work reliably --- but new deployments should evaluate vLLM (for throughput) or SGLang (for structured generation and agent workloads) first.
 
 ### Text Embeddings Inference (TEI)
@@ -447,7 +446,7 @@ For HuggingFace infrastructure specifically, the typical pattern is: vLLM for th
 
 ## Common Mistakes and Misconceptions
 
-- **"Serving an LLM is just deploying a container."** Large models need tensor parallelism across multiple GPUs, KV cache management, continuous batching, and careful memory planning. A simple Deployment with one container won't work for models larger than one GPU's memory.
+- **"Serving an LLM is just deploying a container."** Large models need tensor parallelism across multiple GPUs, KV cache management, continuous batching, and careful memory planning.
 - **"Bigger instances are always better for LLM serving."** Cost-per-token often favors multiple smaller GPU instances over fewer large ones, depending on model size and batching strategy. Profile your specific model to find the cost-optimal configuration.
 - **"Auto-scaling LLM inference works like web services."** LLM pods take minutes to load models into GPU memory. Scale-from-zero is extremely slow. Maintain warm replicas and scale on custom metrics (queue depth, KV cache utilization) rather than CPU.
 - **"All LLM serving frameworks are interchangeable."** vLLM excels at throughput with PagedAttention, TGI integrates tightly with HuggingFace models, Triton supports multi-model serving. Choose based on your specific model and serving requirements.

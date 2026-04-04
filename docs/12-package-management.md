@@ -169,21 +169,7 @@ ArgoCD supports Helm Charts, Kustomize overlays, plain YAML directories, and Jso
 
 Flux v2 was designed to be composable: each controller does one thing, and they communicate through Kubernetes resources. This makes Flux extensible (you can add image automation controllers, notification controllers, etc.) but also means there are more pieces to understand and configure.
 
-### Why GitOps Matters
-
-The significance of GitOps is not the specific tools --- it is the operational model. When Git is the source of truth:
-
-**Audit trail.** Every change to the cluster is a Git commit. `git log` shows who changed what, when, and why. This satisfies compliance requirements that are impossible to meet with manual `kubectl apply` workflows.
-
-**Rollback.** Reverting to a previous cluster state is `git revert`. The GitOps controller sees the new commit and reconciles the cluster to the previous state. No need to remember what was running before or manually reconstruct manifests.
-
-**Access control.** Developers do not need direct kubectl access to the cluster. They push changes to Git, changes are reviewed through pull requests, and the GitOps controller applies them. The blast radius of a compromised developer laptop is reduced because the laptop does not have cluster credentials.
-
-**Drift detection and correction.** If someone manually modifies a resource in the cluster, the GitOps controller detects the drift and reverts it. The cluster always converges to the state defined in Git. This eliminates "snowflake clusters" where manual changes accumulate over time.
-
-**Consistency across clusters.** If you manage multiple clusters (dev, staging, production, or multiple production regions), GitOps ensures they are configured from the same source. Promoting a change from staging to production is a Git merge, not a series of manual kubectl commands against different clusters.
-
-GitOps is the logical endpoint of the declarative, desired-state model that runs through all of Kubernetes' design. Kubernetes says "declare the desired state and let controllers reconcile." GitOps says "store the desired state in Git and let a controller reconcile." It is the same pattern, applied at a higher level of abstraction.
+If you manage multiple clusters (dev, staging, production, or multiple production regions), GitOps ensures they are configured from the same source. Promoting a change from staging to production is a Git merge, not a series of manual kubectl commands against different clusters.
 
 ## Common Mistakes and Misconceptions
 

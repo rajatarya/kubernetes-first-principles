@@ -2,7 +2,7 @@
 
 Every object in a Kubernetes cluster --- every Pod, every Secret, every ConfigMap, every CRD instance --- exists as a key-value pair in etcd. There is no secondary database, no cache that can reconstruct state. If etcd loses data, the cluster loses its memory. If etcd becomes slow, every API server call becomes slow. If etcd goes down, the cluster is effectively frozen: controllers cannot reconcile, the scheduler cannot place pods, and kubectl returns errors.
 
-Understanding etcd operations is not optional for anyone responsible for Kubernetes infrastructure. This chapter covers backup, restore, maintenance, monitoring, and the disaster recovery procedures you hope to never need.
+This chapter covers backup, restore, maintenance, monitoring, and the disaster recovery procedures you hope to never need.
 
 ## What etcd Stores
 
@@ -60,7 +60,7 @@ Raft requires a **quorum** --- a majority of members --- to commit writes. With 
 
 ## Backup
 
-A backup you have never tested is wishful thinking. etcd backup is the single most important operational procedure for any Kubernetes cluster.
+A backup you have never tested is wishful thinking.
 
 ### Taking a Snapshot
 
@@ -220,7 +220,7 @@ etcdctl member list
 etcdctl member remove <member-id>
 ```
 
-When scaling from 3 to 5 members, you gain tolerance for 2 failures instead of 1, but you increase the write latency (the leader must wait for acknowledgment from 3 members instead of 2). Most clusters should stay at 3 or 5 members. Going to 7 is rarely justified.
+When scaling from 3 to 5 members, you gain tolerance for 2 failures instead of 1, but you increase the write latency (the leader must wait for acknowledgment from 3 members instead of 2). Most clusters should stay at 3 or 5 members; 7+ members hurt write latency without meaningful availability gain.
 
 ## Disaster Recovery Procedure
 
@@ -243,7 +243,7 @@ If only one member has failed (and quorum is maintained), do not restore from a 
 
 - **"etcd backs up automatically in managed Kubernetes."** True for the control plane etcd in EKS/GKE/AKS. But if you run self-managed clusters or use etcd for other purposes, backups are your responsibility. Test restores regularly.
 - **"etcd can store large values."** etcd has a default per-value limit of 1.5 MB. Storing large ConfigMaps, Secrets, or CRDs that approach this limit degrades performance. Keep resources small.
-- **"Adding more etcd nodes improves write performance."** More nodes means more replication for each write (Raft consensus requires majority acknowledgment). 3 or 5 members is optimal; 7+ actually hurts write latency.
+- **"Adding more etcd nodes improves write performance."** More nodes means more Raft acknowledgments per write --- 7+ members hurt, not help, write performance.
 
 ## Further Reading
 

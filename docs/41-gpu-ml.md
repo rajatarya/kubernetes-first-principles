@@ -1,6 +1,6 @@
 # Chapter 41: GPU Workloads and AI/ML on Kubernetes
 
-Kubernetes was built to orchestrate stateless web services. GPUs were built to render triangles and multiply matrices. Bringing these two worlds together required years of extension work --- device plugins, operator stacks, specialized schedulers, and high-speed networking --- because none of the original Kubernetes abstractions anticipated hardware accelerators. This chapter covers the full GPU infrastructure stack from first principles: how GPUs are exposed to the scheduler, how they are shared, how training jobs are orchestrated, and how to avoid burning money on idle accelerators.
+Kubernetes was built to orchestrate stateless web services. GPUs were built to render triangles and multiply matrices. Bringing these two worlds together required years of extension work --- device plugins, operator stacks, specialized schedulers, and high-speed networking --- because none of the original Kubernetes abstractions anticipated hardware accelerators.
 
 ## The Device Plugin Framework
 
@@ -67,7 +67,7 @@ The device plugin model has several hard limitations that shape everything downs
 - **Integer-only quantities.** You request `nvidia.com/gpu: 1` or `nvidia.com/gpu: 2`. There is no `nvidia.com/gpu: 0.5`. Fractional GPUs do not exist in this model.
 - **Non-sharable.** A GPU allocated to one pod is exclusively allocated. Two pods cannot share the same device ID through the standard device plugin.
 - **Not overcommittable.** Unlike CPU, which can be overcommitted (requests < limits), GPU counts are absolute. If a node has 4 GPUs and 4 are allocated, a fifth pod cannot be scheduled there.
-- **No memory management.** Kubernetes has no visibility into GPU memory. There is no equivalent of `resources.limits.memory` for GPU VRAM. A pod requesting `nvidia.com/gpu: 1` gets the full physical GPU, whether it uses 1 GB or 80 GB of its VRAM.
+- **No memory management.** Kubernetes has no visibility into GPU memory. There is no equivalent of `resources.limits.memory` for GPU VRAM. A pod requesting `nvidia.com/gpu: 1` gets the full physical GPU.
 
 These constraints are why MIG, MPS, time-slicing, and ultimately DRA were created.
 
@@ -160,7 +160,7 @@ GPU SHARING MODELS
 
 ## Dynamic Resource Allocation (DRA)
 
-The device plugin framework served its purpose for seven years, but its count-based model hit a wall as GPU infrastructure grew more complex. You cannot express "give me a MIG slice with 20 GB of memory on a GPU that has NVLink connectivity to another GPU already allocated to this pod" with `nvidia.com/gpu: 1`.
+You cannot express "give me a MIG slice with 20 GB of memory on a GPU that has NVLink connectivity to another GPU already allocated to this pod" with `nvidia.com/gpu: 1`.
 
 ### Why Device Plugins Were Insufficient
 
@@ -275,7 +275,7 @@ Core concepts:
 
 ## Networking for Distributed Training
 
-Distributed training spends a significant fraction of total time on communication. After each forward/backward pass, gradients must be synchronized across all workers (AllReduce). On a 1000-GPU training run, the network is the bottleneck.
+Distributed training spends a significant fraction of total time on communication. After each forward/backward pass, gradients must be synchronized across all workers (AllReduce).
 
 ### Why Standard TCP Is Insufficient
 
@@ -381,9 +381,8 @@ The default Kubernetes scheduler spreads pods across nodes. For GPU workloads, *
 
 ## Common Mistakes and Misconceptions
 
-- **"GPUs can be shared across pods like CPU."** By default, a GPU is allocated as a whole device to one pod. Sharing requires MIG (physical partitioning), MPS (time-sharing), or DRA (Dynamic Resource Allocation). Without these, a pod requesting 1 GPU gets exclusive access.
+- **GPUs are allocated exclusively as whole units by default.** No fractional requests, no sharing between pods without MIG, MPS, or DRA.
 - **"Any Kubernetes node can schedule GPU workloads."** Nodes need the NVIDIA device plugin (or GPU Operator) installed, proper drivers, and the nvidia container runtime configured. Without this stack, K8s doesn't know GPUs exist.
-- **"GPU requests and limits work like CPU."** You can only request whole GPUs (e.g., `nvidia.com/gpu: 1`). Fractional GPU requests require MIG or third-party tools. There are no GPU "millicores."
 - **"Training and inference need the same infrastructure."** Training needs high-bandwidth interconnects (NVLink, InfiniBand), gang scheduling, and checkpointing. Inference needs low latency, autoscaling, and model serving frameworks. Different workloads, different architectures.
 
 ## Further Reading

@@ -39,7 +39,7 @@ The **Container Runtime Interface (CRI)** was introduced in Kubernetes 1.5 to so
 
 Any container runtime that implemented this gRPC interface could be plugged into the kubelet without modifying kubelet source code. The kubelet would communicate with the runtime over a Unix socket, and the runtime would handle everything from there.
 
-This was a critical architectural decision. CRI turned the container runtime into a **pluggable component** --- the same design philosophy that Kubernetes applied to networking (CNI), storage (CSI), and cloud providers. Define a clean interface, let implementations compete, and avoid coupling the core system to any particular vendor.
+This was a critical architectural decision --- the same design philosophy that Kubernetes applied to networking (CNI), storage (CSI), and cloud providers. Define a clean interface, let implementations compete, and avoid coupling the core system to any particular vendor.
 
 ```
 The CRI Interface (simplified)
@@ -87,7 +87,7 @@ kubelet ---> dockershim ---> Docker Engine (dockerd) ---> containerd ---> runc
 
 Four layers of indirection to start a container. And the dockershim added a particular kind of burden: because it lived in the kubelet codebase, every Kubernetes release had to ensure compatibility with Docker. Docker bugs became kubelet bugs. Docker's release cycle constrained Kubernetes' release cycle. The dockershim was approximately 2,000 lines of complex translation code that had to be maintained by the Kubernetes community despite being, conceptually, Docker's problem.
 
-This situation was unsustainable. The Kubernetes community was maintaining a compatibility shim for one specific vendor's product inside its core codebase. The existence of CRI was supposed to make runtimes pluggable, but the most popular runtime was still hardwired into kubelet through the shim.
+This situation was unsustainable. The Kubernetes community was maintaining a compatibility shim for one specific vendor's product inside its core codebase.
 
 ## containerd Goes Standalone
 
@@ -162,7 +162,7 @@ The Current Ecosystem (2024+)
   └───────────────────┘              └──────────────────────────────┘
 ```
 
-The container runtime wars are effectively over. The lesson they teach is a design lesson: **define clean interfaces early, and the ecosystem will sort itself out.** CRI turned the container runtime from a hardwired dependency into a pluggable component, and the result was a healthier ecosystem where runtimes could compete on merit without requiring changes to Kubernetes core. The removal of dockershim, despite the community anxiety it caused, was the natural conclusion of a process that began six years earlier with the introduction of CRI.
+The lesson they teach is a design lesson: **define clean interfaces early, and the ecosystem will sort itself out.** CRI turned the container runtime from a hardwired dependency into a pluggable component, and the result was a healthier ecosystem where runtimes could compete on merit without requiring changes to Kubernetes core. The removal of dockershim, despite the community anxiety it caused, was the natural conclusion of a process that began six years earlier with the introduction of CRI.
 
 ## Common Mistakes and Misconceptions
 

@@ -2,11 +2,9 @@
 
 Kubernetes makes it easy to deploy applications and hard to understand what they cost. A developer requests 2 CPU cores and 4 GB of memory for a service that uses 0.3 cores and 800 MB at peak. Multiply that by hundreds of services across dozens of namespaces, and you arrive at the industry average: **only 13% of requested CPU is actually used**. The rest is reserved but idle, burning money on cloud provider invoices.
 
-Cost optimization in Kubernetes is not about being cheap. It is about aligning resource allocation with actual consumption, eliminating waste that serves no purpose, and building feedback loops so that teams understand the cost of their decisions. This chapter covers the tools and strategies that make this practical.
-
 ## The Cost Problem
 
-The disconnect between requested and used resources exists because of a rational incentive: nobody wants their service to be OOM-killed or CPU-throttled, so everyone over-provisions. Without visibility into actual usage, the safe choice is to request more than you need.
+The disconnect between requested and used resources exists because of a rational incentive: nobody wants their service to be OOM-killed or CPU-throttled, so everyone over-provisions.
 
 ```
 THE RESOURCE EFFICIENCY GAP
@@ -206,7 +204,7 @@ Tools and automation are necessary but not sufficient. Cost optimization sticks 
 
 4. **Regular review cadence.** Monthly cost reviews at the team level, quarterly at the organization level. Celebrate wins (a team that cut costs 40% through right-sizing) and investigate anomalies (a namespace that doubled in cost with no traffic increase).
 
-The goal is not to minimize cost --- it is to maximize the value per dollar. A service that costs $50,000/month and handles 10 million requests is not expensive. A service that costs $500/month and handles zero requests is infinitely expensive.
+The goal is not to minimize cost --- it is to maximize the value per dollar.
 
 ## Common Mistakes and Misconceptions
 

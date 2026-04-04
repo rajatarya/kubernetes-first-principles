@@ -1,6 +1,6 @@
 # Chapter 27: Supply Chain Security
 
-A container image is code someone else wrote, compiled by a build system you may not control, stored in a registry you access over the network, and executed with the same privileges as your application. At every step in this chain --- source code, build, distribution, deployment --- there is an opportunity for compromise. Supply chain security is the discipline of verifying that what you deploy is what you intended to deploy, and that nothing was tampered with along the way.
+A container image passes through source code, build systems, registries, and your cluster --- each step is an opportunity for compromise. Supply chain security verifies that nothing was tampered with along the way.
 
 This is not a theoretical concern. The SolarWinds attack (2020) injected malicious code into a build pipeline. The Codecov breach (2021) modified a bash uploader to exfiltrate credentials. The xz utils backdoor (2024) hid a sophisticated compromise in a compression library used by SSH. Kubernetes clusters are particularly exposed because they pull images from external registries on every deployment, and a single compromised base image can propagate to hundreds of workloads.
 
@@ -162,7 +162,7 @@ spec:
 
 ## SBOM: Software Bill of Materials
 
-An SBOM is a machine-readable inventory of every component in a container image --- every library, every dependency, every version. It answers the question: "When the next Log4Shell happens, are we affected?"
+An SBOM is a machine-readable inventory of every component in a container image --- every package and dependency. It answers the question: "When the next Log4Shell happens, are we affected?"
 
 **Generation tools:**
 
@@ -187,20 +187,7 @@ cosign attach sbom --sbom sbom.json ghcr.io/myorg/myapp@sha256:abc123...
 
 ## Image Scanning
 
-Vulnerability scanning inspects every package in an image against known vulnerability databases (NVD, GitHub Advisory Database, vendor-specific feeds).
-
-```bash
-# Scan with Trivy
-trivy image ghcr.io/myorg/myapp:latest
-
-# Scan with severity filter
-trivy image --severity HIGH,CRITICAL ghcr.io/myorg/myapp:latest
-
-# Scan and fail CI if critical vulnerabilities found
-trivy image --exit-code 1 --severity CRITICAL ghcr.io/myorg/myapp:latest
-```
-
-Scanning should happen at three points: in CI (before push to registry), in the registry (continuous scanning of stored images), and at admission time (via Kyverno or Gatekeeper policies that check scan results).
+Scanning should happen in CI, in the registry, and at admission time (via Kyverno/Gatekeeper).
 
 ## The SLSA Framework
 
@@ -213,7 +200,7 @@ SLSA (Supply-chain Levels for Software Artifacts, pronounced "salsa") is a frame
 | **2** | Hosted build | Build runs on a hosted service (not a developer laptop). Provenance is signed. |
 | **3** | Hardened builds | Build service is hardened against tampering. Provenance is non-forgeable. Build is isolated. Source is version-controlled. |
 
-SLSA is not a tool you install. It is a maturity model. GitHub Actions with reusable workflows can achieve SLSA Level 3 using the `slsa-framework/slsa-github-generator` action, which produces signed provenance attestations.
+GitHub Actions with reusable workflows can achieve SLSA Level 3 using the `slsa-framework/slsa-github-generator` action, which produces signed provenance attestations.
 
 ## Restricting Image Registries
 

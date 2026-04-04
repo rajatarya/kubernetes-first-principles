@@ -61,8 +61,6 @@ THE RECONCILE LOOP
   └───────────────┘
 ```
 
-This six-step pattern is so universal that you should internalize it as the skeleton of every Reconcile function you will ever write.
-
 ## Kubebuilder Scaffolding
 
 Kubebuilder generates the boilerplate so you can focus on the reconciliation logic. A typical workflow:
@@ -302,15 +300,9 @@ OPERATOR MATURITY MODEL
              Increasing automation and operational knowledge
 ```
 
-**Level 1** is where most teams should start. Automate the install. Get the CRD right. Write a solid Reconcile loop. Each subsequent level adds operational knowledge that was previously trapped in runbooks and human memory.
-
-**Level 3** is the inflection point where an operator begins to pay for itself. Automated backup, restore, and upgrades eliminate the most common sources of human error in database and stateful service operations.
-
-**Level 5** is the aspirational end state --- the operator makes scaling and tuning decisions that previously required a dedicated SRE. Few operators reach this level, but those that do (CockroachDB, Elastic Cloud on Kubernetes) represent a step change in operational burden.
+Start at Level 1. Level 3 is the inflection point where automated backup and upgrades pay off. Level 5 (auto-pilot) is rare; CockroachDB and ECK are examples.
 
 ## Putting It All Together
-
-Building an operator is not difficult. Building a *good* operator requires discipline:
 
 1. **Start with the API.** Design your CRD spec and status carefully. They are a contract with your users. Changing them later requires conversion webhooks and migration paths.
 
@@ -328,7 +320,7 @@ Building an operator is not difficult. Building a *good* operator requires disci
 
 - **"Every application needs an Operator."** Operators are for stateful, complex applications that need operational automation (databases, message queues). A stateless web service managed by a Deployment does not need an Operator.
 - **"Writing an Operator is straightforward."** Operators encode operational expertise in code. The happy path is simple, but handling every failure mode (partial updates, resource conflicts, cascading failures) correctly takes significant engineering effort.
-- **"Operators are always better than Helm charts."** Operators add a continuously running controller to your cluster. Helm charts are simpler: apply once, done. Use Operators when you need active reconciliation; use Helm when install-time configuration is sufficient.
+- **"Operators are always better than Helm charts."** Helm charts are simpler: apply once, done. Use Operators when you need active reconciliation; use Helm when install-time configuration is sufficient.
 - **"All Operators on OperatorHub are production-quality."** OperatorHub lists community and vendor operators with varying maturity levels. Check the capability level (basic install through full lifecycle) and community adoption before deploying to production.
 
 ## Further Reading

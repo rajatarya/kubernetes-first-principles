@@ -6,7 +6,7 @@ RBAC answers a single question: **who can do what to which resources?** Understa
 
 ## The Authorization Model
 
-In [Chapter 3](03-architecture.md), we described the API server as the gateway that every request must pass through. Authentication (proving who you are) is the first gate; authorization (proving you are allowed) is the second. RBAC is the authorization module used by virtually every production cluster.
+In [Chapter 3](03-architecture.md), we described the API server as the gateway that every request must pass through. The API server authenticates every request, then authorizes it --- RBAC is the authorization module used by virtually every production cluster.
 
 Every request to the Kubernetes API server carries three pieces of information relevant to authorization:
 
@@ -259,7 +259,7 @@ spec:
 
 ## OIDC Integration for Human Users
 
-Production clusters should not use client certificates for human users. Client certificates cannot be revoked (Kubernetes has no CRL support), and distributing certificate files is an operational nightmare. Instead, use OpenID Connect (OIDC) to delegate authentication to an identity provider (Okta, Azure AD, Google Workspace, Dex).
+Production clusters should authenticate human users via OIDC rather than client certificates, which cannot be revoked once issued. Use OpenID Connect (OIDC) to delegate authentication to an identity provider (Okta, Azure AD, Google Workspace, Dex).
 
 The flow works as follows:
 
@@ -314,26 +314,6 @@ MULTI-TENANT NAMESPACE MODEL
 - **Use ClusterRoles with namespaced RoleBindings.** Define permissions once, apply per-namespace.
 - **Every namespace gets ResourceQuota and LimitRange.** RBAC controls what you can do; quotas control how much.
 - **CI/CD uses dedicated ServiceAccounts** with edit permissions scoped to specific namespaces. Never share ServiceAccounts across pipelines.
-
-## Common RBAC Mistakes
-
-**cluster-admin for everyone.** The most dangerous anti-pattern. "It works in dev" until someone runs `kubectl delete ns production`. Grant the minimum permissions required.
-
-**Wildcard permissions.** Rules with `resources: ["*"]` or `verbs: ["*"]` grant access to resources that do not exist yet. When a new CRD is installed, wildcard rules automatically apply to it. Be explicit about which resources and verbs you intend to grant.
-
-**Shared ServiceAccounts.** When multiple applications share a ServiceAccount, compromising one application compromises all of them. Every workload should have its own ServiceAccount with only the permissions it needs.
-
-**Ignoring the `default` ServiceAccount.** Every namespace has a `default` ServiceAccount. If you do not create a dedicated one, your pods run as `default` and share whatever permissions are bound to it. Create application-specific ServiceAccounts and set `automountServiceAccountToken: false` on the default.
-
-**Not auditing RBAC.** Use `kubectl auth can-i --list --as=alice -n production` to verify what a user can actually do. Automate this with tools like `rakkess` or `kubectl-who-can`.
-
-```bash
-# Check what alice can do in production
-kubectl auth can-i --list --as=alice -n production
-
-# Check who can delete secrets in production
-kubectl who-can delete secrets -n production
-```
 
 ## Least Privilege Checklist
 

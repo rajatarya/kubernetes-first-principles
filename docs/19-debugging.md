@@ -195,7 +195,11 @@ kubectl exec -it debug-pod -- nslookup my-service.my-namespace.svc.cluster.local
 kubectl logs -n kube-system -l k8s-app=kube-dns
 ```
 
-Common causes: CoreDNS pods are not running, the pod's DNS policy is misconfigured, or a NetworkPolicy is blocking DNS traffic (port 53 UDP/TCP to the kube-dns Service).
+Common causes:
+
+- CoreDNS pods are not running
+- The pod's DNS policy is misconfigured
+- A NetworkPolicy is blocking DNS traffic (port 53 UDP/TCP to the kube-dns Service)
 
 ### Pattern 2: Service Not Routing Traffic
 
@@ -241,7 +245,12 @@ systemctl status containerd
 crictl ps
 ```
 
-Common causes: kubelet crashed, container runtime is down, the node ran out of disk space, or network connectivity to the API server was lost.
+Common causes:
+
+- kubelet crashed
+- Container runtime is down
+- The node ran out of disk space
+- Network connectivity to the API server was lost
 
 ### Pattern 4: Persistent Volume Claim Stuck in Pending
 
@@ -258,7 +267,12 @@ kubectl describe pvc my-claim
 # - "waiting for first consumer to be created before binding"
 ```
 
-Common causes: StorageClass does not exist, the CSI driver is not installed, `WaitForFirstConsumer` volume binding mode is waiting for a pod to be scheduled, or the requested storage exceeds available capacity.
+Common causes:
+
+- StorageClass does not exist
+- The CSI driver is not installed
+- `WaitForFirstConsumer` volume binding mode is waiting for a pod to be scheduled
+- The requested storage exceeds available capacity
 
 ### Pattern 5: Intermittent OOMKills
 
