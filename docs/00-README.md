@@ -1,8 +1,8 @@
-# The Ultimate Kubernetes Course
+# Kubernetes from First Principles
 
-**From First Principles to Production: A Complete Curriculum**
+**Why It Works the Way It Does**
 
-This is an eight-part course that takes you from "why does Kubernetes exist?" to "I'm running GPU-accelerated ML workloads in production across multiple clusters." It is written for someone who understands Linux, networking, and computing but wants to deeply understand Kubernetes --- not just follow tutorials, but build genuine intuition for how the system works and why.
+This is an eight-part book that takes you from "why does Kubernetes exist?" to "I'm running GPU-accelerated ML workloads in production across multiple clusters." It is written for engineers who understand Linux, networking, and how systems work --- and want to understand Kubernetes deeply, not just follow tutorials.
 
 ---
 

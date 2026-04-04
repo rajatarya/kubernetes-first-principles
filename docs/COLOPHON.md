@@ -2,7 +2,7 @@
 
 ## How This Book Was Made
 
-This book was written in a single evening session on April 3-4, 2026, through a conversation between a human (Rajat Arya) and Claude Code (Anthropic's Claude Opus 4.6 with 1M context). The entire process — from "help me set up a Kubernetes cluster on EC2" to a published 80,000-word, 45-chapter textbook — happened in one continuous conversation.
+*Kubernetes from First Principles: Why It Works the Way It Does* was written over a weekend (April 3-4, 2026) through a collaboration between Rajat Arya and Claude Code (Anthropic's Claude Opus 4.6 with 1M context). The entire process — from "help me set up a Kubernetes cluster on EC2" to a published 98,000-word, 45-chapter textbook with 5 appendices — happened in one continuous conversation.
 
 ## The Process
 

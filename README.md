@@ -1,10 +1,8 @@
-# The Ultimate Kubernetes Course
+# Kubernetes from First Principles
 
-**From First Principles to Production: A Complete Curriculum**
+**Why It Works the Way It Does**
 
-A 98,000-word, 45-chapter open-source textbook (with 5 appendices) that teaches Kubernetes by explaining *why* it was designed the way it was --- not just *how* to use it. Includes 326 curated external links, 2,500+ lines of ASCII diagrams, decision trees, a troubleshooting quick-reference, and common-mistakes callouts in every chapter.
-
-This book was written for someone who understands Linux, networking, and computing but wants to deeply understand Kubernetes. It covers everything from the historical origins (Google's Borg system) through running GPU-accelerated LLM inference in production.
+Most Kubernetes resources teach you how to write YAML. This book teaches you why the YAML looks the way it does. 45 chapters covering architecture, security, scaling, platform engineering, and GPU/ML infrastructure --- each traced from the original design problem through the ecosystem's evolution to today's best practice. Written for engineers who know Linux, networking, and how systems work, and want to understand Kubernetes the way they think.
 
 ## Start Reading
 
@@ -33,8 +31,6 @@ This book was written for someone who understands Linux, networking, and computi
 
 ## What Makes This Different
 
-Most Kubernetes resources teach you how to write YAML. This book teaches you why the YAML looks the way it does.
-
 Every architectural decision is traced back to the problem it solves. Every tool is explained in the context of what existed before it and why it was insufficient. The goal is to build intuition deep enough that you could have designed something similar given the same constraints.
 
 ## The Companion Cluster
@@ -53,7 +49,7 @@ sudo kubeadm init --apiserver-advertise-address=<IP> --pod-network-cidr=10.244.0
 
 ## How This Was Made
 
-This book was generated in a single conversation session on April 3-4, 2026, through a collaboration between a human and Claude Code (Anthropic's Claude Opus 4.6). Research agents gathered material from official Kubernetes documentation, CNCF project pages, cloud provider docs, and academic papers. Writing agents produced the chapters in parallel, followed by a coherence pass across all 45 chapters.
+This book was generated over a weekend (April 3-4, 2026) through a collaboration between a human and Claude Code (Anthropic's Claude Opus 4.6). Research agents gathered material from official Kubernetes documentation, CNCF project pages, cloud provider docs, and academic papers. Writing agents produced the chapters in parallel, followed by editorial passes for coherence, conciseness, and link verification.
 
 See the [Colophon](docs/COLOPHON.md) for the full story, including the exact prompts used to generate each part.
 

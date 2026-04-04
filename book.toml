@@ -1,7 +1,7 @@
 [book]
-title = "The Ultimate Kubernetes Course"
+title = "Kubernetes from First Principles"
 authors = ["Rajat Arya"]
-description = "From First Principles to Production: A Complete Curriculum"
+description = "Why It Works the Way It Does"
 src = "docs"
 language = "en"
 
@@ -11,9 +11,9 @@ build-dir = "book"
 [output.html]
 default-theme = "navy"
 preferred-dark-theme = "navy"
-git-repository-url = "https://github.com/rajatarya/ultimate-k8s"
-edit-url-template = "https://github.com/rajatarya/ultimate-k8s/edit/main/docs/{path}"
-site-url = "/ultimate-k8s/"
+git-repository-url = "https://github.com/rajatarya/kubernetes-first-principles"
+edit-url-template = "https://github.com/rajatarya/kubernetes-first-principles/edit/main/docs/{path}"
+site-url = "/kubernetes-first-principles/"
 no-section-label = false
 
 [output.html.search]
