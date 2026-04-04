@@ -8,7 +8,7 @@ This book was written for someone who understands Linux, networking, and computi
 
 ## Start Reading
 
-**[Start here: Table of Contents](docs/README.md)**
+**[Start here: Table of Contents](docs/00-README.md)**
 
 ## What's Inside
 
