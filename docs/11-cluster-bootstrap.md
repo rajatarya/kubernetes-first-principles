@@ -158,7 +158,7 @@ The most significant development in cluster bootstrapping was the emergence of m
 
 **Google Kubernetes Engine (GKE)**, launched in 2015, was the first. Google managed the control plane as a service. Users only managed worker nodes (and later, with Autopilot mode, not even that). GKE's early availability gave it a lasting advantage: it had years of operational experience that competitors could not quickly replicate.
 
-**Azure Kubernetes Service (AKS)** launched in 2017, and **Amazon Elastic Kubernetes Service (EKS)** launched in 2018. AWS was notably late to the Kubernetes party, having bet heavily on its own orchestration system (ECS) before market demand forced its hand. EKS's eventual success validated Kubernetes as the industry standard: when the largest cloud provider builds a managed service for your project, you have won.
+**Azure Kubernetes Service (AKS)** entered preview in 2017 (GA June 2018), and **Amazon Elastic Kubernetes Service (EKS)** launched in 2018. AWS was notably late to the Kubernetes party, having bet heavily on its own orchestration system (ECS) before market demand forced its hand. EKS's eventual success validated Kubernetes as the industry standard: when the largest cloud provider builds a managed service for your project, you have won.
 
 By the mid-2020s, managed Kubernetes services account for the majority of production Kubernetes usage. The bootstrapping tools --- kubeadm, kops, kubespray --- remain essential for on-premises deployments, specialized environments, and educational purposes, but the center of gravity has shifted decisively toward managed services.
 

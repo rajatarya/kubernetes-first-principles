@@ -53,7 +53,7 @@ spec:
 
 **Continuous batching**: Traditional batching waits for all requests in a batch to complete before accepting new ones. If one request generates 500 tokens and another generates 10, the short request's GPU cycles are wasted while waiting. Continuous batching (also called iteration-level scheduling) adds and removes requests from the batch at every decode step. The GPU is never idle.
 
-Together, these deliver **up to 24x throughput improvement** over naive serving. Organizations adopting vLLM have reported 50--75% cost reductions compared to traditional serving stacks, thanks to the combination of PagedAttention's memory efficiency and continuous batching's GPU utilization gains.
+Together, these deliver **up to 24x throughput improvement** over naive single-request serving (2--4x over production servers with static batching). Organizations adopting vLLM have reported 50--75% cost reductions compared to traditional serving stacks, thanks to the combination of PagedAttention's memory efficiency and continuous batching's GPU utilization gains.
 
 ### Inference Server Comparison
 
@@ -291,7 +291,7 @@ When a new request arrives with a prefix matching a cached KV cache, the decode 
 
 Benchmarks from the llm-d team show:
 
-- **~57x faster P90 Time to First Token** compared to round-robin load balancing (because cache-aware routing eliminates redundant prefill).
+- **~57x faster P90 Time to First Token** compared to round-robin load balancing in prefix-cache-heavy workloads with high prompt reuse (because cache-aware routing eliminates redundant prefill).
 - **~2x throughput** improvement versus round-robin distribution.
 
 ### The Production Stack

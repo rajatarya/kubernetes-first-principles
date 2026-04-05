@@ -35,7 +35,7 @@ Flannel was "good enough" for getting started, and it remains useful in simple e
 
 ## Calico: Production-Grade Networking (2016)
 
-**Calico**, created by Tigera, took a fundamentally different approach. Instead of overlay networking, Calico used **BGP (Border Gateway Protocol)** to distribute pod routes across the physical network. Each node announced its pod subnet to its neighbors using BGP, and the physical network infrastructure routed packets natively. No encapsulation. No overlay. Packets traveled from pod to pod using the same routing mechanisms that power the internet.
+**Calico**, created by Project Calico (later commercialized by Tigera), took a fundamentally different approach. Instead of overlay networking, Calico used **BGP (Border Gateway Protocol)** to distribute pod routes across the physical network. Each node announced its pod subnet to its neighbors using BGP, and the physical network infrastructure routed packets natively. No encapsulation. No overlay. Packets traveled from pod to pod using the same routing mechanisms that power the internet.
 
 This approach had significant advantages:
 
@@ -135,7 +135,7 @@ Today, organizations running at scale increasingly use Cilium or Calico's eBPF d
 
 ## Service Mesh Evolution
 
-**Istio**, jointly developed by Google, IBM, and Lyft and announced in 2017, was the first major service mesh for Kubernetes. Istio's architecture injected an **Envoy sidecar proxy** into every pod. All traffic to and from the pod passed through this proxy, which could enforce mTLS (mutual TLS), collect metrics, perform traffic routing, implement circuit breakers, and enforce access policies.
+**Istio**, jointly developed by Google and IBM, using Lyft's Envoy proxy as its data plane, and announced in 2017, was the first major service mesh for Kubernetes. Istio's architecture injected an **Envoy sidecar proxy** into every pod. All traffic to and from the pod passed through this proxy, which could enforce mTLS (mutual TLS), collect metrics, perform traffic routing, implement circuit breakers, and enforce access policies.
 
 ```mermaid
 sequenceDiagram

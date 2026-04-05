@@ -24,7 +24,7 @@ The YAML Explosion: One Application's Manifests
              │   concerns..."        │ role.yaml             RBAC      │
              │                       │ rolebinding.yaml      RBAC      │
              ▼                       │ limitrange.yaml       Limits    │
-     ┌───────────────┐               │ podsecuritypolicy.yaml Safety  │
+     ┌───────────────┐               │ poddisruptionbudget.yaml Uptime │
      │  × 3 envs     │               │ prometheus-rules.yaml  Observe │
      │  (dev/stg/prd)│               │ grafana-dashboard.json Observe │
      └───────────────┘               └─────────────────────────────────┘

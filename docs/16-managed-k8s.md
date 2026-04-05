@@ -78,7 +78,7 @@ This is a critical capacity planning consideration. If you run many small pods, 
 
 **Node management.** EKS offers three options: self-managed nodes (EC2 instances you configure), managed node groups (AWS manages the EC2 lifecycle), and Fargate (serverless pods, similar to GKE Autopilot but per-pod). **Karpenter** is AWS's open-source node autoscaler, which provisions right-sized nodes based on pending pod requirements --- it is faster and more flexible than the Cluster Autoscaler.
 
-**Upgrades.** EKS upgrades are the most manual of the three providers. You upgrade the control plane first (one API call or console click), then upgrade each node group separately. There is no automatic release channel for control plane upgrades. You must actively track Kubernetes versions and initiate upgrades.
+**Upgrades.** EKS upgrades are the most manual of the three providers. You upgrade the control plane first (one API call or console click), then upgrade each node group separately. There is no automatic release channel for control plane upgrades in the standard configuration --- you must actively track Kubernetes versions and initiate upgrades. However, EKS Auto Mode (launched December 2024) manages node and upgrade operations automatically for clusters that opt in.
 
 **Pricing.** $0.10/hr for the cluster ($72/month). EKS on Fargate adds a per-pod charge.
 
@@ -100,13 +100,13 @@ AKS differentiates primarily on pricing: the control plane is **free** in the Fr
 
 **Networking.** AKS offers two networking models. **kubenet** is a basic overlay network where pods get IPs from a virtual network that is not routable in the VPC (Azure calls it VNet). **Azure CNI** assigns pods real VNet IPs, similar to AWS VPC CNI and GKE Alias IPs. Azure CNI Overlay is a newer option that provides Azure CNI features without consuming VNet IPs for every pod.
 
-**Upgrades.** AKS has the fastest security patching cadence. It supports automatic upgrades through channels (none, patch, stable, rapid, node-image). Node image upgrades can be applied independently from Kubernetes version upgrades.
+**Upgrades.** AKS has a rapid security patching cadence. It supports automatic upgrades through channels (none, patch, stable, rapid, node-image). Node image upgrades can be applied independently from Kubernetes version upgrades.
 
 **Pricing.** Free tier: $0 for the control plane. Standard tier: $0.10/hr (adds SLA and more features). Premium tier: $0.60/hr (adds long-term support versions).
 
 ### AKS Strengths
 - Free control plane in Free tier
-- Fastest security patching
+- Rapid security patching
 - Strong integration with Azure Active Directory for RBAC
 - Azure Arc extends AKS management to on-premises and other clouds
 - AKS Automatic mode (similar to GKE Autopilot)
@@ -125,10 +125,10 @@ AKS differentiates primarily on pricing: the control plane is **free** in the Fr
 | **Pod networking** | Alias IPs (VPC-native) | VPC CNI (ENI-based) | Azure CNI or kubenet |
 | **Pod IP routable in VPC?** | Yes | Yes | Yes (Azure CNI) |
 | **Default node autoscaler** | Cluster Autoscaler | Karpenter / CA | Cluster Autoscaler / KEDA |
-| **Upgrade automation** | Release channels | Manual initiation | Upgrade channels |
+| **Upgrade automation** | Release channels | Manual initiation; EKS Auto Mode (Dec 2024) manages upgrades automatically | Upgrade channels |
 | **Version adoption speed** | Fastest | Moderate | Moderate |
 | **Identity integration** | Google IAM + Workload Identity | IAM Roles for Service Accounts | Azure AD + Workload Identity |
-| **Service mesh** | Anthos Service Mesh | App Mesh / Istio | Open Service Mesh / Istio |
+| **Service mesh** | Anthos Service Mesh | Istio / Linkerd (App Mesh deprecated Sept 2024) | Istio add-on (Open Service Mesh archived Sept 2023) |
 | **GPU support** | Yes (multi-GPU, TPU) | Yes (GPU, Inferentia, Trainium) | Yes (GPU) |
 | **Max nodes per cluster** | 15,000 | 5,000 (soft limit) | 5,000 |
 

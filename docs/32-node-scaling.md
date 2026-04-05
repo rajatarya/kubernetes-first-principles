@@ -111,12 +111,12 @@ The node group abstraction that Cluster Autoscaler depends on is the root cause 
 
 Karpenter eliminates this entirely. It evaluates the full instance type catalog and picks the cheapest instance that fits the pending pods after bin-packing. If three pending pods need 2 CPU + 4 GB each, Karpenter might choose a single `m5.xlarge` (4 CPU, 16 GB) rather than three separate nodes.
 
-**Scaling speed.** Karpenter's end-to-end latency is approximately 55 seconds --- roughly 3x faster than Cluster Autoscaler. It skips the node group indirection and calls the cloud API directly. It also batches pending pods for 10 seconds before making a decision, which produces better bin-packing.
+**Scaling speed.** Karpenter's end-to-end latency is approximately 60--90 seconds --- roughly 2--3x faster than Cluster Autoscaler. It skips the node group indirection and calls the cloud API directly. It also batches pending pods for 10 seconds before making a decision, which produces better bin-packing.
 
 The following sequence diagram shows the timing of each step in Karpenter's scaling cascade --- notice the 10-second batching window that enables better bin-packing:
 
 ```
-KARPENTER SCALING CASCADE (~55 seconds end-to-end)
+KARPENTER SCALING CASCADE (~60-90 seconds end-to-end)
 ───────────────────────────────────────────────────
 
   Pending Pod     Karpenter        EC2 Fleet API    New EC2          kubelet         Scheduler       Pod
@@ -161,7 +161,7 @@ KARPENTER SCALING CASCADE (~55 seconds end-to-end)
     │               │                  │               │               │               ├─────────────▶│
     │               │                  │               │               │               │              │
     │               │                  │               │               │               │  Running     │
-    │               │                  │               │               │               │  (~55s total)│
+    │               │                  │               │               │               │(~60-90s total)│
 ```
 
 **Consolidation.** Karpenter continuously evaluates whether existing nodes can be consolidated. If node A is 30% utilized and node B is 25% utilized, Karpenter can cordon both, move their pods to a single smaller node, and terminate the originals. Cluster Autoscaler can only scale down nodes that are underutilized --- it cannot replace a node with a smaller one.
@@ -208,23 +208,23 @@ spec:
 |---|---|---|
 | **Abstraction** | Node groups (ASG/MIG) | Direct instance provisioning |
 | **Instance selection** | Fixed per node group | Dynamic per scheduling batch |
-| **Scale-up latency** | 3--4 minutes | ~55 seconds |
+| **Scale-up latency** | 3--4 minutes | ~60--90 seconds |
 | **Scale-down** | Remove underutilized nodes | Consolidation (replace + remove) |
 | **Bin-packing** | Limited (one group at a time) | Cross-instance-type optimization |
 | **Spot handling** | Mixed instance policies | First-class, per-node decisions |
-| **Cloud support** | AWS, GCP, Azure, others | AWS (GA), Azure (preview) |
+| **Cloud support** | AWS, GCP, Azure, others | AWS (GA), Azure (GA via AKS Node Autoprovision since late 2024) |
 | **Configuration** | Node groups + CA flags | NodePool CRDs |
 | **Maturity** | 8+ years, battle-tested | Younger, rapidly maturing |
 
 ## When to Use Each
 
 **Use Cluster Autoscaler when:**
-- You run on GCP, Azure (non-preview), OpenStack, vSphere, or bare metal
+- You run on GCP, OpenStack, vSphere, or bare metal
 - Your organization requires the stability of a long-established project
 - You have existing node group infrastructure and limited appetite for migration
 
 **Use Karpenter when:**
-- You run on AWS (or Azure with preview tolerance)
+- You run on AWS or Azure (AKS Node Autoprovision, GA since late 2024)
 - You want faster scaling, better bin-packing, and automated cost optimization
 - You are starting a new cluster or willing to migrate from node groups
 - You run diverse workloads that benefit from flexible instance type selection

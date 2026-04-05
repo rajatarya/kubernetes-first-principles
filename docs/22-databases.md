@@ -43,7 +43,7 @@ Operators are the answer. An operator is a custom controller that encodes domain
 
 PostgreSQL has the most mature operator ecosystem on Kubernetes.
 
-**CloudNativePG** --- The strongest momentum in 2025. A CNCF Sandbox project with a clean architecture that runs the operator and the database in the same container (no sidecar model). Supports automated failover, continuous backup to object storage (S3, GCS, Azure Blob), point-in-time recovery, connection pooling via PgBouncer, and declarative configuration. The project's velocity and community engagement make it the default choice for new deployments.
+**CloudNativePG** --- The strongest momentum in 2025. A CNCF Sandbox project with a clean architecture: each PostgreSQL pod runs a lightweight instance manager alongside the database process in the same container (no sidecar), while the operator itself runs as a separate Deployment. Supports automated failover, continuous backup to object storage (S3, GCS, Azure Blob), point-in-time recovery, connection pooling via PgBouncer, and declarative configuration. The project's velocity and community engagement make it the default choice for new deployments.
 
 **Crunchy Data PGO (postgres-operator)** --- The most battle-tested option. Crunchy Data has been running PostgreSQL on Kubernetes since before it was fashionable. PGO supports pgBackRest for backup (the gold standard for PostgreSQL backup), high availability via Patroni, connection pooling, monitoring integration, and multi-cluster replication. Choose this if you want the operator with the longest production track record.
 

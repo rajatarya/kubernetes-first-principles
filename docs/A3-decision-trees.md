@@ -71,13 +71,13 @@ Kubernetes scaling operates at two levels: pod-level (adding replicas or resizin
 flowchart TD
     A[Need Autoscaling] --> B{Scale pods or nodes?}
     B -->|Pods| C{Horizontal —<br>more replicas?}
-    B -->|Nodes| D{Running on AWS?}
+    B -->|Nodes| D{Running on AWS or Azure?}
     C -->|Yes| E([HPA])
     C -->|No| F{Right-size resources?}
     F -->|Yes| G([VPA])
     F -->|No| H(["KEDA<br>(event-driven, queues, etc.)"])
-    D -->|Yes| I([Karpenter])
-    D -->|No| J(["Cluster Autoscaler<br>(GCP / Azure / on-prem)"])
+    D -->|Yes| I(["Karpenter<br>(AWS native, Azure via AKS NAP)"])
+    D -->|No| J(["Cluster Autoscaler<br>(GCP / on-prem)"])
 ```
 
 ---
@@ -168,7 +168,7 @@ flowchart TD
 
 ## 10. StatefulSet vs Operator for Databases?
 
-Running databases on Kubernetes is possible but requires careful consideration. A managed cloud database (RDS, Cloud SQL) avoids the operational burden entirely. If you must run on K8s, operators like CloudNativePG and Percona handle failover, backups, and scaling automatically. A raw StatefulSet works for dev/staging but lacks production automation. [Chapter 22](22-databases.md) covers this decision in depth, and [Chapter 37](37-operators.md) explains the operator pattern.
+Running databases on Kubernetes is possible but requires careful consideration. A managed cloud database (RDS, Cloud SQL) avoids the operational burden entirely. If you must run on K8s, operators like CloudNativePG and Percona handle failover, backups, and scaling automatically. A raw StatefulSet works for dev/staging but lacks production automation. [Chapter 22](22-databases.md) covers this decision in depth, and [Chapter 38](38-operators.md) explains the operator pattern.
 
 ```mermaid
 flowchart TD

@@ -28,7 +28,7 @@ The Collector is the workhorse of the OTel pipeline. How you deploy it determine
 OTEL COLLECTOR DEPLOYMENT PATTERNS
 ────────────────────────────────────
 
-  PATTERN 1: DAEMONSET / AGENT (most common, ~81% of deployments)
+  PATTERN 1: DAEMONSET / AGENT (most widely adopted pattern)
   ┌──────────────────────────────────────────────────────────────┐
   │  Node 1                    Node 2                            │
   │  ┌───────┐ ┌───────┐     ┌───────┐ ┌───────┐               │

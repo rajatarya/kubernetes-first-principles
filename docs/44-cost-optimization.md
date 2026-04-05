@@ -30,7 +30,7 @@ This is not a Kubernetes problem per se --- the same over-provisioning existed i
 
 The **Vertical Pod Autoscaler (VPA)** observes actual resource usage over time and recommends (or automatically sets) CPU and memory requests. In recommendation mode, it does not change anything --- it just tells you what the values should be.
 
-**Goldilocks** (from Fairwind) wraps VPA in a dashboard that shows recommendations for every deployment in a namespace. It creates a VPA object in recommendation mode for each deployment and surfaces the results in a web UI.
+**Goldilocks** (from Fairwinds) wraps VPA in a dashboard that shows recommendations for every deployment in a namespace. It creates a VPA object in recommendation mode for each deployment and surfaces the results in a web UI.
 
 ```bash
 # Install Goldilocks
@@ -220,7 +220,7 @@ The goal is not to minimize cost --- it is to maximize the value per dollar.
 - [AWS: Best Practices for EC2 Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-best-practices.html) --- AWS guidance on diversifying instance types, handling interruptions, and using Spot with EKS node groups and Karpenter.
 - [GKE Cost Optimization Guide](https://cloud.google.com/kubernetes-engine/docs/best-practices/cost-optimization) --- Google's recommendations for GKE right-sizing, cluster autoscaling, committed use discounts, and Spot VMs.
 - [Kubernetes Documentation: Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) --- the official reference for requests, limits, QoS classes, and LimitRanges that form the foundation of cost control.
-- [Goldilocks by Fairwind](https://github.com/FairwindsOps/goldilocks) --- an open-source tool that runs VPA in recommendation mode and presents a dashboard of right-sizing suggestions per workload.
+- [Goldilocks by Fairwinds](https://github.com/FairwindsOps/goldilocks) --- an open-source tool that runs VPA in recommendation mode and presents a dashboard of right-sizing suggestions per workload.
 
 ---
 

@@ -208,7 +208,7 @@ webhooks:
     failurePolicy: Fail        # or Ignore
     sideEffects: None           # None, NoneOnDryRun, or Unknown
     timeoutSeconds: 5           # default 10, max 30
-    matchConditions:            # CEL-based filtering (1.28+)
+    matchConditions:            # CEL-based filtering (beta 1.28, GA 1.30)
       - name: exclude-system
         expression: "!object.metadata.namespace.startsWith('kube-')"
 ```
@@ -217,7 +217,7 @@ webhooks:
 
 **`sideEffects`** declares whether the webhook has side effects beyond modifying the admission response. Webhooks that write to external systems should declare this honestly; it affects dry-run behavior.
 
-**`matchConditions`** (Kubernetes 1.28+) use CEL expressions to filter which objects actually get sent to the webhook. This is far more efficient than filtering inside the webhook itself, because non-matching objects never leave the API server.
+**`matchConditions`** (beta in Kubernetes 1.28, GA in 1.30) use CEL expressions to filter which objects actually get sent to the webhook. This is far more efficient than filtering inside the webhook itself, because non-matching objects never leave the API server.
 
 **`timeoutSeconds`** sets how long the API server waits for a webhook response. Keep this low (3--5 seconds). A slow webhook adds latency to every matching API request. A webhook that consistently times out under `failurePolicy: Fail` will make the cluster unusable.
 

@@ -195,7 +195,7 @@ Both Crossplane and Terraform manage cloud infrastructure declaratively. The dif
 | **Developer interface** | kubectl, Kubernetes RBAC | CLI, separate auth |
 | **Composition** | XRDs + Compositions (CRDs) | Modules (HCL) |
 | **Ecosystem** | Growing, CRD-based providers | Massive, mature provider ecosystem |
-| **Secret handling** | Kubernetes Secrets, native | State file (secrets in plain text) |
+| **Secret handling** | Kubernetes Secrets, native | State file (encrypted via backend configuration; e.g., S3 SSE, Terraform Cloud encryption at rest) |
 
 **Crossplane's advantage:** Continuous reconciliation means drift is detected and corrected automatically. If someone manually changes an RDS instance's configuration via the AWS console, Crossplane will notice and revert it on the next reconciliation cycle (typically 1--10 minutes). Terraform only detects drift when someone runs `terraform plan`.
 

@@ -190,7 +190,7 @@ behavior:
 
 ### Key Concepts
 
-- **stabilizationWindowSeconds:** The HPA looks at the desired replica count over this time window and picks the highest (for scale-down) or lowest (for scale-up). A 300-second stabilization window for scale-down means the HPA will not reduce replicas until the desired count has been lower for at least 5 minutes. This prevents premature scale-down after a traffic burst.
+- **stabilizationWindowSeconds:** The HPA looks at all recommended replica counts over this time window and picks the highest value for both scale-up and scale-down. This conservative behavior prevents premature scale-down (by remembering recent high recommendations) and ensures adequate scale-up (by not ignoring recent spikes). A 300-second stabilization window for scale-down means the HPA will not reduce replicas until no recommendation within the past 5 minutes called for a higher count. This prevents premature scale-down after a traffic burst.
 
 - **Policies (Percent vs Pods):** Each policy defines a maximum change rate. `Percent: 10` means remove at most 10% of current replicas. `Pods: 2` means remove at most 2 pods. You can combine multiple policies.
 

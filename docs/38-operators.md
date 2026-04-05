@@ -209,7 +209,7 @@ The return value of `Reconcile` controls what happens next:
 | Return Value | Behavior |
 |---|---|
 | `ctrl.Result{}, nil` | Terminal. No requeue. The controller is done until the next watch event. |
-| `ctrl.Result{}, err` | Immediate requeue with exponential backoff (default 5ms → 1000s). |
+| `ctrl.Result{}, err` | Immediate requeue with exponential backoff (default ~1s → 16min). |
 | `ctrl.Result{Requeue: true}, nil` | Immediate requeue (no backoff). Use sparingly. |
 | `ctrl.Result{RequeueAfter: 30s}, nil` | Scheduled requeue. Useful for polling external systems. |
 

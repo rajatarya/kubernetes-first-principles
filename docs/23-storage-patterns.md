@@ -311,7 +311,7 @@ Storage is the foundation that stateful workloads rest on. Get it right and your
 
 ## Common Mistakes and Misconceptions
 
-- **"All PersistentVolumes are the same."** RWO (ReadWriteOnce) can only be mounted by one node. RWX (ReadWriteMany) works across nodes but requires NFS or cloud file systems (EFS, Filestore). Choosing wrong access mode causes mount failures.
+- **"All PersistentVolumes are the same."** RWO (ReadWriteOnce) can only be mounted by one node. RWX (ReadWriteMany) works across nodes but requires NFS or cloud file systems (EFS, Filestore). Choosing wrong access mode causes mount failures. Note: RWO allows multiple pods on the *same* node to mount the volume simultaneously. For databases that require exclusive single-pod access, use `ReadWriteOncePod` (RWOP), which restricts the volume to exactly one pod. RWOP is GA since Kubernetes 1.29.
 - **"Storage classes are just about disk type."** Storage classes also control reclaim policy (Delete vs Retain), volume binding mode (Immediate vs WaitForFirstConsumer), and provisioner. WaitForFirstConsumer is critical for zone-aware scheduling.
 - **"I can resize PVCs freely."** Volume expansion must be enabled on the storage class (`allowVolumeExpansion: true`). Not all provisioners support it. Shrinking is never supported — plan initial sizes carefully.
 
