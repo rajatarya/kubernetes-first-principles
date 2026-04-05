@@ -116,40 +116,35 @@ The control plane node is tainted with `node-role.kubernetes.io/control-plane:No
 
 When a worker node joins the cluster, it needs to authenticate to the API server. But it has no certificate yet --- that is what it is trying to obtain. This is solved by the **TLS bootstrap** protocol.
 
-```
-TLS BOOTSTRAP HANDSHAKE
-────────────────────────
+```mermaid
+sequenceDiagram
+    participant K as Kubelet (Worker)
+    participant A as API Server
+    participant C as CSR Approving Controller
+    participant CA as CA (Signer)
 
-Worker Node                              Control Plane
-─────────────                            ─────────────
-    │                                         │
-    │  1. kubeadm join --token abc123         │
-    │     (token was generated during init)   │
-    │                                         │
-    │  2. Connect to API server on port 6443  │
-    │     Verify server cert against          │
-    │     discovery token CA cert hash        │
-    │──────────────────────────────────────►  │
-    │                                         │
-    │  3. Authenticate with bootstrap token   │
-    │     (token maps to a service account    │
-    │      with permission to create CSRs)    │
-    │──────────────────────────────────────►  │
-    │                                         │
-    │  4. Create CertificateSigningRequest    │
-    │     "I am node X, give me a cert"       │
-    │──────────────────────────────────────►  │
-    │                                         │
-    │  5. Controller auto-approves the CSR    │
-    │     (csrapproving controller)           │
-    │                                         │
-    │  6. Signed certificate returned         │
-    │◄──────────────────────────────────────  │
-    │                                         │
-    │  7. Kubelet now uses real cert for      │
-    │     all future API server communication │
-    │                                         │
-    ▼                                         ▼
+    Note over K: kubeadm join --token abc123
+
+    K->>A: TLS connect (verify CA cert hash)
+    K->>A: Authenticate with bootstrap token
+    Note right of A: Token valid — grants CSR create permission
+
+    K->>A: POST CertificateSigningRequest
+    Note left of K: "I am node X, give me a cert"
+
+    A->>C: CSR created
+    Note right of C: Auto-approve (first cert from bootstrap token)
+
+    C->>CA: Sign request
+    CA-->>C: Signed certificate
+
+    C-->>A: CSR approved + signed cert
+    A-->>K: Signed certificate returned
+
+    rect rgba(50, 108, 229, 0.1)
+        Note over K,CA: Kubelet now uses real certificate for all API calls.<br/>Bootstrap token can be safely revoked.
+        K->>A: Authenticated API calls (using real cert)
+    end
 ```
 
 The bootstrap token is a short-lived, low-privilege credential. It grants exactly one permission: the ability to create a CertificateSigningRequest. The `csrapproving` controller in the controller manager automatically approves CSRs from bootstrap tokens (for the first certificate). The worker receives a signed certificate and uses it for all subsequent communication. The bootstrap token can now be revoked.

@@ -1,36 +1,21 @@
 # Chapter 6: The Ecosystem — Why Operators, Helm, and Service Meshes Exist
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    YOUR APPLICATION                              │
-├─────────────────────────────────────────────────────────────────┤
-│  GitOps         │  Packaging       │  Observability              │
-│  ArgoCD / Flux  │  Helm / Kustomize│  Prometheus / Grafana       │
-├─────────────────┴──────────────────┴────────────────────────────┤
-│                    SERVICE MESH (optional)                       │
-│               Istio / Linkerd / Cilium Service Mesh             │
-│           (mTLS, traffic management, distributed tracing)       │
-├─────────────────────────────────────────────────────────────────┤
-│                       OPERATORS                                  │
-│  PostgreSQL Operator │ Kafka Operator │ Prometheus Operator │ ...│
-│        (CRD + Controller = domain knowledge as code)            │
-├─────────────────────────────────────────────────────────────────┤
-│                    KUBERNETES CORE                               │
-│  Deployments, Services, ConfigMaps, Secrets, RBAC, CRDs        │
-│  API Server, etcd, Scheduler, Controllers, Kubelet              │
-├─────────────────────────────────────────────────────────────────┤
-│                    INFRASTRUCTURE PLUGINS                        │
-│  CNI (Flannel/Calico/Cilium)  │  CRI (containerd/CRI-O)       │
-│  CSI (EBS/NFS/Ceph)           │  Cloud Controller Manager      │
-├─────────────────────────────────────────────────────────────────┤
-│                    LINUX + HARDWARE                              │
-│         cgroups, namespaces, iptables/eBPF, kernel              │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    APP["YOUR APPLICATION"]
+    TOOLS["GitOps: ArgoCD / Flux<br>Packaging: Helm / Kustomize<br>Observability: Prometheus / Grafana"]
+    MESH["SERVICE MESH (optional)<br>Istio / Linkerd / Cilium Service Mesh<br>mTLS, traffic management, distributed tracing"]
+    OPS["OPERATORS<br>PostgreSQL Operator | Kafka Operator | Prometheus Operator | ...<br>CRD + Controller = domain knowledge as code"]
+    CORE["KUBERNETES CORE<br>Deployments, Services, ConfigMaps, Secrets, RBAC, CRDs<br>API Server, etcd, Scheduler, Controllers, Kubelet"]
+    PLUGINS["INFRASTRUCTURE PLUGINS<br>CNI: Flannel/Calico/Cilium | CRI: containerd/CRI-O<br>CSI: EBS/NFS/Ceph | Cloud Controller Manager"]
+    LINUX["LINUX + HARDWARE<br>cgroups, namespaces, iptables/eBPF, kernel"]
 
- Kubernetes provides the middle layers.
- Everything above and below is pluggable.
- This is "platform for platforms" by design.
+    APP --> TOOLS --> MESH --> OPS --> CORE --> PLUGINS --> LINUX
 ```
+
+Kubernetes provides the middle layers.
+Everything above and below is pluggable.
+This is "platform for platforms" by design.
 
 ## Operators: Teaching Kubernetes Domain Knowledge
 

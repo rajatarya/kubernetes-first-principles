@@ -41,36 +41,18 @@ Any container runtime that implemented this gRPC interface could be plugged into
 
 This was a critical architectural decision --- the same design philosophy that Kubernetes applied to networking (CNI), storage (CSI), and cloud providers. Define a clean interface, let implementations compete, and avoid coupling the core system to any particular vendor.
 
-```
-The CRI Interface (simplified)
+```mermaid
+flowchart TD
+    kubelet["kubelet"] -->|"gRPC over<br>Unix socket"| CRI["CRI gRPC Interface"]
 
-  kubelet
-    |
-    | gRPC over Unix socket
-    |
-    v
-  ┌──────────────────────────────────┐
-  │        CRI gRPC Interface         │
-  ├──────────────────────────────────┤
-  │  RuntimeService:                  │
-  │    RunPodSandbox()                │
-  │    StopPodSandbox()               │
-  │    CreateContainer()              │
-  │    StartContainer()               │
-  │    StopContainer()                │
-  │    ListContainers()               │
-  │    ExecSync()                     │
-  │                                   │
-  │  ImageService:                    │
-  │    PullImage()                    │
-  │    ListImages()                   │
-  │    RemoveImage()                  │
-  ├──────────────────────────────────┤
-  │  Implemented by:                  │
-  │    - containerd (via CRI plugin)  │
-  │    - CRI-O                        │
-  │    - (formerly) dockershim        │
-  └──────────────────────────────────┘
+    CRI --- RS["RuntimeService<br>RunPodSandbox, CreateContainer,<br>StartContainer, StopContainer,<br>ListContainers, ExecSync"]
+    CRI --- IS["ImageService<br>PullImage, ListImages,<br>RemoveImage"]
+
+    CRI -->|"Implemented by"| containerd["containerd<br>(via CRI plugin)"]
+    CRI -->|"Implemented by"| CRIO["CRI-O"]
+    CRI -->|"Formerly"| dockershim["dockershim<br>(removed in 1.24)"]
+
+    style dockershim fill:#666,stroke:#999,color:#ccc
 ```
 
 ## The Dockershim: A Bridge to Nowhere
@@ -147,19 +129,21 @@ Today, the container runtime landscape has settled into a clear pattern:
 
 **Specialized runtimes** exist for specific use cases: gVisor (Google) provides kernel-level sandboxing for stronger isolation, Kata Containers runs each container in a lightweight VM for hardware-level isolation, and Firecracker (AWS) powers Lambda and Fargate with microVMs. All of these can be plugged into Kubernetes through CRI, demonstrating the power of the pluggable interface.
 
-```
-The Current Ecosystem (2024+)
+```mermaid
+flowchart TD
+    subgraph Dev["Developer Workstation"]
+        Docker["Docker Desktop<br>(build images)"] --> OCI["OCI Image"]
+    end
 
-  Developer Workstation              Production Cluster
-  ┌───────────────────┐              ┌──────────────────────────────┐
-  │  Docker Desktop   │              │  kubelet                     │
-  │  (build images)   │              │    |                         │
-  │       |           │   push to    │    v                         │
-  │       v           │   registry   │  containerd  OR  CRI-O      │
-  │  OCI Image ───────┼──────────>   │    |              |          │
-  │                   │              │    v              v          │
-  │                   │              │   runc   (or gVisor/Kata)   │
-  └───────────────────┘              └──────────────────────────────┘
+    OCI -->|"push to registry"| kubelet
+
+    subgraph Prod["Production Cluster"]
+        kubelet["kubelet"]
+        kubelet --> containerd
+        kubelet --> CRIO["CRI-O"]
+        containerd --> runc["runc<br>(or gVisor / Kata)"]
+        CRIO --> runc
+    end
 ```
 
 The lesson they teach is a design lesson: **define clean interfaces early, and the ecosystem will sort itself out.** CRI turned the container runtime from a hardwired dependency into a pluggable component, and the result was a healthier ecosystem where runtimes could compete on merit without requiring changes to Kubernetes core. The removal of dockershim, despite the community anxiety it caused, was the natural conclusion of a process that began six years earlier with the introduction of CRI.

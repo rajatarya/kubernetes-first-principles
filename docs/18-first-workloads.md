@@ -79,25 +79,15 @@ spec:
 
 The Service creates a stable virtual IP (ClusterIP) that load-balances across all pods matching the selector. When pods are created, destroyed, or become unready, the Service automatically updates its endpoints. This decouples clients from the pod lifecycle.
 
+```mermaid
+flowchart TD
+    Client["Client Pod"] -- "GET http://web-app/" --> Service["Service<br>ClusterIP: 10.96.45.12"]
+    Service -- "load balance" --> Pod1["Pod 1<br>10.244.1.5:80"]
+    Service -- "load balance" --> Pod2["Pod 2<br>10.244.2.8:80"]
+    Service -- "load balance" --> Pod3["Pod 3<br>10.244.1.6:80"]
 ```
-SERVICE ROUTING
-───────────────
 
-Client Pod                  Service (ClusterIP: 10.96.45.12)
-    │                              │
-    │  GET http://web-app/         │
-    │─────────────────────────────►│
-    │                              │
-    │                  ┌───────────┼───────────┐
-    │                  │           │           │
-    │                  ▼           ▼           ▼
-    │              Pod 1       Pod 2       Pod 3
-    │           10.244.1.5  10.244.2.8  10.244.1.6
-    │              :80         :80         :80
-    │
-    │  kube-proxy maintains iptables/IPVS rules
-    │  that distribute traffic across healthy pods
-```
+> **kube-proxy** maintains iptables/IPVS rules that distribute traffic across healthy pods.
 
 Apply both:
 

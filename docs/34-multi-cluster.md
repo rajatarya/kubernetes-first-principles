@@ -22,47 +22,33 @@ This works for small organizations with 2--3 clusters and dedicated platform tea
 
 The most widely adopted approach uses a GitOps tool to manage multiple clusters from a single source of truth. **ArgoCD ApplicationSets** are purpose-built for this.
 
-```
-GITOPS-DRIVEN MULTI-CLUSTER
-─────────────────────────────
+```mermaid
+flowchart TB
+    subgraph git["Git Repository"]
+        base["/base/<br>deployment.yaml<br>networkpolicy.yaml<br>monitoring.yaml"]
+        usVals["/clusters/us-east/<br>values.yaml"]
+        euVals["/clusters/eu-west/<br>values.yaml"]
+        apVals["/clusters/ap-south/<br>values.yaml"]
+    end
 
-  ┌──────────────────────────────────────────────┐
-  │                Git Repository                 │
-  │                                               │
-  │  /clusters/                                   │
-  │    us-east/                                   │
-  │      values.yaml   (region-specific overrides)│
-  │    eu-west/                                   │
-  │      values.yaml                              │
-  │    ap-south/                                  │
-  │      values.yaml                              │
-  │  /base/                                       │
-  │    deployment.yaml (shared templates)         │
-  │    networkpolicy.yaml                         │
-  │    monitoring.yaml                            │
-  └──────────────────┬────────────────────────────┘
-                     │
-                     │  ArgoCD watches repo
-                     │
-  ┌──────────────────▼────────────────────────────┐
-  │             ArgoCD (hub cluster)               │
-  │                                                │
-  │  ApplicationSet generator: clusters            │
-  │  → For each cluster in list:                   │
-  │    → Create Application targeting that cluster │
-  │    → Inject cluster-specific values            │
-  │    → Sync state to match Git                   │
-  └────┬──────────────┬──────────────┬─────────────┘
-       │              │              │
-       ▼              ▼              ▼
-  ┌──────────┐  ┌──────────┐  ┌──────────┐
-  │ us-east  │  │ eu-west  │  │ ap-south │
-  │ cluster  │  │ cluster  │  │ cluster  │
-  │          │  │          │  │          │
-  │ Same base│  │ Same base│  │ Same base│
-  │ + region │  │ + region │  │ + region │
-  │ overrides│  │ overrides│  │ overrides│
-  └──────────┘  └──────────┘  └──────────┘
+    subgraph hub["ArgoCD Hub Cluster"]
+        appset["ApplicationSet generator<br>For each cluster:<br>- Create Application<br>- Inject cluster-specific values<br>- Sync state to match Git"]
+    end
+
+    subgraph regional["Regional Clusters"]
+        usEast["us-east cluster<br>base + region overrides"]
+        euWest["eu-west cluster<br>base + region overrides"]
+        apSouth["ap-south cluster<br>base + region overrides"]
+    end
+
+    git -- "ArgoCD watches repo" --> hub
+    appset --> usEast
+    appset --> euWest
+    appset --> apSouth
+
+    style git fill:#f0f0ff,stroke:#333
+    style hub fill:#fff0e0,stroke:#333
+    style regional fill:#e0ffe0,stroke:#333
 ```
 
 ```yaml

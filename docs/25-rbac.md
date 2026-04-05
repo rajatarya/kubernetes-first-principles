@@ -16,69 +16,66 @@ Every request to the Kubernetes API server carries three pieces of information r
 
 RBAC evaluates these against a set of rules. If any rule grants the requested action, the request is allowed. If no rule matches, the request is denied. RBAC is **additive-only** --- there is no way to write a "deny" rule. You grant permissions; you never revoke them. If a subject has no matching grants, the default is denial.
 
-```
-RBAC AUTHORIZATION FLOW
-────────────────────────
+```mermaid
+flowchart TD
+    req["kubectl get pods -n production"]
+    authn["API Server<br>(Authentication)"]
+    extract["Who: user:alice<br>What: verb:get resource:pods<br>Where: namespace:production"]
+    authz["API Server<br>(Authorization)"]
+    scan["Scan RoleBindings<br>in 'production' namespace"]
+    binding["RoleBinding 'dev-access'<br>subjects: group:developers<br>roleRef: role:pod-reader"]
+    role["Role 'pod-reader'<br>resources: pods<br>verbs: get, list, watch"]
+    checkUser{"alice in<br>group:developers?"}
+    checkVerb{"verb:get on<br>pods allowed?"}
+    allow["RESULT: ALLOW"]
+    deny["RESULT: DENY"]
 
-  kubectl get pods -n production
-       │
-       ▼
-  ┌──────────────┐     ┌──────────────────────────────────┐
-  │  API Server  │────▶│  Who?  user:alice                 │
-  │  (authn)     │     │  What?  verb:get  resource:pods   │
-  └──────┬───────┘     │  Where? namespace:production      │
-         │             └──────────────┬───────────────────┘
-         ▼                            │
-  ┌──────────────┐                    ▼
-  │  API Server  │     ┌──────────────────────────────────┐
-  │  (authz)     │────▶│  Scan all RoleBindings in        │
-  └──────┬───────┘     │  "production" namespace           │
-         │             │                                    │
-         │             │  RoleBinding "dev-access"          │
-         │             │    subjects: [group:developers]    │
-         │             │    roleRef: role:pod-reader        │
-         │             │                                    │
-         │             │  Role "pod-reader"                 │
-         │             │    rules:                          │
-         │             │    - resources: [pods]             │
-         │             │      verbs: [get, list, watch]     │
-         │             └──────────────┬───────────────────┘
-         │                            │
-         ▼                            ▼
-  ┌──────────────────────────────────────────┐
-  │  alice is in group:developers? YES       │
-  │  verb:get on resource:pods allowed? YES  │
-  │  ──────────────────────────────────────  │
-  │  RESULT: ALLOW                           │
-  └──────────────────────────────────────────┘
+    req --> authn
+    authn --> extract
+    extract --> authz
+    authz --> scan
+    scan --> binding
+    binding --> role
+    role --> checkUser
+    checkUser -- YES --> checkVerb
+    checkUser -- NO --> deny
+    checkVerb -- YES --> allow
+    checkVerb -- NO --> deny
+
+    style allow fill:#d4edda,stroke:#333
+    style deny fill:#f8d7da,stroke:#333
 ```
 
 ## The Four RBAC Objects
 
 RBAC uses exactly four object types. Two define permissions, two bind permissions to subjects.
 
+```mermaid
+flowchart TD
+    subgraph Permissions
+        Role["Role<br>(namespaced)"]
+        CR["ClusterRole<br>(cluster-wide)"]
+    end
+
+    subgraph Bindings
+        RB["RoleBinding<br>(namespaced)"]
+        CRB["ClusterRoleBinding<br>(cluster-wide)"]
+    end
+
+    subgraph Subjects
+        S["User / Group /<br>ServiceAccount"]
+    end
+
+    RB -- "roleRef" --> Role
+    RB -- "roleRef" --> CR
+    CRB -- "roleRef" --> CR
+    RB -- "subjects" --> S
+    CRB -- "subjects" --> S
+    style Bindings fill:#fff0e0,stroke:#333
+    style Subjects fill:#e0ffe0,stroke:#333
 ```
-RBAC OBJECT RELATIONSHIPS
-──────────────────────────
 
-  PERMISSIONS                          BINDINGS
-  ───────────                          ────────
-
-  ┌─────────────┐                   ┌──────────────────┐
-  │   Role      │◄──────────────────│  RoleBinding      │──▶ Subject
-  │ (namespaced)│   roleRef         │  (namespaced)     │    (User, Group,
-  └─────────────┘                   └──────────────────┘     ServiceAccount)
-
-  ┌─────────────┐                   ┌──────────────────┐
-  │ ClusterRole │◄──────────────────│ ClusterRoleBinding│──▶ Subject
-  │ (cluster)   │   roleRef         │  (cluster-wide)   │
-  └─────────────┘                   └──────────────────┘
-
-  KEY INSIGHT: A RoleBinding can reference a ClusterRole.
-  This grants the ClusterRole's permissions ONLY within
-  the RoleBinding's namespace. This is the most common
-  pattern for multi-tenant clusters.
-```
+> **Key insight:** A RoleBinding can reference a ClusterRole. This grants the ClusterRole's permissions **only within the RoleBinding's namespace**. This is the most common pattern for multi-tenant clusters.
 
 ### Role
 

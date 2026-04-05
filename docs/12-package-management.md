@@ -65,23 +65,20 @@ But Helm v2 had a critical architectural flaw: **Tiller**.
 
 Tiller was a server-side component that ran inside the Kubernetes cluster. When you ran `helm install`, your local Helm client sent the rendered manifests to Tiller, which then applied them to the cluster. Tiller stored release state (which Charts were installed, at which versions, with which values) as ConfigMaps in the cluster.
 
-```
-Helm v2 Architecture
+```mermaid
+flowchart TD
+    helm["helm CLI<br>Chart + values.yaml"] -->|"gRPC"| Tiller
 
-  Developer Machine                 Kubernetes Cluster
-  ┌──────────────┐                 ┌──────────────────────────────┐
-  │  helm CLI    │  gRPC           │                              │
-  │              │────────────────>│  Tiller (Deployment)         │
-  │  Chart +     │                 │    - cluster-admin access    │
-  │  values.yaml │                 │    - renders templates       │
-  └──────────────┘                 │    - applies to API server   │
-                                   │    - stores state in         │
-                                   │      ConfigMaps              │
-                                   │                              │
-                                   │  Problem: Tiller has         │
-                                   │  GOD MODE access to the      │
-                                   │  entire cluster              │
-                                   └──────────────────────────────┘
+    subgraph Cluster["Kubernetes Cluster"]
+        Tiller["Tiller (Deployment)<br>cluster-admin access"]
+        Tiller --> API["API Server"]
+        Tiller --> CM["ConfigMaps<br>(release state)"]
+    end
+
+    Warning["Problem: Tiller has<br>GOD MODE access to<br>the entire cluster"]
+
+    style Tiller fill:#f44,color:#fff,stroke:#d00
+    style Warning fill:#fee,stroke:#f44,color:#d00
 ```
 
 The problem was that Tiller required **cluster-admin privileges** by default. It needed broad access because it had to create any type of resource in any namespace on behalf of any user. This meant:
@@ -162,38 +159,16 @@ The traditional workflow was: a developer modifies manifests, runs `kubectl appl
 
 **GitOps** addresses all of these problems by applying a single principle: **Git is the single source of truth for the desired state of the cluster.**
 
-```
-GitOps: The Reconciliation Loop
+```mermaid
+flowchart TD
+    Dev["Developer"] -->|"git push"| Git["Git Repo<br>(source of truth)"]
+    Git -->|"watch"| Controller["GitOps Controller<br>(ArgoCD / Flux)<br><br>1. Watch Git for changes<br>2. Compare Git state to cluster state<br>3. Reconcile: apply diff to<br>make cluster match Git"]
+    Controller -->|"apply"| K8s["Kubernetes Cluster"]
+    K8s -->|"drift detection"| Controller
 
-  ┌──────────┐     push      ┌──────────┐
-  │Developer │──────────────>│  Git Repo │
-  │          │               │  (source  │
-  └──────────┘               │  of truth)│
-                             └─────┬─────┘
-                                   │ watch
-                                   │
-                             ┌─────▼──────────────────────┐
-                             │  GitOps Controller          │
-                             │  (ArgoCD / Flux)            │
-                             │                             │
-                             │  1. Watch Git for changes   │
-                             │  2. Compare Git state to    │
-                             │     cluster state           │
-                             │  3. Reconcile: apply diff   │
-                             │     to make cluster match   │
-                             │     Git                     │
-                             └─────┬──────────────────────┘
-                                   │ apply
-                                   │
-                             ┌─────▼─────┐
-                             │ Kubernetes│
-                             │ Cluster   │
-                             └───────────┘
+    Rollback["Rollback = git revert<br>Audit = git log<br>Review = pull request<br>Access = Git permissions"]
 
-  Rollback = git revert
-  Audit    = git log
-  Review   = pull request
-  Access   = Git permissions
+    style Rollback fill:#eff,stroke:#099,color:#066
 ```
 
 The idea is that a controller running inside the cluster watches a Git repository. When the repository changes (new commit, merged pull request), the controller compares the desired state in Git to the actual state in the cluster and reconciles any differences. This is the **Kubernetes reconciliation pattern applied to deployment itself** --- the same pattern that the Deployment controller uses to reconcile desired and actual pod counts, now applied at the level of the entire cluster configuration.

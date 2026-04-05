@@ -81,29 +81,37 @@ spec:
 
 This headless Service produces the following DNS records:
 
+```mermaid
+flowchart TB
+    subgraph sts["StatefulSet: db (replicas: 3)"]
+        db0["db-0<br>10.244.1.5"]
+        db1["db-1<br>10.244.2.8"]
+        db2["db-2<br>10.244.1.9"]
+    end
+
+    subgraph dns["DNS Records (Headless Service: db, clusterIP: None)"]
+        dns0["db-0.db.default.svc.cluster.local"]
+        dns1["db-1.db.default.svc.cluster.local"]
+        dns2["db-2.db.default.svc.cluster.local"]
+        dnsAll["db.default.svc.cluster.local<br>(A record → all three IPs)"]
+    end
+
+    dns0 --> db0
+    dns1 --> db1
+    dns2 --> db2
+    dnsAll -.-> db0
+    dnsAll -.-> db1
+    dnsAll -.-> db2
+
+    style dns fill:#f0f0ff,stroke:#333
+    style sts fill:#e0ffe0,stroke:#333
 ```
-HEADLESS SERVICE DNS RESOLUTION
-────────────────────────────────
 
-StatefulSet: db    Headless Service: db
-replicas: 3        clusterIP: None
+Application connects to:
 
-  ┌──────────────────────────────────────────────────────┐
-  │                  DNS Records                         │
-  │                                                      │
-  │  db-0.db.default.svc.cluster.local → 10.244.1.5     │
-  │  db-1.db.default.svc.cluster.local → 10.244.2.8     │
-  │  db-2.db.default.svc.cluster.local → 10.244.1.9     │
-  │                                                      │
-  │  db.default.svc.cluster.local → [all three IPs]     │
-  │  (A record returns all pod IPs, no load balancing)   │
-  └──────────────────────────────────────────────────────┘
-
-  Application connects to:
-    db-0.db.default.svc.cluster.local    ← always reaches db-0
-    db-1.db.default.svc.cluster.local    ← always reaches db-1
-    db.default.svc.cluster.local         ← reaches any (round-robin DNS)
-```
+- `db-0.db.default.svc.cluster.local` --- always reaches db-0
+- `db-1.db.default.svc.cluster.local` --- always reaches db-1
+- `db.default.svc.cluster.local` --- reaches any (round-robin DNS)
 
 The DNS naming convention is: `<pod-name>.<service-name>.<namespace>.svc.cluster.local`
 

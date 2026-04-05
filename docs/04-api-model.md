@@ -39,110 +39,62 @@ The reconciliation loop is the mechanism by which Kubernetes achieves its declar
 
 Consider what happens when you apply a Deployment object:
 
-```
- kubectl apply                    CONTROL PLANE
-     │
-     ▼
-┌──────────┐  store   ┌──────┐
-│API Server │────────►│ etcd │
-└────┬──┬───┘         └──────┘
-     │  │
-     │  │ watch
-     │  ▼
-     │ ┌────────────────────┐  create    ┌────────────┐
-     │ │ Deployment         │──────────►│ ReplicaSet │
-     │ │ Controller         │           └─────┬──────┘
-     │ └────────────────────┘                 │
-     │                                        │ watch
-     │                                        ▼
-     │                          ┌────────────────────┐  create   ┌─────┐
-     │                          │ ReplicaSet         │─────────►│ Pod │
-     │                          │ Controller         │          │ Pod │
-     │                          └────────────────────┘          │ Pod │
-     │                                                          └──┬──┘
-     │  watch                                                      │
-     ▼                                                             │
-┌──────────────┐  bind pod ──► node                                │
-│  Scheduler   │───────────────────────────────────────────────────┘
-└──────────────┘                           │
-                                           │ watch
-                                           ▼
-                              ┌────────────────────┐
-                              │ Kubelet (on node)  │
-                              │  → containerd      │
-                              │  → start container │
-                              └────────────────────┘
+```mermaid
+flowchart TD
+    kubectl["kubectl apply"] --> API["API Server"]
+    API -->|store| etcd["etcd"]
+    API -->|watch| DC["Deployment Controller"]
+    DC -->|create| RS["ReplicaSet"]
+    API -->|watch| RSC["ReplicaSet Controller"]
+    RSC -->|create| Pods["Pod<br>Pod<br>Pod"]
+    API -->|watch| Scheduler["Scheduler"]
+    Scheduler -->|"bind pod to node"| Pods
+    API -->|watch| Kubelet["Kubelet (on node)<br>containerd<br>start container"]
+    Pods --> Kubelet
 ```
 
 The following sequence diagram shows the temporal flow --- notice that every component communicates only through the API server:
 
-```
-DEPLOYMENT CREATION: SEQUENCE OF EVENTS
-────────────────────────────────────────
+```mermaid
+sequenceDiagram
+    participant User as User (kubectl)
+    participant API as API Server
+    participant etcd as etcd
+    participant DC as Deployment Controller
+    participant RSC as ReplicaSet Controller
+    participant Sched as Scheduler
+    participant KL as Kubelet (per node)
+    participant EC as Endpoint Controller
 
-  User          API Server       etcd        Deployment    ReplicaSet    Scheduler     Kubelet      Endpoint
- (kubectl)                                   Controller    Controller                  (per node)   Controller
-    │               │              │              │              │            │             │             │
-    │  POST /apis/  │              │              │              │            │             │             │
-    │  apps/v1/     │              │              │              │            │             │             │
-    │  deployments  │              │              │              │            │             │             │
-    ├──────────────▶│              │              │              │            │             │             │
-    │               │  store       │              │              │            │             │             │
-    │               │  Deployment  │              │              │            │             │             │
-    │               ├─────────────▶│              │              │            │             │             │
-    │   201 Created │              │              │              │            │             │             │
-    │◀──────────────┤              │              │              │            │             │             │
-    │               │              │  watch:      │              │            │             │             │
-    │               │              │  new Deploy  │              │            │             │             │
-    │               │              ├─────────────▶│              │            │             │             │
-    │               │              │              │              │            │             │             │
-    │               │  create      │  compare:    │              │            │             │             │
-    │               │  ReplicaSet  │  0 RS exist  │              │            │             │             │
-    │               │◀─────────────┤  need 1      │              │            │             │             │
-    │               │  store RS    │              │              │            │             │             │
-    │               ├─────────────▶│              │              │            │             │             │
-    │               │              │              │  watch:      │            │             │             │
-    │               │              │              │  new RS      │            │             │             │
-    │               │              │              ├─────────────▶│            │             │             │
-    │               │              │              │              │            │             │             │
-    │               │  create      │              │  compare:    │            │             │             │
-    │               │  3 Pods      │              │  0 pods,     │            │             │             │
-    │               │◀─────────────┤──────────────┤  need 3      │            │             │             │
-    │               │  store Pods  │              │              │            │             │             │
-    │               ├─────────────▶│              │              │            │             │             │
-    │               │              │              │              │  watch:    │             │             │
-    │               │              │              │              │  3 unbound │             │             │
-    │               │              │              │              │  Pods      │             │             │
-    │               │              │              │              ├───────────▶│             │             │
-    │               │              │              │              │            │             │             │
-    │               │  update Pod  │              │              │  assign    │             │             │
-    │               │  .spec.      │              │              │  nodeName  │             │             │
-    │               │  nodeName    │              │              │  per Pod   │             │             │
-    │               │◀─────────────┤──────────────┤──────────────┤────────────┤             │             │
-    │               ├─────────────▶│              │              │            │             │             │
-    │               │              │              │              │            │  watch:     │             │
-    │               │              │              │              │            │  Pod bound  │             │
-    │               │              │              │              │            │  to my node │             │
-    │               │              │              │              │            ├────────────▶│             │
-    │               │              │              │              │            │             │             │
-    │               │              │              │              │            │  start      │             │
-    │               │              │              │              │            │  containers │             │
-    │               │              │              │              │            │  via CRI    │             │
-    │               │              │              │              │            │             │             │
-    │               │  update Pod  │              │              │            │  report     │             │
-    │               │  .status     │              │              │            │  status:    │             │
-    │               │  (Running)   │              │              │            │  Running,IP │             │
-    │               │◀─────────────┤──────────────┤──────────────┤────────────┤─────────────┤             │
-    │               ├─────────────▶│              │              │            │             │             │
-    │               │              │              │              │            │             │  watch:     │
-    │               │              │              │              │            │             │  Pod Ready  │
-    │               │              │              │              │            │             ├────────────▶│
-    │               │              │              │              │            │             │             │
-    │               │  update      │              │              │            │             │  add Pod IP │
-    │               │  Endpoints   │              │              │            │             │  to Service │
-    │               │◀─────────────┤──────────────┤──────────────┤────────────┤─────────────┤─────────────┤
-    │               ├─────────────▶│              │              │            │             │             │
-    │               │              │              │              │            │             │             │
+    User->>API: POST /apis/apps/v1/deployments
+    API->>etcd: store Deployment
+    API-->>User: 201 Created
+
+    API-->>DC: watch: new Deployment
+    Note over DC: compare: 0 RS exist, need 1
+    DC->>API: create ReplicaSet
+    API->>etcd: store RS
+
+    API-->>RSC: watch: new RS
+    Note over RSC: compare: 0 pods, need 3
+    RSC->>API: create 3 Pods
+    API->>etcd: store Pods
+
+    API-->>Sched: watch: 3 unbound Pods
+    Note over Sched: assign nodeName per Pod
+    Sched->>API: update Pod .spec.nodeName
+    API->>etcd: store updated Pods
+
+    API-->>KL: watch: Pod bound to my node
+    Note over KL: start containers via CRI
+
+    KL->>API: update Pod .status (Running, IP)
+    API->>etcd: store Pod status
+
+    API-->>EC: watch: Pod Ready
+    Note over EC: add Pod IP to Service
+    EC->>API: update Endpoints
+    API->>etcd: store Endpoints
 ```
 
 Here's the same flow in words:

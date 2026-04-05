@@ -71,39 +71,33 @@ When you run `kubeadm init` on a machine destined to be a control plane node, it
 
 **Static pod manifests.** Rather than running control plane components as system services, kubeadm writes static pod manifests to `/etc/kubernetes/manifests/`. The kubelet watches this directory and automatically creates pods for any manifests it finds. This means the API server, controller manager, scheduler, and etcd all run as pods on the control plane node --- Kubernetes managing itself. This approach is elegant: it means the same mechanisms that manage user workloads also manage the control plane.
 
-```
-kubeadm init: What Happens
+```mermaid
+flowchart TD
+    Start["Machine with kubelet +<br>container runtime installed"]
 
-  Machine with kubelet + container runtime installed
-  │
-  ├─ Phase 1: Preflight checks
-  │   └─ Verify container runtime, ports, kernel modules, resources
-  │
-  ├─ Phase 2: Generate PKI
-  │   └─ CA, API server cert, kubelet certs, etcd certs, SA keys
-  │   └─ Writes to /etc/kubernetes/pki/
-  │
-  ├─ Phase 3: Generate kubeconfig files
-  │   └─ admin.conf, kubelet.conf, controller-manager.conf, scheduler.conf
-  │
-  ├─ Phase 4: Write static pod manifests
-  │   └─ /etc/kubernetes/manifests/kube-apiserver.yaml
-  │   └─ /etc/kubernetes/manifests/kube-controller-manager.yaml
-  │   └─ /etc/kubernetes/manifests/kube-scheduler.yaml
-  │   └─ /etc/kubernetes/manifests/etcd.yaml
-  │
-  ├─ Phase 5: Wait for control plane
-  │   └─ kubelet reads manifests, starts pods, API server becomes healthy
-  │
-  ├─ Phase 6: Upload configuration
-  │   └─ Store cluster config in ConfigMap for future joins
-  │
-  ├─ Phase 7: Generate bootstrap token
-  │   └─ Short-lived token for worker nodes to join
-  │
-  └─ Phase 8: Install addons
-      └─ CoreDNS (cluster DNS)
-      └─ kube-proxy (service networking)
+    Start --> P1
+    P1["Phase 1: Preflight checks<br>Verify container runtime, ports,<br>kernel modules, resources"]
+
+    P1 --> P2
+    P2["Phase 2: Generate PKI<br>CA, API server cert, kubelet certs,<br>etcd certs, SA keys<br>Writes to /etc/kubernetes/pki/"]
+
+    P2 --> P3
+    P3["Phase 3: Generate kubeconfig files<br>admin.conf, kubelet.conf,<br>controller-manager.conf, scheduler.conf"]
+
+    P3 --> P4
+    P4["Phase 4: Write static pod manifests<br>kube-apiserver.yaml<br>kube-controller-manager.yaml<br>kube-scheduler.yaml<br>etcd.yaml"]
+
+    P4 --> P5
+    P5["Phase 5: Wait for control plane<br>kubelet reads manifests, starts pods,<br>API server becomes healthy"]
+
+    P5 --> P6
+    P6["Phase 6: Upload configuration<br>Store cluster config in ConfigMap<br>for future joins"]
+
+    P6 --> P7
+    P7["Phase 7: Generate bootstrap token<br>Short-lived token for<br>worker nodes to join"]
+
+    P7 --> P8
+    P8["Phase 8: Install addons<br>CoreDNS (cluster DNS)<br>kube-proxy (service networking)"]
 ```
 
 **Bootstrap tokens.** kubeadm generates a short-lived token that worker nodes use to authenticate with the API server during the join process. This solves the chicken-and-egg problem of node authentication: the node needs credentials to talk to the API server, but the API server needs to verify the node's identity. The bootstrap token provides initial trust, and the node uses it to request a proper kubelet certificate through the TLS bootstrap protocol.

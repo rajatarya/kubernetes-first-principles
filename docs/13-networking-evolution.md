@@ -10,24 +10,19 @@ This requirement is deceptively simple to state and remarkably difficult to impl
 
 **Flannel**, created by CoreOS in 2014, was the first widely-adopted CNI plugin for Kubernetes. Flannel's approach was simple: create a VXLAN overlay network. Each node was assigned a subnet (e.g., node 1 gets 10.244.1.0/24, node 2 gets 10.244.2.0/24), and VXLAN encapsulation handled cross-node communication. When a pod on node 1 sent a packet to a pod on node 2, Flannel encapsulated the pod-to-pod packet inside a UDP packet with the node-to-node addresses, sent it across the physical network, and de-encapsulated it on the other side.
 
-```
-Flannel VXLAN Overlay
+```mermaid
+flowchart LR
+    subgraph Node1["Node 1 (10.0.0.1)"]
+        PodA["Pod A<br>10.244.1.5"] --> flannel1["flannel.1<br>(VXLAN dev)"]
+        flannel1 --> encap["Encapsulate:<br>src=10.0.0.1, dst=10.0.0.2"]
+    end
 
-  Node 1 (10.0.0.1)                          Node 2 (10.0.0.2)
-  ┌───────────────────────┐                  ┌───────────────────────┐
-  │  Pod A: 10.244.1.5    │                  │  Pod B: 10.244.2.8    │
-  │       |               │                  │       ^               │
-  │       v               │                  │       |               │
-  │  ┌──────────────┐     │                  │  ┌──────────────┐     │
-  │  │ flannel.1    │     │                  │  │ flannel.1    │     │
-  │  │ (VXLAN dev)  │     │                  │  │ (VXLAN dev)  │     │
-  │  └──────┬───────┘     │                  │  └──────┬───────┘     │
-  │         |             │                  │         ^             │
-  │    encapsulate:       │                  │    decapsulate:       │
-  │    src=10.0.0.1       │   physical       │    unwrap to get      │
-  │    dst=10.0.0.2       │   network        │    original packet    │
-  │    payload=[Pod pkt]  │ ─────────────>   │                      │
-  └───────────────────────┘                  └───────────────────────┘
+    encap -->|"Physical network<br>(VXLAN encapsulated)"| decap
+
+    subgraph Node2["Node 2 (10.0.0.2)"]
+        decap["Decapsulate:<br>unwrap original packet"] --> flannel2["flannel.1<br>(VXLAN dev)"]
+        flannel2 --> PodB["Pod B<br>10.244.2.8"]
+    end
 ```
 
 Flannel worked. It was simple to deploy, easy to understand, and provided basic pod-to-pod connectivity. But it had significant limitations:
@@ -142,35 +137,31 @@ Today, organizations running at scale increasingly use Cilium or Calico's eBPF d
 
 **Istio**, jointly developed by Google, IBM, and Lyft and announced in 2017, was the first major service mesh for Kubernetes. Istio's architecture injected an **Envoy sidecar proxy** into every pod. All traffic to and from the pod passed through this proxy, which could enforce mTLS (mutual TLS), collect metrics, perform traffic routing, implement circuit breakers, and enforce access policies.
 
-```
-Sidecar Mesh vs. Sidecar-less Mesh
+```mermaid
+sequenceDiagram
+    box Traditional (Istio with sidecars)
+        participant A1 as Pod A: App
+        participant E1 as Pod A: Envoy
+        participant E2 as Pod B: Envoy
+        participant B1 as Pod B: App
+    end
 
-  Traditional (Istio with sidecars):
+    A1->>E1: request
+    E1->>E2: mTLS
+    E2->>B1: request
 
-  ┌─────────────────────────┐     ┌─────────────────────────┐
-  │  Pod A                  │     │  Pod B                  │
-  │  ┌──────┐  ┌─────────┐ │     │ ┌─────────┐  ┌──────┐  │
-  │  │ App  │─>│ Envoy   │─┼────>┼─│ Envoy   │─>│ App  │  │
-  │  │      │  │ sidecar │ │     │ │ sidecar │  │      │  │
-  │  └──────┘  └─────────┘ │     │ └─────────┘  └──────┘  │
-  └─────────────────────────┘     └─────────────────────────┘
-    Each pod has its own proxy       Memory + CPU per pod
+    Note over A1,B1: Per-pod proxy: 50-100 MB memory each
 
-  Sidecar-less (Cilium Service Mesh / Istio Ambient):
+    box Sidecar-less (Cilium / Istio Ambient)
+        participant A2 as Pod A: App
+        participant NP as Per-Node eBPF Proxy
+        participant B2 as Pod B: App
+    end
 
-  ┌────────────┐  ┌────────────┐
-  │  Pod A     │  │  Pod B     │
-  │  ┌──────┐  │  │  ┌──────┐  │
-  │  │ App  │  │  │  │ App  │  │
-  │  └──┬───┘  │  │  └──┬───┘  │
-  └─────┼──────┘  └─────┼──────┘
-        │               │
-  ┌─────▼───────────────▼──────────────────┐
-  │  Per-Node Proxy / eBPF datapath        │
-  │  (shared, not per-pod)                 │
-  │  mTLS, L7 policy, observability        │
-  └────────────────────────────────────────┘
-    One proxy per node, not per pod
+    A2->>NP: request
+    NP->>B2: mTLS + L7 policy
+
+    Note over A2,B2: One shared proxy per node: 10x less memory
 ```
 
 The sidecar approach was powerful but expensive. Each sidecar consumed memory (50-100 MB per pod was common for Envoy), added latency (traffic traversed two proxies for each hop), and increased the complexity of the pod lifecycle (the sidecar had to start before the application, and shutting down required careful ordering). In a cluster with 10,000 pods, the sidecar overhead was 500 GB to 1 TB of memory just for the mesh infrastructure.

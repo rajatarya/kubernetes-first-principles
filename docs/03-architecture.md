@@ -2,44 +2,36 @@
 
 ## The Big Picture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        CONTROL PLANE                            │
-│                                                                 │
-│  ┌──────────┐    ┌──────────────┐    ┌──────────────────────┐  │
-│  │          │    │              │    │  kube-controller-     │  │
-│  │   etcd   │◄──►│  API Server  │◄──►│  manager             │  │
-│  │  (state) │    │  (gateway)   │    │  (reconciliation)    │  │
-│  │          │    │              │    └──────────────────────┘  │
-│  └──────────┘    └──────┬───────┘    ┌──────────────────────┐  │
-│                         │            │  kube-scheduler       │  │
-│                         │       ┌───►│  (placement)          │  │
-│                         │       │    └──────────────────────┘  │
-│                         │       │                               │
-└─────────────────────────┼───────┼───────────────────────────────┘
-                          │       │
-              ┌───────────┼───────┼───────────┐
-              │           │       │           │
-              ▼           ▼       ▼           ▼
-┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-│   NODE 1        │ │   NODE 2        │ │   NODE 3        │
-│                 │ │                 │ │                 │
-│  ┌───────────┐  │ │  ┌───────────┐  │ │  ┌───────────┐  │
-│  │  kubelet  │  │ │  │  kubelet  │  │ │  │  kubelet  │  │
-│  └─────┬─────┘  │ │  └─────┬─────┘  │ │  └─────┬─────┘  │
-│        │        │ │        │        │ │        │        │
-│  ┌─────▼─────┐  │ │  ┌─────▼─────┐  │ │  ┌─────▼─────┐  │
-│  │containerd │  │ │  │containerd │  │ │  │containerd │  │
-│  └─────┬─────┘  │ │  └─────┬─────┘  │ │  └─────┬─────┘  │
-│        │        │ │        │        │ │        │        │
-│  ┌─────▼─────┐  │ │  ┌─────▼─────┐  │ │  ┌─────▼─────┐  │
-│  │  Pod Pod  │  │ │  │  Pod Pod  │  │ │  │  Pod Pod  │  │
-│  └───────────┘  │ │  └───────────┘  │ │  └───────────┘  │
-│                 │ │                 │ │                 │
-│  ┌───────────┐  │ │  ┌───────────┐  │ │  ┌───────────┐  │
-│  │kube-proxy │  │ │  │kube-proxy │  │ │  │kube-proxy │  │
-│  └───────────┘  │ │  └───────────┘  │ │  └───────────┘  │
-└─────────────────┘ └─────────────────┘ └─────────────────┘
+```mermaid
+flowchart TD
+    subgraph CP["Control Plane"]
+        etcd["etcd<br>(state)"]
+        API["API Server<br>(gateway)"]
+        CM["kube-controller-manager<br>(reconciliation)"]
+        SCHED["kube-scheduler<br>(placement)"]
+        etcd <--> API
+        API <--> CM
+        API <--> SCHED
+    end
+
+    subgraph N1["Node 1"]
+        kubelet1["kubelet"] --> containerd1["containerd"] --> pods1["Pod Pod"]
+        kubeproxy1["kube-proxy"]
+    end
+
+    subgraph N2["Node 2"]
+        kubelet2["kubelet"] --> containerd2["containerd"] --> pods2["Pod Pod"]
+        kubeproxy2["kube-proxy"]
+    end
+
+    subgraph N3["Node 3"]
+        kubelet3["kubelet"] --> containerd3["containerd"] --> pods3["Pod Pod"]
+        kubeproxy3["kube-proxy"]
+    end
+
+    API --> kubelet1
+    API --> kubelet2
+    API --> kubelet3
 ```
 
 **Every arrow is through the API Server.** There are no direct connections between components. This is the single most important architectural constraint.
@@ -98,32 +90,14 @@ Kubernetes runs dozens of controllers, each responsible for a specific aspect of
 - The **Job controller** watches Job objects and creates Pods to run tasks to completion.
 - The **Endpoint controller** watches Services and Pods to maintain the mapping between them.
 
-```
-              ┌─────────────────────────────────┐
-              │         CONTROLLER LOOP          │
-              │                                  │
-              │   ┌──────────┐                   │
-              │   │ OBSERVE  │ ◄─── Watch API    │
-              │   │ current  │      Server       │
-              │   │ state    │                   │
-              │   └────┬─────┘                   │
-              │        │                         │
-              │        ▼                         │
-              │   ┌──────────┐                   │
-              │   │  DIFF    │ Compare actual    │
-              │   │ actual   │ vs desired        │
-              │   │ vs spec  │                   │
-              │   └────┬─────┘                   │
-              │        │                         │
-              │        ▼                         │
-              │   ┌──────────┐                   │
-              │   │   ACT    │ Create/delete/    │
-              │   │ to fix   │ update objects    │
-              │   │ drift    │ via API Server    │
-              │   └────┬─────┘                   │
-              │        │                         │
-              │        └─────────► (repeat)      │
-              └─────────────────────────────────┘
+```mermaid
+flowchart TD
+    OBSERVE["OBSERVE<br>current state"] -->|Compare actual<br>vs desired| DIFF["DIFF<br>actual vs spec"]
+    DIFF -->|Create/delete/update<br>objects via API Server| ACT["ACT<br>to fix drift"]
+    ACT -->|repeat| OBSERVE
+
+    OBSERVE -.-|Watch API Server| API(("API<br>Server"))
+    ACT -.-|Write to API Server| API
 ```
 
 The genius of this pattern is **decomposition**. Each controller handles exactly one concern. The Deployment controller knows nothing about nodes or networking; the ReplicaSet controller knows nothing about rolling updates. Each controller reads from and writes to the API server, and the API server provides the shared state that coordinates them.

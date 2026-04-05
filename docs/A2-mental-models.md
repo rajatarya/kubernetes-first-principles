@@ -8,51 +8,28 @@ Each part of this book introduces a cluster of related concepts. These diagrams 
 
 **The Reconciliation Loop — the heart of Kubernetes.**
 
-```
-  User writes YAML
-        │
-        ▼
-   ┌─────────┐       ┌────────────┐       ┌───────┐
-   │ kubectl  │──────▶│ API Server │──────▶│ etcd  │
-   └─────────┘       └─────┬──────┘       └───────┘
-                            │                  ▲
-                    ┌───────┴───────┐          │
-                    │               │    (desired state
-                    ▼               ▼     stored here)
-            ┌──────────────┐ ┌───────────┐
-            │  Controller  │ │ Scheduler │
-            │   Manager    │ │ (assign   │
-            │ (reconcile)  │ │  to node) │
-            └──────┬───────┘ └─────┬─────┘
-                   │               │
-                   └───────┬───────┘
-                           │
-                           ▼
-              ┌─────────────────────┐
-              │   kubelet (on node) │
-              └──────────┬──────────┘
-                         │
-                         ▼
-              ┌─────────────────────┐
-              │  Container Runtime  │
-              └──────────┬──────────┘
-                         │
-                         ▼
-              ┌─────────────────────┐
-              │     Container       │
-              └─────────────────────┘
+```mermaid
+flowchart TD
+    A["User writes YAML"] --> B["kubectl"]
+    B --> C["API Server"]
+    C --> D["etcd<br>(desired state stored here)"]
 
-    ┌──────────────────────────────────────────────┐
-    │          The Watch / Reconciliation Loop      │
-    │                                              │
-    │  Controller watches ──▶ detects drift        │
-    │       │                     │                │
-    │       │              compares desired         │
-    │       │              vs. actual state         │
-    │       │                     │                │
-    │       └──── takes action ◀──┘                │
-    │             to converge                      │
-    └──────────────────────────────────────────────┘
+    C --> E["Controller Manager<br>(reconcile)"]
+    C --> F["Scheduler<br>(assign to node)"]
+
+    E --> G["kubelet (on node)"]
+    F --> G
+
+    G --> H["Container Runtime"]
+    H --> I["Container"]
+
+    subgraph loop ["The Watch / Reconciliation Loop"]
+        direction LR
+        W1["Controller watches"] --> W2["Detects drift"]
+        W2 --> W3["Compares desired<br>vs. actual state"]
+        W3 --> W4["Takes action<br>to converge"]
+        W4 --> W1
+    end
 ```
 
 ---
@@ -61,34 +38,35 @@ Each part of this book introduces a cluster of related concepts. These diagrams 
 
 **The Stack — what runs on what.**
 
-```
-    ┌─────────────────────────────────────────┐
-    │             Application                 │
-    ├─────────────────────────────────────────┤
-    │     Helm / Kustomize  (packaging)       │
-    ├─────────────────────────────────────────┤
-    │     kubeadm / k3s     (bootstrap)       │
-    ├─────────────────────────────────────────┤
-    │          Kubernetes API                  │
-    ├───────────────────┬─────────────────────┤
-    │  Container Runtime│    CNI Plugin       │
-    │  containerd /     │  (Cilium, Calico,   │
-    │  CRI-O            │   Flannel ...)      │
-    ├───────────────────┴─────────────────────┤
-    │       OCI Runtime  (runc)               │
-    ├─────────────────────────────────────────┤
-    │           Linux Kernel                  │
-    │     ┌───────────┐  ┌────────────┐       │
-    │     │  cgroups   │  │ namespaces │       │
-    │     │ (resource  │  │ (isolation)│       │
-    │     │  limits)   │  │            │       │
-    │     └───────────┘  └────────────┘       │
-    └─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    S1["Application"]
+    S2["Helm / Kustomize (packaging)"]
+    S3["kubeadm / k3s (bootstrap)"]
+    S4["Kubernetes API"]
+    S5["Container Runtime<br>containerd / CRI-O"]
+    S6["CNI Plugin<br>Cilium, Calico, Flannel ..."]
+    S7["OCI Runtime (runc)"]
 
-    CNI plugs in here ─────────────────┐
-    to provide pod networking:         │
-                                       ▼
-    Pod A ◀──── CNI virtual network ────▶ Pod B
+    S1 --> S2 --> S3 --> S4
+    S4 --> S5
+    S4 --> S6
+    S5 --> S7
+    S6 --> S7
+
+    subgraph kernel ["Linux Kernel"]
+        K1["cgroups<br>(resource limits)"]
+        K2["namespaces<br>(isolation)"]
+    end
+
+    S7 --> kernel
+
+    subgraph cni ["CNI Virtual Network"]
+        direction LR
+        PA["Pod A"] <--> PB["Pod B"]
+    end
+
+    S6 --> cni
 ```
 
 ---
@@ -97,49 +75,41 @@ Each part of this book introduces a cluster of related concepts. These diagrams 
 
 **Your First Cluster — who talks to whom.**
 
-```
-                        ┌───────────────┐
-                        │ Cloud Provider│
-                        │  (AWS/GCP/AZ) │
-                        └───────┬───────┘
-                                │
-                                ▼
-                  ┌─────────────────────────┐
-                  │           VPC           │
-                  │                         │
-                  │  ┌───────────────────┐  │
-                  │  │   Control Plane   │  │
-                  │  │    (managed)      │  │
-                  │  │  ┌─────────────┐  │  │
-                  │  │  │ API Server  │◀─┼──┼──── kubectl
-                  │  │  └─────────────┘  │  │
-                  │  └───────────────────┘  │        ┌─────────────┐
-                  │                         │◀───────│ CI/CD       │
-                  │  ┌───────────────────┐  │        │ Pipeline    │
-                  │  │   Worker Node 1   │  │        └─────────────┘
-                  │  │ ┌───────────────┐ │  │
-                  │  │ │  Pod          │ │  │
-                  │  │ │ ┌───┐ ┌─────┐│ │  │
-                  │  │ │ │app│ │side-││ │  │
-                  │  │ │ │   │ │car  ││ │  │
-                  │  │ │ └───┘ └─────┘│ │  │
-                  │  │ └───────────────┘ │  │
-                  │  └───────────────────┘  │
-                  │                         │
-                  │  ┌───────────────────┐  │
-                  │  │   Worker Node 2   │  │
-                  │  │ ┌───────────────┐ │  │
-                  │  │ │  Pod     Pod  │ │  │
-                  │  │ └───────────────┘ │  │
-                  │  └───────────────────┘  │
-                  └─────────────────────────┘
+```mermaid
+flowchart TD
+    Cloud["Cloud Provider<br>(AWS / GCP / AZ)"]
+    Cloud --> VPC
 
-    Debugging tools point at pods:
-    ┌────────────┐
-    │ kubectl    │──▶  logs
-    │            │──▶  exec
-    │            │──▶  describe (events)
-    └────────────┘
+    kubectl["kubectl"] --> API
+    CICD["CI/CD Pipeline"] --> VPC
+
+    subgraph VPC
+        subgraph CP ["Control Plane (managed)"]
+            API["API Server"]
+        end
+
+        subgraph N1 ["Worker Node 1"]
+            subgraph Pod1 ["Pod"]
+                App["app"]
+                Sidecar["sidecar"]
+            end
+        end
+
+        subgraph N2 ["Worker Node 2"]
+            Pod2a["Pod"]
+            Pod2b["Pod"]
+        end
+    end
+
+    API --> N1
+    API --> N2
+
+    subgraph debug ["Debugging Tools"]
+        direction LR
+        KC["kubectl"] --> Logs["logs"]
+        KC --> Exec["exec"]
+        KC --> Describe["describe (events)"]
+    end
 ```
 
 ---
@@ -148,52 +118,27 @@ Each part of this book introduces a cluster of related concepts. These diagrams 
 
 **State — the hard problem.**
 
-```
-    ┌──────────────────────┐    ┌──────────────────────────┐
-    │     Deployment       │    │      StatefulSet          │
-    │  (stateless)         │    │  (ordered, stable ID)     │
-    │                      │    │                          │
-    │  Pods are fungible,  │    │  pod-0, pod-1, pod-2    │
-    │  interchangeable     │    │  each has stable name    │
-    └──────────────────────┘    └────────────┬─────────────┘
-                                             │
-                                             ▼
-                                    ┌────────────────┐
-                                    │      PVC       │
-                                    │ (claim storage) │
-                                    └───────┬────────┘
-                                            │
-                                            ▼
-                                    ┌────────────────┐
-                                    │       PV       │
-                                    │ (actual volume) │
-                                    └───────┬────────┘
-                                            │
-                                            ▼
-                                    ┌────────────────┐
-                                    │ StorageClass   │
-                                    │ (provisioner)  │
-                                    └───────┬────────┘
-                                            │
-                                            ▼
-                                    ┌────────────────┐
-                                    │   Cloud Disk   │
-                                    │  (EBS/PD/AzD)  │
-                                    └────────────────┘
+```mermaid
+flowchart TD
+    Deploy["Deployment<br>(stateless)<br>Pods are fungible,<br>interchangeable"]
+    SS["StatefulSet<br>(ordered, stable ID)<br>pod-0, pod-1, pod-2<br>each has stable name"]
 
-    ┌──────────────────────────────────────────────────┐
-    │  Operators manage databases on Kubernetes:       │
-    │                                                  │
-    │  Operator ──▶ watches CRD ──▶ manages            │
-    │               (e.g. PostgresCluster)             │
-    │                   StatefulSet + PVCs + Secrets   │
-    └──────────────────────────────────────────────────┘
+    SS --> PVC["PVC<br>(claim storage)"]
+    PVC --> PV["PV<br>(actual volume)"]
+    PV --> SC["StorageClass<br>(provisioner)"]
+    SC --> Disk["Cloud Disk<br>(EBS / PD / AzD)"]
 
-    Jobs & CronJobs (separate branch):
-    ┌───────────┐       ┌────────────┐
-    │   Job     │       │  CronJob   │
-    │ (run once)│       │ (scheduled)│──▶ creates Job on schedule
-    └───────────┘       └────────────┘
+    subgraph operators ["Operators manage databases on K8s"]
+        direction LR
+        Op["Operator"] -->|watches| CRD["CRD<br>(e.g. PostgresCluster)"]
+        CRD -->|manages| Res["StatefulSet +<br>PVCs + Secrets"]
+    end
+
+    subgraph jobs ["Jobs and CronJobs"]
+        direction LR
+        Job["Job<br>(run once)"]
+        CronJob["CronJob<br>(scheduled)"] -->|creates Job<br>on schedule| Job
+    end
 ```
 
 ---
@@ -249,40 +194,24 @@ Each part of this book introduces a cluster of related concepts. These diagrams 
 
 **The Scaling Cascade — metrics to machines.**
 
-```
-    ┌──────────┐
-    │ Metrics  │  (CPU, memory, custom metrics)
-    └────┬─────┘
-         │
-         ▼
-    ┌──────────┐     scale pods         ┌──────────────┐
-    │   HPA    │────horizontally───────▶│  More Pods   │
-    └────┬─────┘                        └──────────────┘
-         │
-         │ pods go Pending
-         │ (no capacity)
-         ▼
-    ┌────────────────────┐  scale nodes  ┌──────────────┐
-    │ Karpenter /        │──────────────▶│  Cloud API   │
-    │ Cluster Autoscaler │               │ (provision   │
-    └────────────────────┘               │  new VMs)    │
-                                         └──────────────┘
+```mermaid
+flowchart TD
+    M["Metrics<br>(CPU, memory, custom)"]
+    M --> HPA["HPA"]
+    HPA -->|"scale pods<br>horizontally"| Pods["More Pods"]
+    HPA -->|"pods go Pending<br>(no capacity)"| KCA["Karpenter /<br>Cluster Autoscaler"]
+    KCA -->|"scale nodes"| Cloud["Cloud API<br>(provision new VMs)"]
 
-    ┌────────────────────────────────────────────────┐
-    │  Side branch: VPA (Vertical Pod Autoscaler)    │
-    │                                                │
-    │  Metrics ──▶ VPA ──▶ resize pods vertically    │
-    │                      (adjust requests/limits)  │
-    └────────────────────────────────────────────────┘
+    subgraph vpa ["VPA (Vertical Pod Autoscaler)"]
+        direction LR
+        VM["Metrics"] --> VPA2["VPA"] --> Resize["Resize pods vertically<br>(adjust requests/limits)"]
+    end
 
-    Resource Tuning feeds into scheduling:
-    ┌───────────────────┐       ┌─────────────┐
-    │ requests & limits │──────▶│  Scheduler  │
-    │ (CPU, memory)     │       │  decisions  │
-    └───────────────────┘       └─────────────┘
-         │
-         └──▶ Affects bin-packing, QoS class,
-              eviction priority, HPA thresholds
+    subgraph scheduling ["Resource Tuning feeds Scheduling"]
+        direction LR
+        RL["requests and limits<br>(CPU, memory)"] --> Sched["Scheduler decisions"]
+        RL --> Effects["Affects bin-packing,<br>QoS class, eviction<br>priority, HPA thresholds"]
+    end
 ```
 
 ---
@@ -291,41 +220,23 @@ Each part of this book introduces a cluster of related concepts. These diagrams 
 
 **The Platform — abstraction over infrastructure.**
 
-```
-    ┌────────────┐                ┌────────────────────────┐
-    │ Developer  │                │      Git Repo          │
-    │            │                │  (source of truth)     │
-    └─────┬──────┘                └───────────┬────────────┘
-          │                                   │
-          │ writes Claim                      │ GitOps loop
-          ▼                                   ▼
-    ┌────────────────┐              ┌──────────────────┐
-    │  Platform API  │              │     ArgoCD /     │
-    │  (Crossplane   │              │     Flux         │
-    │   XRD / CRD)   │              └────────┬─────────┘
-    └───────┬────────┘                       │
-            │                                │ sync
-            │ provisions                     ▼
-            ▼                       ┌──────────────────┐
-    ┌────────────────┐              │    Cluster(s)    │
-    │ Cloud Resources│              └──────────────────┘
-    │ (RDS, S3, etc.)│
-    └────────────────┘
+```mermaid
+flowchart TD
+    Dev["Developer"] -->|writes Claim| PlatAPI["Platform API<br>(Crossplane XRD / CRD)"]
+    PlatAPI -->|provisions| CloudRes["Cloud Resources<br>(RDS, S3, etc.)"]
 
-    ┌──────────────────────────────────────────────────────┐
-    │  Extension Mechanism:                                │
-    │                                                      │
-    │  CRD ──▶ Operator (controller) ──▶ manages resources │
-    │  (defines new API)  (watches & reconciles)           │
-    └──────────────────────────────────────────────────────┘
+    Git["Git Repo<br>(source of truth)"] -->|GitOps loop| Argo["ArgoCD / Flux"]
+    Argo -->|sync| Clusters["Cluster(s)"]
 
-    Horizontal concerns:
-    ┌─────────────────┐    ┌───────────────────┐
-    │  Multi-Cluster  │    │  Multi-Tenancy    │
-    │  (fleet mgmt,   │    │  (namespaces,     │
-    │   federation)   │    │   vClusters,      │
-    │                 │    │   resource quotas) │
-    └─────────────────┘    └───────────────────┘
+    subgraph ext ["Extension Mechanism"]
+        direction LR
+        CRD["CRD<br>(defines new API)"] --> Operator["Operator<br>(watches & reconciles)"] --> Resources["Manages resources"]
+    end
+
+    subgraph horiz ["Horizontal Concerns"]
+        MC["Multi-Cluster<br>(fleet mgmt, federation)"]
+        MT["Multi-Tenancy<br>(namespaces, vClusters,<br>resource quotas)"]
+    end
 ```
 
 ---

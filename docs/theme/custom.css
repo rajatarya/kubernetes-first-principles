@@ -1,36 +1,43 @@
-/* Kubernetes-themed color overrides */
-/* Official K8s blue: #326CE5, lighter: #4A85E8, darker: #2756B8 */
+/* Kubernetes from First Principles — Custom Theme */
+/* K8s palette: #326CE5 (blue), #1a4eb8 (darker), #5a8ef0 (lighter), #141e33 (navy bg) */
 
-/* Sidebar */
+/* ─── Typography ─── */
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+.content {
+    font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 1.7rem;
+    line-height: 1.75;
+    letter-spacing: -0.01em;
+}
+
+.content h1, .content h2, .content h3, .content h4 {
+    font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.content code, .content pre code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.88em;
+}
+
+/* ─── Sidebar ─── */
 .sidebar {
     background-color: #1a2744;
+    font-family: 'Source Sans 3', -apple-system, sans-serif;
 }
 
 .sidebar .sidebar-scrollbox {
     background-color: #1a2744;
 }
 
-/* Active sidebar link */
 .sidebar .active {
     color: #6fa8ff;
 }
 
-/* Links throughout the book */
-.content a {
-    color: #326CE5;
-}
-
-.content a:hover {
-    color: #2756B8;
-}
-
-/* Navy theme adjustments (the default) */
-.navy .content a {
-    color: #6fa8ff;
-}
-
-.navy .content a:hover {
-    color: #93bdff;
+.sidebar li a {
+    transition: color 0.15s ease;
 }
 
 .navy .sidebar {
@@ -41,18 +48,79 @@
     color: #6fa8ff;
 }
 
-/* Chapter title styling */
+/* ─── Links ─── */
+.content a {
+    color: #326CE5;
+    text-decoration: none;
+}
+
+.content a:hover {
+    color: #2756B8;
+    text-decoration: underline;
+}
+
+.navy .content a {
+    color: #6fa8ff;
+}
+
+.navy .content a:hover {
+    color: #93bdff;
+    text-decoration: underline;
+}
+
+/* ─── Headings ─── */
 .content h1 {
-    border-bottom: 2px solid #326CE5;
+    border-bottom: 3px solid #326CE5;
+    padding-bottom: 0.4em;
+    margin-bottom: 1em;
+    font-size: 2em;
+}
+
+.content h2 {
+    border-bottom: 1px solid rgba(50, 108, 229, 0.2);
     padding-bottom: 0.3em;
+    margin-top: 2em;
 }
 
-/* Code blocks - subtle K8s blue tint */
+.navy .content h2 {
+    border-bottom-color: rgba(111, 168, 255, 0.15);
+}
+
+.content h3 {
+    margin-top: 1.6em;
+    color: #2756B8;
+}
+
+.navy .content h3 {
+    color: #6fa8ff;
+}
+
+/* ─── Code blocks ─── */
+.content pre {
+    border-radius: 6px;
+    border-left: 3px solid #326CE5;
+    padding: 1em 1.2em;
+}
+
+.navy .content pre {
+    background-color: #0d1626;
+    border-left-color: #5a8ef0;
+}
+
 .navy .content code {
-    background-color: #1a2744;
+    background-color: rgba(26, 39, 68, 0.6);
+    border-radius: 3px;
+    padding: 0.15em 0.35em;
 }
 
-/* Tables - K8s blue header */
+/* ─── Tables ─── */
+.content table {
+    border-collapse: collapse;
+    border-radius: 6px;
+    overflow: hidden;
+    width: 100%;
+}
+
 .content table thead {
     background-color: #326CE5;
     color: white;
@@ -60,18 +128,122 @@
 
 .content table thead th {
     border-color: #2756B8;
+    font-weight: 600;
+    padding: 0.6em 1em;
+    text-align: left;
+}
+
+.content table tbody td {
+    padding: 0.5em 1em;
+    border-bottom: 1px solid rgba(50, 108, 229, 0.1);
+}
+
+.content table tbody tr:hover {
+    background-color: rgba(50, 108, 229, 0.04);
 }
 
 .navy .content table thead {
     background-color: #1e3a6e;
 }
 
-/* Menu bar accent */
+.navy .content table tbody td {
+    border-bottom-color: rgba(111, 168, 255, 0.08);
+}
+
+.navy .content table tbody tr:hover {
+    background-color: rgba(111, 168, 255, 0.05);
+}
+
+/* ─── Blockquotes (callouts, key insights, Common Mistakes) ─── */
+.content blockquote {
+    border-left: 4px solid #326CE5;
+    background: linear-gradient(135deg, rgba(50, 108, 229, 0.06), rgba(50, 108, 229, 0.02));
+    border-radius: 0 6px 6px 0;
+    padding: 0.8em 1.2em;
+    margin: 1.5em 0;
+}
+
+.content blockquote p {
+    margin: 0.4em 0;
+}
+
+.content blockquote strong:first-child {
+    color: #326CE5;
+}
+
+.navy .content blockquote {
+    border-left-color: #5a8ef0;
+    background: linear-gradient(135deg, rgba(90, 142, 240, 0.08), rgba(90, 142, 240, 0.02));
+}
+
+.navy .content blockquote strong:first-child {
+    color: #6fa8ff;
+}
+
+/* ─── Menu bar ─── */
 #menu-bar {
     border-bottom: 2px solid #326CE5;
 }
 
-/* Search highlight */
+.menu-title {
+    font-family: 'Source Sans 3', -apple-system, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* ─── Search highlight ─── */
 .content mark {
-    background-color: rgba(50, 108, 229, 0.3);
+    background-color: rgba(50, 108, 229, 0.25);
+    border-radius: 2px;
+    padding: 0.1em 0.2em;
+}
+
+/* ─── Mermaid diagrams ─── */
+.mermaid {
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 1.2em 0.8em;
+    margin: 1em 0;
+    background: rgba(50, 108, 229, 0.03);
+    border: 1px solid rgba(50, 108, 229, 0.1);
+    border-radius: 8px;
+}
+
+.navy .mermaid {
+    background: rgba(90, 142, 240, 0.04);
+    border-color: rgba(90, 142, 240, 0.1);
+}
+
+.mermaid svg {
+    max-width: none;
+    display: block;
+    margin: 0 auto;
+}
+
+/* ─── Horizontal rules ─── */
+.content hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(50, 108, 229, 0.3), transparent);
+    margin: 2.5em 0;
+}
+
+/* ─── Lists ─── */
+.content ul li, .content ol li {
+    margin-bottom: 0.3em;
+}
+
+/* ─── Print styles ─── */
+@media print {
+    .content h1 {
+        border-bottom-color: #000;
+    }
+    .content blockquote {
+        border-left-color: #333;
+        background: #f5f5f5;
+    }
+    .mermaid {
+        border-color: #ccc;
+        background: #fafafa;
+    }
 }

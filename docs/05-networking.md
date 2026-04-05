@@ -74,29 +74,15 @@ Pod IP addresses are ephemeral. When a pod is destroyed and recreated, it gets a
 
 A Service provides a **stable virtual IP address** (the ClusterIP) and a **stable DNS name** that routes traffic to the set of pods matching the Service's label selector. The mapping from Service to pods is maintained by the Endpoints (or EndpointSlice) controller, which watches for pod changes and updates the endpoint list.
 
+```mermaid
+flowchart TD
+    SVC["Service: web-svc<br>ClusterIP: 10.96.0.42<br>DNS: web-svc.default.svc<br>Selector: app=web"]
+    SVC -->|"kube-proxy / iptables<br>load-balances across"| Pod1["Pod app=web<br>10.244.1.5<br>Node 1"]
+    SVC -->|"kube-proxy / iptables<br>load-balances across"| Pod2["Pod app=web<br>10.244.2.8<br>Node 2"]
+    SVC -->|"kube-proxy / iptables<br>load-balances across"| Pod3["Pod app=web<br>10.244.1.9<br>Node 1"]
 ```
-                    ┌─────────────────────────────────┐
-                    │        Service: "web-svc"        │
-                    │     ClusterIP: 10.96.0.42       │
-                    │     DNS: web-svc.default.svc    │
-                    │     Selector: app=web            │
-                    └───────────────┬─────────────────┘
-                                    │
-                         kube-proxy / iptables
-                         load-balances across:
-                                    │
-                    ┌───────────────┼───────────────┐
-                    │               │               │
-                    ▼               ▼               ▼
-              ┌──────────┐   ┌──────────┐   ┌──────────┐
-              │ Pod      │   │ Pod      │   │ Pod      │
-              │ app=web  │   │ app=web  │   │ app=web  │
-              │10.244.1.5│   │10.244.2.8│   │10.244.1.9│
-              │ Node 1   │   │ Node 2   │   │ Node 1   │
-              └──────────┘   └──────────┘   └──────────┘
 
- Client code: http://web-svc:80  →  transparently routed to a pod
-```
+Client code: `http://web-svc:80` is transparently routed to a pod.
 
 Kube-proxy (or the CNI plugin) programs rules on every node that intercept traffic to the Service's ClusterIP and redirect it to one of the backing pod IPs, using round-robin or other load-balancing algorithms. From the client's perspective, the Service has a single, stable address; the fact that traffic is being distributed to ephemeral pods is transparent.
 
