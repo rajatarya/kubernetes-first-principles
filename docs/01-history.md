@@ -13,7 +13,7 @@ Timeline: The Road to Container Orchestration
 
  Inside Google:
  ───────────────────────────────────────────────────────────────────────────
- 2003-04        2006          2011-13         2014
+ 2003-04        2006-2008       2011-13         2014
    │              │               │              │
    ▼              │               ▼              ▼
   Borg         cgroups +       Omega          Kubernetes
@@ -45,7 +45,7 @@ But configuration management operated at the wrong level of abstraction for the 
 
 ## The Container Revolution: Docker and the Shipping Container Metaphor
 
-Containers were not new when Docker launched in 2013. The underlying Linux kernel features --- cgroups (for resource limits) and namespaces (for isolation) --- had existed since 2006-2008. Google had been using containers internally since at least 2004, running everything from web search to Gmail inside Linux containers managed by their Borg system. FreeBSD had jails since 2000. Solaris had zones since 2004.
+Containers were not new when Docker launched in 2013. The underlying Linux kernel features --- cgroups (for resource limits) and namespaces (for isolation) --- had been in the Linux kernel since 2008 (cgroups merged in v2.6.24). Google had been using containers internally since at least 2004, running everything from web search to Gmail inside Linux containers managed by their Borg system. FreeBSD had jails since 2000. Solaris had zones since 2004.
 
 What Docker did was **make containers accessible**. It provided a simple command-line interface, a standardized image format (the Dockerfile and layered filesystem), and a distribution mechanism (Docker Hub). For the first time, a developer could package an application and all its dependencies into a single artifact, push it to a registry, and run it identically on any Linux machine. The shipping container metaphor was apt: just as standardized shipping containers revolutionized global trade by providing a uniform interface between ships, trains, and trucks, Docker containers provided a uniform interface between development, testing, and production.
 
@@ -87,12 +87,12 @@ The founders made a crucial strategic decision: Rather than open-sourcing Borg, 
 
 - Using standard open-source components (etcd for storage, instead of Google's proprietary Chubby/Colossus)
 - Supporting multiple container runtimes (not just Google's internal runtime)
-- Designing for extensibility from the start (API extensibility (later ThirdPartyResources, then CRDs), custom controllers, pluggable networking)
+- Designing for extensibility from the start (a pluggable API that later evolved into ThirdPartyResources and then CRDs, custom controllers, pluggable networking)
 - Making the system portable across cloud providers and on-premises environments
 
 Kubernetes was donated to the newly formed Cloud Native Computing Foundation (CNCF) in 2015, ensuring its governance was independent of any single company. This was a masterstroke of ecosystem building: by making Kubernetes vendor-neutral, Google ensured that every major cloud provider (AWS, Azure, GCP) would offer managed Kubernetes services, creating a de facto standard that benefited everyone --- including Google, whose cloud platform was smaller than AWS but whose expertise in running Kubernetes was unmatched.
 
-> **The Borg Lineage**: Kubernetes (Greek: helmsman) was originally codenamed "Project Seven" --- a reference to Seven of Nine from Star Trek, a Borg who became an individual. The name is a deliberate allusion to Kubernetes' origins in Google's Borg system, while signaling that it had been liberated from Google's proprietary infrastructure to become something independent.
+> **The Borg Lineage**: Kubernetes (Greek: steersman or pilot) was reportedly codenamed "Project Seven" --- a reference to Seven of Nine from Star Trek, a Borg who became an individual. The name is a deliberate allusion to Kubernetes' origins in Google's Borg system, while signaling that it had been liberated from Google's proprietary infrastructure to become something independent.
 
 ## Common Mistakes and Misconceptions
 

@@ -182,7 +182,7 @@ This appendix provides a quick-reference glossary for terms used throughout the 
 
 **Scheduler (kube-scheduler)** — A control plane component that assigns newly created Pods to nodes based on resource requirements, constraints, affinity rules, and scheduling policies. (see [Chapter 3](03-architecture.md))
 
-**Secret** — A Kubernetes object used to store sensitive information such as passwords, tokens, and TLS certificates, encoded in base64. (see [Chapter 28](28-secrets.md))
+**Secret** — A Kubernetes object for storing sensitive data (passwords, tokens, TLS certificates). Values are base64-encoded in YAML, but base64 is *encoding*, not encryption --- configure encryption at rest for real protection. (see [Chapter 28](28-secrets.md))
 
 **Selector** — A query expression that uses labels to filter and identify a set of Kubernetes objects. (see [Chapter 4](04-api-model.md))
 

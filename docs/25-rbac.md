@@ -223,7 +223,7 @@ Any user who has `admin` access in a namespace now automatically gets full acces
 
 Kubernetes v1.24 removed the automatic creation of long-lived ServiceAccount token secrets. The modern model uses **bound service account tokens** with four important properties:
 
-1. **Time-bound** --- Tokens expire (default: 1 hour, auto-rotated by the kubelet)
+1. **Time-bound** --- Tokens expire (default: 1 hour; the kubelet proactively rotates the token when 80% of its lifetime has elapsed, i.e., ~48 minutes by default)
 2. **Audience-scoped** --- Tokens are valid only for specific audiences (typically the API server)
 3. **Pod-bound** --- Tokens are invalidated when the pod is deleted
 4. **Auto-rotated** --- The kubelet refreshes tokens before expiration

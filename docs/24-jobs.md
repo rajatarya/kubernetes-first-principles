@@ -127,7 +127,8 @@ completions=unset, parallelism=5
   All 5 pods run simultaneously.
   Each pulls work from an external queue (SQS, Redis, RabbitMQ).
   When a pod exits successfully, it is not restarted.
-  Job completes when all pods have succeeded.
+  Job completes when at least one pod terminates successfully
+  and all other pods have also terminated.
 
 
 Pattern 4: Indexed Parallel

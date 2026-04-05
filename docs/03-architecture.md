@@ -44,7 +44,7 @@ Kubernetes needs to store the desired state of the entire cluster: every pod spe
 
 The CAP theorem forces a choice between consistency and availability (since network partitions are inevitable), and Kubernetes chose consistency. This is the right choice for a cluster management system: it is better to temporarily refuse writes than to allow conflicting writes that could result in two different controllers making contradictory scheduling decisions.
 
-etcd implements the Raft consensus algorithm, which provides strong consistency (linearizability) across a cluster of typically 3 or 5 nodes. Every write must be acknowledged by a majority of nodes before it is committed. This means etcd can tolerate the failure of (N-1)/2 nodes in a cluster of N nodes: a 3-node cluster can lose 1 node, a 5-node cluster can lose 2.
+etcd implements the Raft consensus algorithm, which provides strong consistency (linearizability) across a cluster of typically 3 or 5 nodes. Every write must be acknowledged by a majority of nodes before it is committed. This means etcd requires a majority of nodes to commit writes: a 3-node cluster needs 2 (tolerates 1 failure), a 5-node cluster needs 3 (tolerates 2 failures). This is why etcd clusters always use an odd number of nodes --- a 4-node cluster still requires 3 for quorum, giving no additional fault tolerance over 3.
 
 Why etcd specifically, rather than ZooKeeper, Consul, or a relational database?
 

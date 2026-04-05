@@ -41,7 +41,7 @@ Kubernetes supports encrypting Secret data before it reaches etcd. You configure
 |----------|-----------|---------------|----------|
 | **identity** | None (plaintext) | N/A | Default. Insecure. |
 | **aescbc** | AES-256-CBC | Static key in config file | Simple encryption. Key is on disk alongside the API server. |
-| **aesgcm** | AES-256-GCM | Static key in config file | Authenticated encryption (integrity + confidentiality). Requires key rotation discipline because GCM nonce reuse is catastrophic. |
+| **aesgcm** | AES-256-GCM | Static key in config file | Authenticated encryption (integrity + confidentiality). Uses random 96-bit nonces (collision risk negligible). Key rotation still recommended. |
 | **secretbox** | XSalsa20-Poly1305 | Static key in config file | Modern authenticated encryption. Preferred over aescbc/aesgcm for static key scenarios. |
 | **kms v2** | Envelope encryption | External KMS (AWS KMS, GCP KMS, Azure Key Vault, HashiCorp Vault) | Production-grade. Keys never leave the KMS. |
 

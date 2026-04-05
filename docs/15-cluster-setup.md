@@ -4,7 +4,7 @@ Every Kubernetes cluster begins as a collection of Linux machines that know noth
 
 ## What kubeadm Actually Does
 
-kubeadm is the official bootstrapping tool. When you run `kubeadm init`, it executes 10 phases in sequence. Each phase solves a specific problem in the bootstrap chain.
+kubeadm is the official bootstrapping tool. When you run `kubeadm init`, it executes 12 phases in sequence. Each phase solves a specific problem in the bootstrap chain.
 
 ```
 kubeadm init

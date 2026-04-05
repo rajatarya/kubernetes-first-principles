@@ -1,6 +1,8 @@
 # Chapter 31: Vertical Pod Autoscaler and Right-Sizing
 
-The Vertical Pod Autoscaler (VPA) adjusts pod resource requests and limits rather than replica count --- a harder problem because changing resources historically required restarting the pod. This constraint shaped VPA's design from the beginning, and in-place pod resize --- alpha since Kubernetes 1.27 and beta since 1.33 --- is expected to reach general availability around Kubernetes 1.35, after more than six years of development. (GA timing and feature details may change; check the KEP-1287 tracking issue for current status.)
+The Vertical Pod Autoscaler (VPA) adjusts pod resource requests and limits rather than replica count --- a harder problem because changing resources historically required restarting the pod. This constraint shaped VPA's design from the beginning, and in-place pod resize --- alpha since Kubernetes 1.27 and beta since 1.33 --- is expected to reach general availability around Kubernetes 1.35, after more than six years of development.
+
+> **Note:** In-place pod resize is a rapidly evolving feature. GA timing and API details may change; check [KEP-1287](https://github.com/kubernetes/enhancements/issues/1287) for current status.
 
 Understanding VPA requires understanding why right-sizing matters, how VPA's three modes work, the new in-place resize mechanism, the critical interaction between VPA and HPA, and the practical workflow for using VPA in production.
 

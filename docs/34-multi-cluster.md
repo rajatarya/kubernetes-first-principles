@@ -128,6 +128,8 @@ spec:
             weight: 1
 ```
 
+**Open Cluster Management (OCM)**, a CNCF sandbox project backed by Red Hat, takes a different approach to federation. Rather than a centralized control plane that pushes workloads to clusters, OCM uses a hub-and-spoke model where managed clusters pull their desired state from the hub via agents. This pull-based model can be easier to operate in environments with strict network policies or firewalls between clusters.
+
 Federation is powerful but complex. It introduces a new control plane that must itself be highly available, and debugging failures requires understanding the federation layer, the per-cluster state, and the reconciliation between them.
 
 ## Approach 4: Service Mesh Multi-Cluster
@@ -183,6 +185,7 @@ Most organizations start with GitOps-driven multi-cluster and add service mesh o
 
 - [ArgoCD ApplicationSets](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) --- Multi-cluster GitOps
 - [Karmada Documentation](https://karmada.io/docs/) --- Multi-cluster federation
+- [Open Cluster Management](https://open-cluster-management.io/) --- CNCF sandbox hub-and-spoke multi-cluster management
 - [Cilium ClusterMesh](https://docs.cilium.io/en/stable/network/clustermesh/) --- Cross-cluster networking
 - [Cluster API](https://cluster-api.sigs.k8s.io/) --- Declarative cluster lifecycle management
 

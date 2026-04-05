@@ -55,7 +55,7 @@ PodDisruptionBudgets solved a subtle but critical problem. When a node needed to
 
 ## v1.6 (March 2017): Security Gets Serious
 
-**RBAC (Role-Based Access Control)** reached beta and was enabled by default. Before RBAC, Kubernetes had ABAC (Attribute-Based Access Control), which required restarting the API server to change policies, and the permissive default allowed most authenticated users to do anything. RBAC changed this fundamentally.
+**RBAC (Role-Based Access Control)** reached beta and was enabled by default. Before RBAC, Kubernetes had ABAC (Attribute-Based Access Control), which required restarting the API server to change policies. However, the bigger problem was that many clusters simply ran with the AlwaysAllow authorizer --- the permissive default --- which allowed any authenticated user to do anything. ABAC was available as a more restrictive alternative, but its static file-based configuration made it cumbersome to adopt. RBAC changed this fundamentally.
 
 RBAC introduced Roles (permissions scoped to a namespace), ClusterRoles (permissions scoped to the cluster), RoleBindings, and ClusterRoleBindings. It allowed fine-grained access control: developer A can create Deployments in namespace "team-a" but not in namespace "team-b." Service accounts can read ConfigMaps but not Secrets. CI/CD pipelines can deploy but not modify RBAC rules.
 
@@ -145,7 +145,7 @@ The **dockershim was removed**, completing the deprecation announced in v1.20. C
 
 **AppArmor support reached GA**, providing mandatory access control profiles that restrict container capabilities at the kernel level. AppArmor profiles could limit filesystem access, network operations, and capability usage, providing a defense-in-depth layer beyond Seccomp and Linux capabilities.
 
-The **nftables kube-proxy backend** was introduced, replacing iptables with its successor in the Linux kernel. nftables provides better performance, a cleaner rule syntax, and improved maintainability. While eBPF-based solutions (Cilium, Calico) offer superior performance, nftables modernized the default kube-proxy for environments that prefer to use the standard kernel networking stack.
+The **nftables kube-proxy backend** was promoted to beta (it first appeared as alpha in v1.29), replacing iptables with its successor in the Linux kernel. nftables provides better performance, a cleaner rule syntax, and improved maintainability. While eBPF-based solutions (Cilium, Calico) offer superior performance, nftables modernized the default kube-proxy for environments that prefer to use the standard kernel networking stack.
 
 ## v1.32+ (2025-2026): Continued Maturation
 
