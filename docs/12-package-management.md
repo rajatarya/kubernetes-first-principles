@@ -4,6 +4,47 @@
 
 Every Kubernetes resource is defined by a YAML manifest. A simple web application requires, at minimum: a Deployment (to run the pods), a Service (to expose them), a ConfigMap (for configuration), a Secret (for credentials), an Ingress (for external access), a ServiceAccount (for identity), and resource quotas. That is seven YAML files for a single application. A real production application typically requires 15-30 manifests when you include HorizontalPodAutoscalers, PodDisruptionBudgets, NetworkPolicies, PersistentVolumeClaims, and RBAC rules.
 
+```
+The YAML Explosion: One Application's Manifests
+
+  Minimal App (7 files)              Production App (15-30 files)
+  ┌─────────────────────┐            ┌─────────────────────────────────┐
+  │ deployment.yaml     │ Pods       │ deployment.yaml                 │
+  │ service.yaml        │ Network    │ service.yaml                    │
+  │ configmap.yaml      │ Config     │ configmap.yaml                  │
+  │ secret.yaml         │ Creds      │ secret.yaml                     │
+  │ ingress.yaml        │ External   │ ingress.yaml                    │
+  │ serviceaccount.yaml │ Identity   │ serviceaccount.yaml             │
+  │ resourcequota.yaml  │ Limits     │ resourcequota.yaml              │
+  └─────────────────────┘            │─────────────────────────────────│
+          7 files                    │ hpa.yaml              Scaling   │
+             │                       │ pdb.yaml              Uptime    │
+             │  "Just add           │ networkpolicy.yaml    Security  │
+             │   production          │ pvc.yaml              Storage   │
+             │   concerns..."        │ role.yaml             RBAC      │
+             │                       │ rolebinding.yaml      RBAC      │
+             ▼                       │ limitrange.yaml       Limits    │
+     ┌───────────────┐               │ podsecuritypolicy.yaml Safety  │
+     │  × 3 envs     │               │ prometheus-rules.yaml  Observe │
+     │  (dev/stg/prd)│               │ grafana-dashboard.json Observe │
+     └───────────────┘               └─────────────────────────────────┘
+             │                                   15-20 files
+             ▼                                       │
+     ┌───────────────┐                               ▼
+     │  7 × 3 = 21   │                      ┌───────────────┐
+     │  files minimum │                      │  × 3 envs     │
+     └───────────────┘                       │  (dev/stg/prd)│
+             │                               └───────────────┘
+             │  "But each env differs:                │
+             │   replicas, limits,                    ▼
+             │   image tags, configs..."     ┌───────────────────┐
+             ▼                               │  20 × 3 = 60      │
+     ┌────────────────────┐                  │  files to maintain │
+     │  21-90 YAML files  │                  └───────────────────┘
+     │  for ONE service   │
+     └────────────────────┘
+```
+
 Now multiply by environments. Most organizations maintain at least three --- development, staging, and production --- with small differences between them: different replica counts, different resource limits, different image tags, different configuration values. If you manage this with raw YAML files, you either maintain three copies of every manifest (tripling the maintenance burden and guaranteeing drift) or you build some ad-hoc templating system with `sed` and environment variables (fragile and error-prone).
 
 This is the **YAML explosion problem**, and it is the root cause behind every tool discussed in this chapter.
