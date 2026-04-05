@@ -19,6 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate version info
+        run: |
+          TAG=$(git describe --tags --always 2>/dev/null || git rev-parse --short HEAD)
+          DATE=$(date -u +%Y-%m-%d)
+          echo "var BOOK_VERSION = '${TAG} (${DATE})';" > docs/theme/version.js
 
       - name: Install mdBook and plugins
         run: |

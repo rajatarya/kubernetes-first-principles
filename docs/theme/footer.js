@@ -19,7 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var license = document.createElement('div');
         license.style.cssText = 'margin-top:0.5em; font-size:0.9em; color:#666;';
-        license.innerHTML = '© 2026 Rajat Arya · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" style="color:#666;">CC BY-NC-SA 4.0</a> · Kubernetes® is a registered trademark of The Linux Foundation';
+        var version = typeof BOOK_VERSION !== 'undefined' ? BOOK_VERSION : '';
+        license.innerHTML = '© 2026 Rajat Arya · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" style="color:#666;">CC BY-NC-SA 4.0</a>' +
+            (version ? ' · ' + version : '') +
+            ' · Kubernetes® is a registered trademark of The Linux Foundation';
 
         footer.appendChild(img);
         footer.appendChild(text);

@@ -19,7 +19,7 @@ edit-url-template = "https://github.com/rajatarya/kubernetes-first-principles/ed
 site-url = "/kubernetes-first-principles/"
 no-section-label = false
 additional-css = ["docs/theme/custom.css"]
-additional-js = ["docs/theme/footer.js", "docs/theme/goatcounter.js", "mermaid.min.js", "mermaid-init.js"]
+additional-js = ["docs/theme/version.js", "docs/theme/footer.js", "docs/theme/goatcounter.js", "mermaid.min.js", "mermaid-init.js"]
 
 [output.html.search]
 enable = true
