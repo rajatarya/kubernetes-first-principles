@@ -16,8 +16,8 @@ Kubernetes Release Timeline: The Inflection Points
 
   ──────────>──────────>──────────>──────────>──────────>──────────>──────────>──────────>──────────>
   "Can it     "Can it     "Can we    "Is it      "Can      "Cleaning   "Removing  "Runtime   "Mature
-   run?"       handle      extend     production  anyone     house"      the        independ-  platform"
-               state?"     it?"       ready?"     set it                 debt"      ence"
+   run?"       handle      extend     production  anyone    house"      the        independ-  platform"
+               state?"     it?"       ready?"     set it                debt"     ence"
                                                   up?"
 ```
 

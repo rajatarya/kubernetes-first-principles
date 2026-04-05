@@ -148,33 +148,33 @@ flowchart TD
 **Defense in Depth.**
 
 ```
-    ┌─────────────────────────────────────────────────────────┐
-    │  Supply Chain (outermost ring)                          │
+    ┌────────────────────────────────────────────────────────┐
+    │  Supply Chain (outermost ring)                         │
     │  Sigstore, SBOM, image scanning                        │
-    │                                                         │
+    │                                                        │
     │  ┌─────────────────────────────────────────────────┐   │
     │  │  Cluster                                        │   │
     │  │  RBAC, Admission Control (OPA/Kyverno)          │   │
     │  │                                                 │   │
-    │  │  ┌─────────────────────────────────────────┐   │   │
-    │  │  │  Namespace                              │   │   │
-    │  │  │  NetworkPolicy, ResourceQuota           │   │   │
-    │  │  │                                         │   │   │
-    │  │  │  ┌─────────────────────────────────┐   │   │   │
-    │  │  │  │  Pod                            │   │   │   │
-    │  │  │  │  SecurityContext, Seccomp,      │   │   │   │
-    │  │  │  │  AppArmor                       │   │   │   │
-    │  │  │  │                                 │   │   │   │
-    │  │  │  │  ┌─────────────────────────┐   │   │   │   │
-    │  │  │  │  │  Container (innermost)  │   │   │   │   │
-    │  │  │  │  │  read-only rootfs       │   │   │   │   │
-    │  │  │  │  │  non-root user          │   │   │   │   │
-    │  │  │  │  │  dropped capabilities   │   │   │   │   │
-    │  │  │  │  └─────────────────────────┘   │   │   │   │
-    │  │  │  └─────────────────────────────────┘   │   │   │
-    │  │  └─────────────────────────────────────────┘   │   │
+    │  │  ┌─────────────────────────────────────────┐    │   │
+    │  │  │  Namespace                              │    │   │
+    │  │  │  NetworkPolicy, ResourceQuota           │    │   │
+    │  │  │                                         │    │   │
+    │  │  │  ┌─────────────────────────────────┐    │    │   │
+    │  │  │  │  Pod                            │    │    │   │
+    │  │  │  │  SecurityContext, Seccomp,      │    │    │   │
+    │  │  │  │  AppArmor                       │    │    │   │
+    │  │  │  │                                 │    │    │   │
+    │  │  │  │  ┌─────────────────────────┐    │    │    │   │
+    │  │  │  │  │  Container (innermost)  │    │    │    │   │
+    │  │  │  │  │  read-only rootfs       │    │    │    │   │
+    │  │  │  │  │  non-root user          │    │    │    │   │
+    │  │  │  │  │  dropped capabilities   │    │    │    │   │
+    │  │  │  │  └─────────────────────────┘    │    │    │   │
+    │  │  │  └─────────────────────────────────┘    │    │   │
+    │  │  └─────────────────────────────────────────┘    │   │
     │  └─────────────────────────────────────────────────┘   │
-    └─────────────────────────────────────────────────────────┘
+    └────────────────────────────────────────────────────────┘
 
     Secrets Management (cross-cutting concern):
     ┌──────────────────────────────────────────────┐
@@ -249,12 +249,12 @@ flowchart TD
     Operational Concerns:
     ┌──────────────────────────────────────────────────────┐
     │                                                      │
-    │  ┌──────────┐  ┌────────────────┐  ┌─────────────┐  │
-    │  │ etcd ops │  │ Disaster       │  │ Cost        │  │
-    │  │ (backup, │  │ Recovery       │  │ Optimization│  │
-    │  │  defrag, │  │ (Velero)       │  │ (right-size,│  │
-    │  │  health) │  │                │  │  spot, idle)│  │
-    │  └──────────┘  │ backup ──▶     │  └─────────────┘  │
+    │  ┌──────────┐  ┌────────────────┐  ┌─────────────┐   │
+    │  │ etcd ops │  │ Disaster       │  │ Cost        │   │
+    │  │ (backup, │  │ Recovery       │  │ Optimization│   │
+    │  │  defrag, │  │ (Velero)       │  │ (right-size,│   │
+    │  │  health) │  │                │  │  spot, idle)│   │
+    │  └──────────┘  │ backup ──▶     │  └─────────────┘   │
     │                │ restore ──▶    │                    │
     │                │ migrate        │                    │
     │                └────────────────┘                    │
@@ -273,23 +273,23 @@ flowchart TD
     ┌───────┐ ┌───────┐ ┌────────┐
     │ Logs  │ │Traces │ │Alerts  │
     │(Loki) │ │(Tempo)│ │(Grafana│
-    └───────┘ └───────┘ │ / PD) │
+    └───────┘ └───────┘ │ / PD)  │
                         └────────┘
 
     GPU Scheduling:
-    ┌──────────────────┐     ┌─────────────────┐     ┌────────────┐
+    ┌──────────────────┐     ┌──────────────────┐     ┌────────────┐
     │  Pod with        │────▶│  Device Plugin / │────▶│ NVIDIA GPU │
     │  gpu request     │     │  DRA             │     │ (on node)  │
     │  (limits:        │     │  (allocates GPU) │     │            │
-    │   nvidia.com/gpu)│     └─────────────────┘     └────────────┘
+    │   nvidia.com/gpu)│     └──────────────────┘     └────────────┘
     └──────────────────┘
 
     LLM Serving:
-    ┌───────┐    ┌──────────────┐    ┌─────────┐    ┌────────────┐
-    │ Model │───▶│ vLLM / TGI   │───▶│ KServe  │───▶│ Inference  │
-    │(weights)   │ (serving     │    │ (routing,│    │ endpoint   │
-    │            │  engine)     │    │  scaling)│    │ (/predict) │
-    └───────┘    └──────────────┘    └─────────┘    └────────────┘
+    ┌─────────┐    ┌──────────────┐    ┌──────────┐    ┌────────────┐
+    │ Model   │───▶│ vLLM / TGI   │───▶│ KServe   │───▶│ Inference  │
+    │(weights)│    │ (serving     │    │ (routing,│    │ endpoint   │
+    │         │    │  engine)     │    │  scaling)│    │ (/predict) │
+    └─────────┘    └──────────────┘    └──────────┘    └────────────┘
 ```
 
 ---

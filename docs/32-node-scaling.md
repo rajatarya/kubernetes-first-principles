@@ -14,7 +14,7 @@ The Cluster Autoscaler (CA) is a Kubernetes controller that watches for pods stu
 CLUSTER AUTOSCALER ARCHITECTURE
 ─────────────────────────────────
 
-  ┌────────────────────────────────────────────────────┐
+  ┌─────────────────────────────────────────────────────┐
   │                 Cluster Autoscaler                  │
   │                                                     │
   │  1. Watch for Pending pods (unschedulable)          │
@@ -28,18 +28,18 @@ CLUSTER AUTOSCALER ARCHITECTURE
   └────────┬────────────────────────────────────────────┘
            │
            ▼
-  ┌────────────────────────────────────────────────────┐
+  ┌─────────────────────────────────────────────────────┐
   │              Cloud Provider API                     │
   │                                                     │
-  │  ┌──────────┐  ┌──────────┐  ┌──────────┐         │
-  │  │ Node     │  │ Node     │  │ Node     │         │
-  │  │ Group A  │  │ Group B  │  │ Group C  │         │
-  │  │          │  │          │  │          │         │
-  │  │ m5.large │  │ m5.4xl   │  │ p3.2xl   │         │
-  │  │ min:2    │  │ min:0    │  │ min:0    │         │
-  │  │ max:20   │  │ max:10   │  │ max:5    │         │
-  │  └──────────┘  └──────────┘  └──────────┘         │
-  └────────────────────────────────────────────────────┘
+  │  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
+  │  │ Node     │  │ Node     │  │ Node     │           │
+  │  │ Group A  │  │ Group B  │  │ Group C  │           │
+  │  │          │  │          │  │          │           │
+  │  │ m5.large │  │ m5.4xl   │  │ p3.2xl   │           │
+  │  │ min:2    │  │ min:0    │  │ min:0    │           │
+  │  │ max:20   │  │ max:10   │  │ max:5    │           │
+  │  └──────────┘  └──────────┘  └──────────┘           │
+  └─────────────────────────────────────────────────────┘
 ```
 
 The critical abstraction is the **node group** (called Auto Scaling Group on AWS, Managed Instance Group on GCP, VM Scale Set on Azure). Each node group is a pool of identically configured nodes: same instance type, same labels, same taints. The Cluster Autoscaler does not provision individual machines --- it increments or decrements a node group's desired count.
@@ -70,14 +70,14 @@ Karpenter takes a fundamentally different approach. Instead of managing node gro
 KARPENTER ARCHITECTURE
 ───────────────────────
 
-  ┌────────────────────────────────────────────────────┐
+  ┌─────────────────────────────────────────────────────┐
   │                   Karpenter                         │
   │                                                     │
   │  1. Watch for Pending pods                          │
   │  2. Batch pending pods (wait 10s for stragglers)    │
   │  3. Bin-pack pods into optimal instance types       │
   │  4. Call EC2 Fleet API directly:                    │
-  │     "launch 1x m5.2xlarge in us-east-1b, spot"     │
+  │     "launch 1x m5.2xlarge in us-east-1b, spot"      │
   │                                                     │
   │  5. Continuously evaluate: can I consolidate?       │
   │     Move pods from underused nodes to others,       │
@@ -85,7 +85,7 @@ KARPENTER ARCHITECTURE
   └────────┬────────────────────────────────────────────┘
            │
            ▼
-  ┌────────────────────────────────────────────────────┐
+  ┌─────────────────────────────────────────────────────┐
   │              Cloud API (direct)                     │
   │                                                     │
   │  No node groups. Karpenter selects from the         │
@@ -96,11 +96,11 @@ KARPENTER ARCHITECTURE
   │    - key: karpenter.sh/capacity-type                │
   │      operator: In                                   │
   │      values: [on-demand, spot]                      │
-  │    - key: node.kubernetes.io/instance-type           │
+  │    - key: node.kubernetes.io/instance-type          │
   │      operator: In                                   │
-  │      values: [m5.large, m5.xlarge, m5.2xlarge,     │
-  │               m6i.large, m6i.xlarge, c5.large, ...]│
-  └────────────────────────────────────────────────────┘
+  │      values: [m5.large, m5.xlarge, m5.2xlarge,      │
+  │               m6i.large, m6i.xlarge, c5.large, ...] │
+  └─────────────────────────────────────────────────────┘
 ```
 
 ### Why Karpenter Is Architecturally Superior
@@ -117,7 +117,7 @@ The following sequence diagram shows the timing of each step in Karpenter's scal
 
 ```
 KARPENTER SCALING CASCADE (~60-90 seconds end-to-end)
-───────────────────────────────────────────────────
+─────────────────────────────────────────────────────
 
   Pending Pod     Karpenter        EC2 Fleet API    New EC2          kubelet         Scheduler       Pod
   (unschedulable) Controller                        Instance         (on new node)
@@ -148,12 +148,12 @@ KARPENTER SCALING CASCADE (~60-90 seconds end-to-end)
     │               │                  │               │  (~20-30s)    │               │              │
     │               │                  │               ├──────────────▶│               │              │
     │               │                  │               │               │               │              │
-    │               │                  │               │               │  register      │              │
-    │               │                  │               │               │  node with     │              │
-    │               │                  │               │               │  API server    │              │
-    │               │                  │               │               │  (~5s)         │              │
+    │               │                  │               │               │  register     │              │
+    │               │                  │               │               │  node with    │              │
+    │               │                  │               │               │  API server   │              │
+    │               │                  │               │               │  (~5s)        │              │
     │               │                  │               │               │               │              │
-    │               │                  │               │               │  node Ready    │              │
+    │               │                  │               │               │  node Ready   │              │
     │               │                  │               │               ├──────────────▶│              │
     │               │                  │               │               │               │              │
     │               │                  │               │               │               │  bind pod    │
@@ -161,7 +161,8 @@ KARPENTER SCALING CASCADE (~60-90 seconds end-to-end)
     │               │                  │               │               │               ├─────────────▶│
     │               │                  │               │               │               │              │
     │               │                  │               │               │               │  Running     │
-    │               │                  │               │               │               │(~60-90s total)│
+    │               │                  │               │               │               │  (~60-90s    │
+    │               │                  │               │               │               │  total)      │
 ```
 
 **Consolidation.** Karpenter continuously evaluates whether existing nodes can be consolidated. If node A is 30% utilized and node B is 25% utilized, Karpenter can cordon both, move their pods to a single smaller node, and terminate the originals. Cluster Autoscaler can only scale down nodes that are underutilized --- it cannot replace a node with a smaller one.

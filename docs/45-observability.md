@@ -29,32 +29,32 @@ OTEL COLLECTOR DEPLOYMENT PATTERNS
 ────────────────────────────────────
 
   PATTERN 1: DAEMONSET / AGENT (most widely adopted pattern)
-  ┌──────────────────────────────────────────────────────────────┐
-  │  Node 1                    Node 2                            │
-  │  ┌───────┐ ┌───────┐     ┌───────┐ ┌───────┐               │
-  │  │ App A │ │ App B │     │ App C │ │ App D │               │
-  │  └───┬───┘ └───┬───┘     └───┬───┘ └───┬───┘               │
-  │      │         │              │         │                    │
-  │      ▼         ▼              ▼         ▼                    │
-  │  ┌──────────────────┐   ┌──────────────────┐                │
-  │  │  OTel Collector  │   │  OTel Collector  │                │
-  │  │  (DaemonSet)     │   │  (DaemonSet)     │                │
-  │  └────────┬─────────┘   └────────┬─────────┘                │
-  └───────────┼──────────────────────┼───────────────────────────┘
+  ┌─────────────────────────────────────────────────────────┐
+  │   Node 1                  Node 2                        │
+  │  ┌───────┐ ┌───────┐     ┌───────┐ ┌───────┐            │
+  │  │ App A │ │ App B │     │ App C │ │ App D │            │
+  │  └───┬───┘ └───┬───┘     └───┬───┘ └───┬───┘            │
+  │      │         │             │         │                │
+  │      ▼         ▼             ▼         ▼                │
+  │  ┌──────────────────┐   ┌──────────────────┐            │
+  │  │  OTel Collector  │   │  OTel Collector  │            │
+  │  │  (DaemonSet)     │   │  (DaemonSet)     │            │
+  │  └────────┬─────────┘   └────────┬─────────┘            │
+  └───────────┼──────────────────────┼──────────────────────┘
               │                      │
               ▼                      ▼
         ┌──────────────────────────────────┐
-        │         Backends                  │
-        │  (Prometheus/Mimir, Loki, Tempo)  │
+        │         Backends                 │
+        │  (Prometheus/Mimir, Loki, Tempo) │
         └──────────────────────────────────┘
 
   PATTERN 2: SIDECAR
   ┌──────────────────┐
   │  Pod             │
-  │  ┌─────┐ ┌─────┐│     Per-pod collector.
-  │  │ App │→│OTel ││     High isolation.
-  │  └─────┘ └──┬──┘│     High resource overhead.
-  └─────────────┼───┘
+  │  ┌─────┐ ┌─────┐ │     Per-pod collector.
+  │  │ App │→│OTel │ │     High isolation.
+  │  └─────┘ └──┬──┘ │     High resource overhead.
+  └─────────────┼────┘
                 ▼
             Backend
 
@@ -105,25 +105,25 @@ THE LGTM STACK
   ┌──────────────────────────┐
   │   OTel Collector Agent   │
   │   (DaemonSet)            │
-  └────┬─────────┬──────┬────┘
-       │         │      │
-  metrics    traces   logs
-       │         │      │
-       ▼         ▼      ▼
-  ┌────────┐ ┌──────┐ ┌──────┐
-  │ Mimir  │ │Tempo │ │ Loki │
+  └────┬─────────┬─────────┬─┘
+       │         │         │
+    metrics    traces     logs
+       │         │         │
+       ▼         ▼         ▼
+  ┌─────────┐ ┌───────┐ ┌──────┐
+  │ Mimir   │ │Tempo  │ │ Loki │
   │(metrics)│ │(trace)│ │(logs)│
-  └────┬───┘ └──┬───┘ └──┬───┘
-       │        │        │
-       └────────┼────────┘
-                │
-                ▼
-         ┌───────────┐
-         │  Grafana  │
-         │  (query,  │
+  └────┬────┘ └──┬────┘ └──┬───┘
+       │         │         │
+       └─────────┼─────────┘
+                 │
+                 ▼
+         ┌────────────┐
+         │  Grafana   │
+         │  (query,   │
          │  visualize,│
-         │  alert)   │
-         └───────────┘
+         │  alert)    │
+         └────────────┘
 ```
 
 ## The OpenTelemetry Operator
@@ -197,22 +197,22 @@ SIGNAL CORRELATION FLOW
 ─────────────────────────
 
   Grafana Dashboard
-  ┌──────────────────────────────────────────────────┐
-  │  Checkout Latency p99 = 1.2s  [▲ spike at 14:23]│
-  │                                    │             │
-  │  Click exemplar ──────────────────▶│             │
-  │                                    ▼             │
-  │  Trace: abc123                                   │
-  │  ├── checkout-svc    200ms                       │
-  │  ├── inventory-svc   150ms                       │
-  │  └── payment-svc     850ms  ◄── slow!            │
-  │                        │                         │
-  │  Click span ───────────▶                         │
-  │                        ▼                         │
-  │  Logs for payment-svc, traceID=abc123:           │
-  │  14:23:01 WARN  Connection pool exhausted        │
+  ┌───────────────────────────────────────────────────┐
+  │  Checkout Latency p99 = 1.2s  [▲ spike at 14:23]  │
+  │                                    │              │
+  │  Click exemplar ──────────────────▶│              │
+  │                                    ▼              │
+  │  Trace: abc123                                    │
+  │  ├── checkout-svc    200ms                        │
+  │  ├── inventory-svc   150ms                        │
+  │  └── payment-svc     850ms  ◄── slow!             │
+  │                        │                          │
+  │  Click span ───────────▶                          │
+  │                        ▼                          │
+  │  Logs for payment-svc, traceID=abc123:            │
+  │  14:23:01 WARN  Connection pool exhausted         │
   │  14:23:01 ERROR Timeout waiting for DB connection │
-  └──────────────────────────────────────────────────┘
+  └───────────────────────────────────────────────────┘
 ```
 
 ## Production Lessons

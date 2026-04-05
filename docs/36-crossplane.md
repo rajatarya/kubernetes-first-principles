@@ -23,22 +23,22 @@ CROSSPLANE RESOURCE FLOW
                            Composition    │  maps XR to
                            (template)     │  managed resources
                                           │
-                    ┌─────────────────────▼──────────────────┐
+                    ┌─────────────────────▼───────────────────┐
                     │                                         │
-          ┌────────▼────────┐  ┌────────────────┐  ┌────────▼────────┐
-          │ Managed Resource│  │ Managed Resource│  │ Managed Resource│
-          │                 │  │                 │  │                 │
-          │ RDS Instance    │  │ Subnet Group    │  │ Security Group  │
-          │ (provider-aws)  │  │ (provider-aws)  │  │ (provider-aws)  │
-          └────────┬────────┘  └────────┬────────┘  └────────┬────────┘
-                   │                    │                     │
-                   ▼                    ▼                     ▼
-          ┌──────────────────────────────────────────────────────┐
-          │                    AWS API                            │
-          │                                                      │
-          │  Actual RDS instance, subnet group, security group   │
-          │  created and continuously reconciled                 │
-          └──────────────────────────────────────────────────────┘
+           ┌────────▼────────┐  ┌─────────────────┐  ┌────────▼────────┐
+           │ Managed Resource│  │ Managed Resource│  │ Managed Resource│
+           │                 │  │                 │  │                 │
+           │ RDS Instance    │  │ Subnet Group    │  │ Security Group  │
+           │ (provider-aws)  │  │ (provider-aws)  │  │ (provider-aws)  │
+           └────────┬────────┘  └────────┬────────┘  └────────┬────────┘
+                    │                    │                    │
+                    ▼                    ▼                    ▼
+           ┌──────────────────────────────────────────────────────┐
+           │                    AWS API                           │
+           │                                                      │
+           │  Actual RDS instance, subnet group, security group   │
+           │  created and continuously reconciled                 │
+           └──────────────────────────────────────────────────────┘
 ```
 
 ## Core Concepts

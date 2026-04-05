@@ -16,9 +16,9 @@ THE RECONCILE LOOP
 
   ┌──────────────────────────────────────────────────────────────┐
   │                      Work Queue                              │
-  │  ┌──────────┐  ┌──────────┐  ┌──────────┐                   │
+  │  ┌──────────┐  ┌──────────┐  ┌──────────┐                    │
   │  │ ns/name  │  │ ns/name  │  │ ns/name  │  ...               │
-  │  └────┬─────┘  └──────────┘  └──────────┘                   │
+  │  └────┬─────┘  └──────────┘  └──────────┘                    │
   └───────┼──────────────────────────────────────────────────────┘
           │
           ▼
@@ -278,27 +278,27 @@ The Operator Framework defines five maturity levels. Most operators in the wild 
 OPERATOR MATURITY MODEL
 ────────────────────────
 
-  Level 5 │  AUTO PILOT
+  Level 5  │  AUTO PILOT
            │  Automatic scaling, tuning, anomaly detection.
            │  Horizontal/vertical scaling based on load.
            │  Self-healing beyond simple restart.
            │
-  Level 4 │  DEEP INSIGHTS
+  Level 4  │  DEEP INSIGHTS
            │  Expose metrics, alerts, log processing.
            │  Grafana dashboards, SLO tracking.
            │  Workload-specific telemetry.
            │
-  Level 3 │  FULL LIFECYCLE
+  Level 3  │  FULL LIFECYCLE
            │  Automated backup/restore.
            │  Version upgrades with data migration.
            │  Configuration tuning.
            │
-  Level 2 │  SEAMLESS UPGRADES
+  Level 2  │  SEAMLESS UPGRADES
            │  Patch and minor version upgrades.
            │  Operand configuration changes.
            │  No downtime during upgrades.
            │
-  Level 1 │  BASIC INSTALL
+  Level 1  │  BASIC INSTALL
            │  Automated deployment and configuration.
            │  Operator manages basic provisioning.
            │

@@ -27,10 +27,10 @@ VPA RECOMMENDATION FLOW
 ────────────────────────
 
   ┌─────────────────────────────────────────────────────┐
-  │                 VPA Components                       │
-  │                                                      │
-  │  ┌──────────────┐   ┌──────────────┐   ┌──────────┐│
-  │  │  Recommender  │   │   Updater    │   │ Admission ││
+  │                 VPA Components                      │
+  │                                                     │
+  │  ┌──────────────┐   ┌──────────────┐   ┌───────────┐│
+  │  │ Recommender  │   │   Updater    │   │ Admission ││
   │  │              │   │              │   │ Webhook   ││
   │  │ Watches pod  │   │ Evicts pods  │   │ Mutates   ││
   │  │ metrics over │   │ that are     │   │ pod spec  ││
@@ -41,15 +41,15 @@ VPA RECOMMENDATION FLOW
   │  │ lowerBound,  │   │ (only in     │   │ (applies  ││
   │  │ upperBound   │   │  Auto mode)  │   │  recs to  ││
   │  └──────┬───────┘   └──────┬───────┘   │  new pods)││
-  │         │                  │           └─────┬────┘│
-  └─────────┼──────────────────┼─────────────────┼─────┘
+  │         │                  │           └─────┬─────┘│
+  └─────────┼──────────────────┼─────────────────┼──────┘
             │                  │                 │
             ▼                  ▼                 ▼
-  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
-  │  Metrics     │   │ Running Pods │   │ API Server   │
-  │  Server /    │   │ (evict +     │   │ (pod create  │
-  │  Prometheus  │   │  recreate)   │   │  admission)  │
-  └──────────────┘   └──────────────┘   └──────────────┘
+   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
+   │  Metrics     │   │ Running Pods │   │ API Server   │
+   │  Server /    │   │ (evict +     │   │ (pod create  │
+   │  Prometheus  │   │  recreate)   │   │  admission)  │
+   └──────────────┘   └──────────────┘   └──────────────┘
 ```
 
 1. **Recommender:** Continuously observes pod resource usage (via Metrics API or Prometheus) and computes recommendations. It maintains a decaying histogram of usage patterns and outputs four values per container: `lowerBound`, `target`, `uncappedTarget`, and `upperBound`.

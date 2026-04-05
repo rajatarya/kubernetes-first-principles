@@ -72,13 +72,13 @@ OPERATOR RECONCILIATION LOOP
 ──────────────────────────────
 
   ┌─────────────────────────────────────────────────────┐
-  │                  Desired State (CR)                  │
+  │                  Desired State (CR)                 │
   │   PostgresCluster: replicas=3, backup=daily,        │
   │   version=16, storage=100Gi, pooler=pgbouncer       │
   └──────────────────────┬──────────────────────────────┘
                          │
                          ▼
-  ┌─────────────────────────────────────────────────────┐
+  ┌──────────────────────────────────────── ─────────────┐
   │              Operator Controller                     │
   │                                                      │
   │   for each reconciliation loop:                      │
@@ -96,17 +96,17 @@ OPERATOR RECONCILIATION LOOP
   │   3. Manage supporting services                      │
   │      ├── Connection pooler (PgBouncer/ProxySQL)      │
   │      ├── Backup schedule (base backup + WAL)         │
-  │      ├── Monitoring endpoints (Prometheus)            │
+  │      ├── Monitoring endpoints (Prometheus)           │
   │      └── TLS certificates                            │
   │                                                      │
   │   4. Handle version upgrades                         │
   │      ├── Minor: rolling restart                      │
   │      └── Major: pg_upgrade or logical replication    │
   │                                                      │
-  └──────────────────────┬──────────────────────────────┘
+  └──────────────────────┬────────────────────── ────────┘
                          │
                          ▼
-  ┌─────────────────────────────────────────────────────┐
+  ┌────────────────────────────────────────────── ───────┐
   │              Managed Resources                       │
   │                                                      │
   │   StatefulSet(primary)  StatefulSet(replicas)        │
@@ -114,7 +114,7 @@ OPERATOR RECONCILIATION LOOP
   │   PVCs(data)            ConfigMaps(postgresql.conf)  │
   │   Secrets(passwords)    CronJob(backup)              │
   │   Deployment(pooler)    ServiceMonitor(metrics)      │
-  └─────────────────────────────────────────────────────┘
+  └─────────────────────────────────────────────── ──────┘
 ```
 
 Each of these responsibilities is a failure mode:

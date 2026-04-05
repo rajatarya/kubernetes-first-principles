@@ -39,20 +39,20 @@ ETCD CLUSTER WITH RAFT CONSENSUS
   │  └───────────┘  │    │  └───────────┘  │    │  └───────────┘  │
   └────────┬────────┘    └────────┬────────┘    └────────┬────────┘
            │                      │                      │
-           └──────────┬───────────┴───────────┬──────────┘
-                      │   Raft Consensus      │
-                      │   (replicate log      │
-                      │    entries to          │
-                      │    majority)           │
-                      ▼                        ▼
+           └──────────┬───────────┴──────────────┬───────┘
+                      │   Raft Consensus         │
+                      │   (replicate log         │
+                      │    entries to            │
+                      │    majority)             │
+                      ▼                          ▼
               Write requires agreement     Read can be served
               from majority (2 of 3)       by any member (with
                                            consistency options)
 
   ┌──────────────────────────────────────────────────────────────┐
-  │  API Server connects to etcd via gRPC over TLS.             │
-  │  Only the API server should talk to etcd directly.          │
-  │  All other components go through the API server.            │
+  │  API Server connects to etcd via gRPC over TLS.              │
+  │  Only the API server should talk to etcd directly.           │
+  │  All other components go through the API server.             │
   └──────────────────────────────────────────────────────────────┘
 ```
 

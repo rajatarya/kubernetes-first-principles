@@ -248,9 +248,9 @@ AFTER: replicas=3 (scaled down)
    │     │     │
    ▼     ▼     ▼
   PV0   PV1   PV2   PV3   PV4         PVCs data-db-3, data-db-4 STILL EXIST
-                      ▲     ▲
-                      │     │
-                   Orphaned PVCs       ← data preserved but no pod using it
+                     ▲     ▲
+                     │     │
+                  Orphaned PVCs       ← data preserved but no pod using it
 
 LATER: replicas=5 (scaled back up)
   db-0  db-1  db-2  db-3  db-4        db-3, db-4 reattach to existing PVCs

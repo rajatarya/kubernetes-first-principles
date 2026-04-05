@@ -39,7 +39,7 @@ HPA FEEDBACK LOOP
    │                                                         │
    │   1. Fetch current metric values from Metrics API       │
    │   2. Compute ratio = currentMetric / desiredMetric      │
-   │   3. If ratio within [0.9, 1.1] → no action            │
+   │   3. If ratio within [0.9, 1.1] → no action             │
    │   4. desiredReplicas = ceil(current * ratio)            │
    │   5. Clamp to [minReplicas, maxReplicas]                │
    │   6. Patch Deployment .spec.replicas                    │
@@ -58,7 +58,7 @@ HPA FEEDBACK LOOP
    └────────┬─────────┘          │   (requests/sec, etc) │
             │                    │                       │
             ▼                    │   external.metrics.k8s│
-   ┌──────────────────┐          │   (SQS depth, etc)   │
+   ┌──────────────────┐          │   (SQS depth, etc)    │
    │  Running Pods    │──────────┘                       │
    │  (report metrics │   metrics scraped                │
    │   via cAdvisor   │   from pods                      │

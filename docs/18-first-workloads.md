@@ -146,7 +146,7 @@ Time    Old Pods (v1)    New Pods (v2)    Total Running
  t0     [A] [B] [C]                       3 (all v1)
  t1     [A] [B] [C]     [D]creating       3 + 1 surge
  t2     [A] [B] [C]     [D]ready          4 (surge = 1)
- t3     [A] [B]  X      [D]              3 (C terminated)
+ t3     [A] [B]  X      [D]               3 (C terminated)
  t4     [A] [B]         [D] [E]creating   3 + 1 surge
  t5     [A] [B]         [D] [E]ready      4
  t6     [A]  X          [D] [E]           3 (B terminated)

@@ -6,9 +6,9 @@ Timeline: Cluster Bootstrap Tools
 2014          2016          2018          2020          2022          2024
   |             |             |             |             |             |
   v             v             v             v             v             v
-kube-up.sh    kubeadm       kubeadm GA    k3s mature    Managed K8s   Managed K8s
-(GCE only)    (alpha)       kops GA       kind 0.9      dominates     >70% of
-              minikube      kubespray     k0s 0.9                     production
+kube-up.sh    kubeadm       kubeadm GA    k3s mature    Managed K8s  Managed K8s
+(GCE only)    (alpha)       kops GA       kind 0.9      dominates    >70% of
+              minikube      kubespray     k0s 0.9                    production
               kops alpha    k3s launch
 
               ──────────── Increasing abstraction ────────────>

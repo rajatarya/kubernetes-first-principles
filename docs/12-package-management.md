@@ -19,27 +19,27 @@ The YAML Explosion: One Application's Manifests
   └─────────────────────┘            │─────────────────────────────────│
           7 files                    │ hpa.yaml              Scaling   │
              │                       │ pdb.yaml              Uptime    │
-             │  "Just add           │ networkpolicy.yaml    Security  │
+             │  "Just add            │ networkpolicy.yaml    Security  │
              │   production          │ pvc.yaml              Storage   │
              │   concerns..."        │ role.yaml             RBAC      │
              │                       │ rolebinding.yaml      RBAC      │
              ▼                       │ limitrange.yaml       Limits    │
      ┌───────────────┐               │ poddisruptionbudget.yaml Uptime │
-     │  × 3 envs     │               │ prometheus-rules.yaml  Observe │
-     │  (dev/stg/prd)│               │ grafana-dashboard.json Observe │
+     │ × 3 envs      │               │ prometheus-rules.yaml  Observe  │
+     │ (dev/stg/prd) │               │ grafana-dashboard.json Observe  │
      └───────────────┘               └─────────────────────────────────┘
              │                                   15-20 files
              ▼                                       │
      ┌───────────────┐                               ▼
-     │  7 × 3 = 21   │                      ┌───────────────┐
-     │  files minimum │                      │  × 3 envs     │
-     └───────────────┘                       │  (dev/stg/prd)│
+     │ 7 × 3 = 21    │                       ┌───────────────┐
+     │ files minimum │                       │ × 3 envs      │
+     └───────────────┘                       │ (dev/stg/prd) │
              │                               └───────────────┘
              │  "But each env differs:                │
              │   replicas, limits,                    ▼
              │   image tags, configs..."     ┌───────────────────┐
-             ▼                               │  20 × 3 = 60      │
-     ┌────────────────────┐                  │  files to maintain │
+             ▼                               │ 20 × 3 = 60       │
+     ┌────────────────────┐                  │ files to maintain │
      │  21-90 YAML files  │                  └───────────────────┘
      │  for ONE service   │
      └────────────────────┘

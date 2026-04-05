@@ -34,50 +34,50 @@ API REQUEST LIFECYCLE
        │
        ▼
   ┌──────────────────────────────────────────────────────┐
-  │  1. AUTHENTICATION                                    │
-  │     Who are you?                                      │
-  │     (x509 certs, bearer tokens, OIDC, webhook)        │
-  │     Result: username, groups, extra fields             │
+  │  1. AUTHENTICATION                                   │
+  │     Who are you?                                     │
+  │     (x509 certs, bearer tokens, OIDC, webhook)       │
+  │     Result: username, groups, extra fields           │
   └──────────────────────┬───────────────────────────────┘
                          │
                          ▼
   ┌──────────────────────────────────────────────────────┐
-  │  2. AUTHORIZATION                                     │
-  │     Are you allowed to do this?                       │
-  │     (RBAC, ABAC, Webhook, Node)                       │
-  │     Result: allow / deny                              │
+  │  2. AUTHORIZATION                                    │
+  │     Are you allowed to do this?                      │
+  │     (RBAC, ABAC, Webhook, Node)                      │
+  │     Result: allow / deny                             │
   └──────────────────────┬───────────────────────────────┘
                          │
                          ▼
   ┌──────────────────────────────────────────────────────┐
-  │  3. MUTATING ADMISSION                                │
-  │     Modify the object before validation.              │
-  │     Webhooks called IN SERIAL (order is not           │
-  │     guaranteed; design for order-independence).        │
-  │     May add defaults, inject sidecars, set labels.    │
+  │  3. MUTATING ADMISSION                               │
+  │     Modify the object before validation.             │
+  │     Webhooks called IN SERIAL (order is not          │
+  │     guaranteed; design for order-independence).      │
+  │     May add defaults, inject sidecars, set labels    │
   └──────────────────────┬───────────────────────────────┘
                          │
                          ▼
   ┌──────────────────────────────────────────────────────┐
-  │  4. OBJECT SCHEMA VALIDATION                          │
-  │     Does the object match the OpenAPI schema?         │
-  │     (built-in validation + CEL validation rules)      │
+  │  4. OBJECT SCHEMA VALIDATION                         │
+  │     Does the object match the OpenAPI schema?        │
+  │     (built-in validation + CEL validation rules)     │
   └──────────────────────┬───────────────────────────────┘
                          │
                          ▼
   ┌──────────────────────────────────────────────────────┐
-  │  5. VALIDATING ADMISSION                              │
-  │     Final policy checks. Reject if rules violated.    │
-  │     Webhooks called IN PARALLEL (order irrelevant).   │
-  │     Cannot modify the object.                         │
+  │  5. VALIDATING ADMISSION                             │
+  │     Final policy checks. Reject if rules violated.   │
+  │     Webhooks called IN PARALLEL (order irrelevant).  │
+  │     Cannot modify the object.                        │
   └──────────────────────┬───────────────────────────────┘
                          │
                          ▼
   ┌──────────────────────────────────────────────────────┐
-  │  6. ETCD STORAGE                                      │
-  │     Convert to storage version.                       │
-  │     Write to etcd.                                    │
-  │     Return response to client.                        │
+  │  6. ETCD STORAGE                                     │
+  │     Convert to storage version.                      │
+  │     Write to etcd.                                   │
+  │     Return response to client.                       │
   └──────────────────────────────────────────────────────┘
 ```
 
@@ -232,9 +232,9 @@ CONVERSION WEBHOOK: HUB AND SPOKE
 ───────────────────────────────────
 
        v1alpha1 ◄────┐
-                      │
+                     │
        v1beta1  ◄────┤  Hub: v1 (storage version)
-                      │
+                     │
        v1       ◄────┘  (no conversion needed for hub)
 
   Request for v1alpha1:

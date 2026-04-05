@@ -14,19 +14,19 @@ THE SOFTWARE SUPPLY CHAIN
        │              │              │             │
        ▼              ▼              ▼             ▼
   Was the code     Was the build   Was the       Is the image
-  reviewed?        tampered with?  image          allowed to
-  Who authored     Was the build   modified       run? Was it
-  this commit?     reproducible?   in transit     signed? Is it
-                                   or at rest?    from a trusted
-                                                  registry?
+  reviewed?        tampered with?  image         allowed to
+  Who authored     Was the build   modified      run? Was it
+  this commit?     reproducible?   in transit    signed? Is it
+                                   or at rest?   from a trusted
+                                                 registry?
 
   ATTACK SURFACE AT EACH STAGE:
-  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────────┐
-  │ Typo-   │  │ Build   │  │ Registry│  │ Deployment  │
-  │ squatted│  │ system  │  │ compro- │  │ of unsigned │
-  │ deps    │  │ compro- │  │ mised   │  │ or outdated │
-  │         │  │ mised   │  │         │  │ images      │
-  └─────────┘  └─────────┘  └─────────┘  └─────────────┘
+  ┌─────────┐     ┌─────────┐    ┌──────────┐  ┌─────────────┐
+  │ Typo-   │     │ Build   │    │ Registry │  │ Deployment  │
+  │ squatted│     │ system  │    │ compro-  │  │ of unsigned │
+  │ deps    │     │ compro- │    │ mised    │  │ or outdated │
+  │         │     │ mised   │    │          │  │ images      │
+  └─────────┘     └─────────┘    └──────────┘  └─────────────┘
 ```
 
 ## Image Signing with Sigstore/Cosign
@@ -45,7 +45,7 @@ SIGSTORE KEYLESS SIGNING PIPELINE
        ▼
   ┌────────────┐
   │  OIDC      │  GitHub Actions, Google, etc.
-  │  Provider   │  Issues JWT with identity claims
+  │  Provider  │  Issues JWT with identity claims
   └─────┬──────┘
         │ 2. Present OIDC token
         ▼
@@ -238,7 +238,7 @@ END-TO-END SUPPLY CHAIN SECURITY
 ──────────────────────────────────
 
   ┌─────────────┐
-  │ Source Code  │  Signed commits, code review,
+  │ Source Code │  Signed commits, code review,
   │             │  dependency scanning (Dependabot)
   └──────┬──────┘
          │

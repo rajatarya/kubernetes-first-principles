@@ -19,29 +19,29 @@ EC2 Instance (m5.large)
 │                                                  │
 │  Primary ENI (eth0)                              │
 │  ┌────────────────────────────────────┐          │
-│  │ Primary IP: 10.0.1.100 (node IP)  │          │
-│  │ Secondary IP: 10.0.1.101 → Pod A  │          │
-│  │ Secondary IP: 10.0.1.102 → Pod B  │          │
-│  │ Secondary IP: 10.0.1.103 → Pod C  │          │
-│  │ ...up to 10 IPs per ENI           │          │
+│  │ Primary IP: 10.0.1.100 (node IP)   │          │
+│  │ Secondary IP: 10.0.1.101 → Pod A   │          │
+│  │ Secondary IP: 10.0.1.102 → Pod B   │          │
+│  │ Secondary IP: 10.0.1.103 → Pod C   │          │
+│  │ ...up to 10 IPs per ENI            │          │
 │  └────────────────────────────────────┘          │
 │                                                  │
 │  Secondary ENI (eth1)                            │
 │  ┌────────────────────────────────────┐          │
-│  │ Primary IP: 10.0.1.200            │          │
-│  │ Secondary IP: 10.0.1.201 → Pod D  │          │
-│  │ Secondary IP: 10.0.1.202 → Pod E  │          │
-│  │ ...up to 10 IPs per ENI           │          │
+│  │ Primary IP: 10.0.1.200             │          │
+│  │ Secondary IP: 10.0.1.201 → Pod D   │          │
+│  │ Secondary IP: 10.0.1.202 → Pod E   │          │
+│  │ ...up to 10 IPs per ENI            │          │
 │  └────────────────────────────────────┘          │
 │                                                  │
 │  Secondary ENI (eth2)                            │
 │  ┌────────────────────────────────────┐          │
-│  │ Primary IP: 10.0.1.210            │          │
-│  │ Secondary IP: 10.0.1.211 → Pod F  │          │
-│  │ ...                               │          │
+│  │ Primary IP: 10.0.1.210             │          │
+│  │ Secondary IP: 10.0.1.211 → Pod F   │          │
+│  │ ...                                │          │
 │  └────────────────────────────────────┘          │
 │                                                  │
-│  m5.large: 3 ENIs x 10 IPs = ~29 max pods       │
+│  m5.large: 3 ENIs x 10 IPs = ~29 max pods        │
 │                                                  │
 └──────────────────────────────────────────────────┘
 
@@ -115,21 +115,21 @@ CSI ARCHITECTURE
 ────────────────
 
 ┌─────────────────────────────────────────────────────────┐
-│                    CONTROL PLANE                         │
+│                    CONTROL PLANE                        │
 │                                                         │
 │  CSI Controller Plugin (Deployment, 1-3 replicas)       │
 │  ┌───────────────────────────────────────────────────┐  │
 │  │                                                   │  │
-│  │  ┌──────────────────┐  ┌──────────────────────┐  │  │
-│  │  │ external-        │  │ external-            │  │  │
-│  │  │ provisioner      │  │ attacher             │  │  │
-│  │  │                  │  │                      │  │  │
-│  │  │ Watches PVCs,    │  │ Watches VolumeAttach │  │  │
-│  │  │ calls CSI        │  │ objects, calls CSI   │  │  │
-│  │  │ CreateVolume()   │  │ ControllerPublish()  │  │  │
-│  │  └────────┬─────────┘  └────────┬─────────────┘  │  │
+│  │  ┌──────────────────┐  ┌──────────────────────┐   │  │
+│  │  │ external-        │  │ external-            │   │  │
+│  │  │ provisioner      │  │ attacher             │   │  │
+│  │  │                  │  │                      │   │  │
+│  │  │ Watches PVCs,    │  │ Watches VolumeAttach │   │  │
+│  │  │ calls CSI        │  │ objects, calls CSI   │   │  │
+│  │  │ CreateVolume()   │  │ ControllerPublish()  │   │  │
+│  │  └────────┬─────────┘  └────────┬─────────────┘   │  │
 │  │           │                     │                 │  │
-│  │  ┌────────▼─────────────────────▼─────────────┐  │  │
+│  │  ┌────────▼─────────────────────▼──────────────┐  │  │
 │  │  │         CSI Driver (controller mode)        │  │  │
 │  │  │                                             │  │  │
 │  │  │  Translates CSI calls to cloud API calls:   │  │  │
@@ -140,7 +140,7 @@ CSI ARCHITECTURE
 └─────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────┐
-│                    EVERY NODE                            │
+│                    EVERY NODE                           │
 │                                                         │
 │  CSI Node Plugin (DaemonSet, one per node)              │
 │  ┌───────────────────────────────────────────────────┐  │
@@ -148,17 +148,17 @@ CSI ARCHITECTURE
 │  │  ┌──────────────────┐                             │  │
 │  │  │ node-driver-     │                             │  │
 │  │  │ registrar        │  Registers the CSI driver   │  │
-│  │  │                  │  with the kubelet            │  │
+│  │  │                  │  with the kubelet           │  │
 │  │  └────────┬─────────┘                             │  │
 │  │           │                                       │  │
 │  │  ┌────────▼───────────────────────────────────┐   │  │
-│  │  │         CSI Driver (node mode)              │   │  │
-│  │  │                                             │   │  │
-│  │  │  NodeStageVolume() → format + mount to      │   │  │
-│  │  │                      staging path           │   │  │
-│  │  │  NodePublishVolume() → bind mount into      │   │  │
-│  │  │                       pod's filesystem      │   │  │
-│  │  └─────────────────────────────────────────────┘   │  │
+│  │  │         CSI Driver (node mode)             │   │  │
+│  │  │                                            │   │  │
+│  │  │  NodeStageVolume() → format + mount to     │   │  │
+│  │  │                      staging path          │   │  │
+│  │  │  NodePublishVolume() → bind mount into     │   │  │
+│  │  │                       pod's filesystem     │   │  │
+│  │  └────────────────────────────────────────────┘   │  │
 │  └───────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
 ```

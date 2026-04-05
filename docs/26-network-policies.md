@@ -21,7 +21,7 @@ NETWORK POLICY TRAFFIC FLOW
   │                   │           │                   │
   │  Egress Policy:   │           │  Ingress Policy:  │
   │  "allow to        │──────────▶│  "allow from      │
-  │   team-beta pods" │  Traffic  │   team-alpha pods" │
+  │  team-beta pods"  │  Traffic  │  team-alpha pods" │
   │                   │  flows    │                   │
   └───────────────────┘  only if  └───────────────────┘
                          BOTH
@@ -273,26 +273,26 @@ POLICY LAYERING FOR A NAMESPACE
 
   production namespace
   ┌──────────────────────────────────────────────────┐
-  │                                                    │
-  │  Policy 1: default-deny-all (ingress + egress)    │
-  │  Policy 2: allow-dns (egress to kube-dns)         │
-  │                                                    │
+  │                                                  │
+  │  Policy 1: default-deny-all (ingress + egress)   │
+  │  Policy 2: allow-dns (egress to kube-dns)        │
+  │                                                  │
   │  ┌──────────┐    ┌──────────┐    ┌──────────┐    │
   │  │ frontend │───▶│ backend  │───▶│ database │    │
   │  │          │    │          │    │          │    │
   │  └──────────┘    └──────────┘    └──────────┘    │
-  │       ▲                │              │           │
-  │       │                ▼              │           │
+  │       ▲                │              │          │
+  │       │                ▼              │          │
   │  Policy 3:        Policy 5:      Policy 7:       │
   │  allow ingress    allow egress   deny all        │
   │  from ingress     to database    egress (no      │
-  │  controller       on 5432        external)        │
-  │                                                    │
-  │  Policy 4:        Policy 6:                       │
-  │  allow egress     allow ingress                   │
-  │  to backend       from backend                    │
-  │  on 8080          on 5432                         │
-  │                                                    │
+  │  controller       on 5432        external)       │
+  │                                                  │
+  │  Policy 4:        Policy 6:                      │
+  │  allow egress     allow ingress                  │
+  │  to backend       from backend                   │
+  │  on 8080          on 5432                        │
+  │                                                  │
   └──────────────────────────────────────────────────┘
 
   External traffic → ingress controller → frontend → backend → database

@@ -13,36 +13,36 @@ INTERNAL DEVELOPER PLATFORM LAYERS
 ─────────────────────────────────────
 
   ┌───────────────────────────────────────────────┐
-  │              Developer Interface               │
-  │                                                │
+  │   Developer Interface                         │
+  │                                               │
   │   Backstage (service catalog, scaffolding,    │
   │   docs, API registry, golden paths)           │
   └───────────────────────┬───────────────────────┘
                           │
   ┌───────────────────────▼───────────────────────┐
-  │            Delivery & Deployment               │
-  │                                                │
+  │   Delivery & Deployment                       │
+  │                                               │
   │   ArgoCD / Flux (GitOps continuous delivery)  │
   │   Tekton / GitHub Actions (CI pipelines)      │
   └───────────────────────┬───────────────────────┘
                           │
   ┌───────────────────────▼───────────────────────┐
-  │          Infrastructure Provisioning           │
-  │                                                │
+  │   Infrastructure Provisioning                 │
+  │                                               │
   │   Crossplane (cloud resources as CRDs)        │
   │   Terraform (infrastructure as code)          │
   └───────────────────────┬───────────────────────┘
                           │
   ┌───────────────────────▼───────────────────────┐
-  │              Container Platform                │
-  │                                                │
+  │   Container Platform                          │
+  │                                               │
   │   Kubernetes (scheduling, networking,         │
   │   service discovery, autoscaling)             │
   └───────────────────────┬───────────────────────┘
                           │
   ┌───────────────────────▼───────────────────────┐
-  │             Observability                      │
-  │                                                │
+  │   Observability                               │
+  │                                               │
   │   Prometheus + Grafana (metrics)              │
   │   Loki / Elasticsearch (logs)                 │
   │   Jaeger / Tempo (traces)                     │

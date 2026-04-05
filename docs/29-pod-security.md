@@ -64,10 +64,10 @@ PSA ENFORCEMENT FLOW
   └──────┬───────┘
          │
          ▼
-  ┌──────────────────────────────────────────────────┐
-  │  Pod Security Admission Controller               │
+  ┌────────────────────────────────────────────────────┐
+  │  Pod Security Admission Controller                 │
   │                                                    │
-  │  1. Which namespace is the pod in?                │
+  │  1. Which namespace is the pod in?                 │
   │     → "production"                                 │
   │                                                    │
   │  2. What labels does the namespace have?           │
@@ -92,7 +92,7 @@ PSA ENFORCEMENT FLOW
   │       Same checks as warn   → ALLOW + AUDIT LOG    │
   │       (Logged for review, pod is admitted)         │
   │                                                    │
-  └──────────────────────────────────────────────────┘
+  └────────────────────────────────────────────────────┘
 ```
 
 ### Namespace Labels

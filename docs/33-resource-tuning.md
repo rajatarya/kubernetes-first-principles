@@ -33,7 +33,7 @@ CFS PERIOD AND QUOTA
   Period 1                    Period 2
   ├──────────────────────────┤──────────────────────────┤
   │████████████░░░░░░░░░░░░░░│████████████░░░░░░░░░░░░░░│
-  │← 50ms used →│← throttled│← 50ms used →│← throttled│
+  │← 50ms used →│← throttled │← 50ms used →│← throttled │
   │             │   50ms    →│             │   50ms    →│
   └──────────────────────────┘──────────────────────────┘
 
@@ -52,7 +52,7 @@ CFS PERIOD AND QUOTA
   │                          │
   │ ALL THREADS THROTTLED    │  Quota exhausted.
   │ for remaining 75ms       │  75ms of wall-clock
-  │░░░░░░░░░░░░░░░░░░░░░░░░░│  latency added.
+  │░░░░░░░░░░░░░░░░░░░░░░░░░ │  latency added.
   └──────────────────────────┘
 ```
 
@@ -169,35 +169,35 @@ A node's total resources (capacity) are not entirely available for pods. The kub
 
 ```
 NODE RESOURCE ACCOUNTING
-─────────────────────────
+────────────────────────
 
   ┌──────────────────────────────────────┐
-  │         Node Capacity (total)        │
-  │         e.g., 16 CPU, 64 Gi memory  │
+  │  Node Capacity (total)               │
+  │  e.g., 16 CPU, 64 Gi memory          │
   │                                      │
-  │  ┌──────────────────────────────┐    │
-  │  │  kube-reserved               │    │
-  │  │  (kubelet, container runtime)│    │
-  │  │  cpu: 200m, memory: 1Gi     │    │
-  │  └──────────────────────────────┘    │
-  │  ┌──────────────────────────────┐    │
-  │  │  system-reserved             │    │
-  │  │  (OS daemons, sshd, journald)│   │
-  │  │  cpu: 100m, memory: 500Mi   │    │
-  │  └──────────────────────────────┘    │
-  │  ┌──────────────────────────────┐    │
-  │  │  eviction-threshold          │    │
+  │  ┌────────────────────────────────┐  │
+  │  │  kube-reserved                 │  │
+  │  │  (kubelet, container runtime)  │  │
+  │  │  cpu: 200m, memory: 1Gi        │  │
+  │  └────────────────────────────────┘  │
+  │  ┌────────────────────────────────┐  │
+  │  │  system-reserved               │  │
+  │  │  (OS daemons, sshd, journald)  │  │
+  │  │  cpu: 100m, memory: 500Mi      │  │
+  │  └────────────────────────────────┘  │
+  │  ┌────────────────────────────────┐  │
+  │  │  eviction-threshold            │  │
   │  │  (hard: memory.available<100Mi)│  │
-  │  └──────────────────────────────┘    │
-  │  ┌──────────────────────────────┐    │
-  │  │  ALLOCATABLE                 │    │
-  │  │  = capacity - kube-reserved  │    │
-  │  │    - system-reserved         │    │
-  │  │    - eviction-threshold      │    │
-  │  │                              │    │
-  │  │  This is what pods can use.  │    │
-  │  │  15.7 CPU, 62.4 Gi          │    │
-  │  └──────────────────────────────┘    │
+  │  └────────────────────────────────┘  │
+  │  ┌────────────────────────────────┐  │
+  │  │  ALLOCATABLE                   │  │
+  │  │  = capacity - kube-reserved    │  │
+  │  │    - system-reserved           │  │
+  │  │    - eviction-threshold        │  │
+  │  │                                │  │
+  │  │  This is what pods can use.    │  │
+  │  │  15.7 CPU, 62.4 Gi             │  │
+  │  └────────────────────────────────┘  │
   └──────────────────────────────────────┘
 ```
 
