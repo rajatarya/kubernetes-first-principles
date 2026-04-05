@@ -1,6 +1,6 @@
 # Chapter 31: Vertical Pod Autoscaler and Right-Sizing
 
-The Vertical Pod Autoscaler (VPA) adjusts pod resource requests and limits rather than replica count --- a harder problem because changing resources historically required restarting the pod. This constraint shaped VPA's design from the beginning, and only in Kubernetes 1.35 did in-place pod resize finally reach general availability, after more than six years of development.
+The Vertical Pod Autoscaler (VPA) adjusts pod resource requests and limits rather than replica count --- a harder problem because changing resources historically required restarting the pod. This constraint shaped VPA's design from the beginning, and in-place pod resize --- alpha since Kubernetes 1.27 and beta since 1.33 --- is expected to reach general availability around Kubernetes 1.35, after more than six years of development. (GA timing and feature details may change; check the KEP-1287 tracking issue for current status.)
 
 Understanding VPA requires understanding why right-sizing matters, how VPA's three modes work, the new in-place resize mechanism, the critical interaction between VPA and HPA, and the practical workflow for using VPA in production.
 
@@ -92,13 +92,13 @@ Both the Updater and Admission Webhook are active. The Updater will evict pods w
 
 ### InPlaceOrRecreate (New)
 
-With the in-place pod resize feature (GA in Kubernetes 1.35), VPA gained a fourth mode. In this mode, VPA first attempts to resize the pod in place --- updating its resource requests without restarting it. If in-place resize is not possible (for example, the new requests exceed node capacity), VPA falls back to the Recreate behavior and evicts the pod.
+With in-place pod resize approaching GA, VPA is gaining a fourth mode (the name `InPlaceOrRecreate` is used here but may differ in the final implementation --- check the VPA documentation for your version). In this mode, VPA first attempts to resize the pod in place --- updating its resource requests without restarting it. If in-place resize is not possible (for example, the new requests exceed node capacity), VPA falls back to the Recreate behavior and evicts the pod.
 
-This is the mode most teams should target once their clusters run Kubernetes 1.35 or later.
+This is the mode most teams should target once their clusters support in-place resize at GA.
 
 ## In-Place Pod Resize
 
-In-place pod resize was proposed in KEP-1287 and took over six years to reach GA. The core challenge was that Kubernetes originally treated a pod's resource requests as immutable --- changing them required deleting and recreating the pod.
+In-place pod resize was proposed in KEP-1287 and has been in development for over six years (alpha in 1.27, beta in 1.33). The core challenge was that Kubernetes originally treated a pod's resource requests as immutable --- changing them required deleting and recreating the pod.
 
 With in-place resize, you can patch a running pod's `spec.containers[*].resources.requests` and `spec.containers[*].resources.limits`, and the kubelet will apply the change to the running container's cgroup without restarting it. The pod's `status.resize` field reports whether the resize was accepted (`InProgress`, `Proposed`, `Deferred`, `Infeasible`).
 

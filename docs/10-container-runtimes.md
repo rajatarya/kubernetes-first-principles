@@ -3,8 +3,8 @@
 ```
 The Evolution of Container Runtimes in Kubernetes
 
-Era 1 (2014-2016):   kubelet ---> Docker Engine ---> containerd ---> runc
-                     "The only option. Three layers of indirection."
+Era 1 (2014-2016):   kubelet ---> Docker Engine (which used libcontainer/runc internally)
+                     "The only option. Docker was a monolith."
 
 Era 2 (2016-2020):   kubelet ---> dockershim ---> Docker Engine ---> containerd ---> runc
                      "CRI exists, but Docker doesn't speak it. Add another layer."
@@ -14,17 +14,19 @@ Era 3 (2018+):       kubelet ---> CRI ---> containerd ---> runc
                      "Direct communication. Docker removed from the chain."
 ```
 
-## Docker's Original Role: Why Three Layers of Indirection?
+## Docker's Original Role: From Monolith to Layers
 
-To understand the container runtime wars, you must first understand what Docker actually was. When people said "Docker," they were referring to at least three distinct pieces of software stacked on top of each other.
+To understand the container runtime wars, you must first understand how Docker evolved. In the early days (2014-2016), Docker Engine was a monolithic daemon. It used an internal library called **libcontainer** (later extracted and renamed to **runc**) to interact with the Linux kernel, setting up namespaces, cgroups, and filesystem mounts. There was no separate "containerd" layer yet --- Docker Engine handled everything from the user-facing API down to container creation in a single process.
 
-At the bottom was **runc** --- a low-level tool that did exactly one thing: create and run a container according to the OCI (Open Container Initiative) runtime specification. runc interacted directly with the Linux kernel, setting up namespaces, cgroups, and filesystem mounts. It was the part that actually made containers exist.
+When Kubernetes launched in 2014-2015, it talked to Docker Engine directly. The kubelet called the Docker API, and Docker Engine internally used libcontainer/runc to create containers. Kubernetes was only using a fraction of what Docker Engine provided. It did not need Docker Compose, Docker Swarm, or Docker's build system. It needed exactly one capability: run containers.
 
-Above runc sat **containerd** --- a daemon that managed the lifecycle of containers. containerd handled image pulling, storage, container execution (by calling runc), and networking setup. It was the layer that turned "create a container from this image" into a sequence of operations: pull the image layers, unpack them into a filesystem, configure the network, call runc with the right parameters.
+In December 2016, Docker began decomposing its monolith. It extracted the core container lifecycle management into a separate daemon called **containerd**, and the low-level container creation into **runc** (the graduated form of libcontainer). This produced the layered architecture that later versions used:
 
-Above containerd sat **Docker Engine (dockerd)** --- the daemon that provided the Docker API, Docker CLI integration, Docker Compose support, Docker Swarm orchestration, build functionality, and all the user-facing features that made Docker popular. dockerd talked to containerd, which talked to runc.
+- **runc** --- a low-level tool that did exactly one thing: create and run a container according to the OCI (Open Container Initiative) runtime specification.
+- **containerd** --- a daemon that managed the lifecycle of containers: image pulling, storage, container execution (by calling runc), and networking setup.
+- **Docker Engine (dockerd)** --- the daemon that provided the Docker API, Docker CLI integration, Docker Compose support, Docker Swarm orchestration, build functionality, and all the user-facing features that made Docker popular. dockerd talked to containerd, which talked to runc.
 
-When Kubernetes launched in 2014-2015, it talked to Docker Engine. This meant every container operation --- start a pod, stop a pod, check if a pod is running --- went through all three layers: kubelet called the Docker API, Docker Engine called containerd, containerd called runc. Each layer added latency, complexity, and potential failure modes. Worse, Kubernetes was only using a fraction of what Docker Engine provided. It did not need Docker Compose, Docker Swarm, or Docker's build system. It needed exactly one capability: run containers.
+With this decomposition, every container operation now went through three layers: kubelet called the Docker API, Docker Engine called containerd, containerd called runc. Each layer added latency, complexity, and potential failure modes.
 
 This was like hiring a general contractor, a subcontractor, and a specialist every time you needed to hammer a single nail.
 

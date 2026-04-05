@@ -127,6 +127,10 @@ func (r *MyAppReconciler) Reconcile(ctx context.Context,
     var childDeploys appsv1.DeploymentList
     if err := r.List(ctx, &childDeploys,
         client.InNamespace(req.Namespace),
+        // NOTE: This field selector requires a custom index. You must register it
+        // in SetupWithManager using mgr.GetFieldIndexer().IndexField() — it does
+        // not work out of the box. See the controller-runtime documentation for
+        // how to set up custom field indexes.
         client.MatchingFields{"metadata.ownerReferences.uid": string(app.UID)},
     ); err != nil {
         return ctrl.Result{}, err
@@ -156,7 +160,9 @@ func (r *MyAppReconciler) Reconcile(ctx context.Context,
     }
 
     // ── Step 5: Update status ───────────────────────────────
-    app.Status.ReadyReplicas = childDeploys.Items[0].Status.ReadyReplicas
+    if len(childDeploys.Items) > 0 {
+        app.Status.ReadyReplicas = childDeploys.Items[0].Status.ReadyReplicas
+    }
     app.Status.Phase = "Running"
     if err := r.Status().Update(ctx, &app); err != nil {
         return ctrl.Result{}, err

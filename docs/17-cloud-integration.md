@@ -4,7 +4,7 @@ Kubernetes defines abstractions --- Services, PersistentVolumes, Ingress --- but
 
 ## How Pod Networking Maps to Cloud Networking
 
-Recall the flat network model from Chapter 5: every pod gets a unique IP, reachable without NAT.
+Recall the flat network model from [Chapter 5](05-networking.md): every pod gets a unique IP, reachable without NAT.
 
 ### AWS VPC CNI: Pods as First-Class VPC Citizens
 

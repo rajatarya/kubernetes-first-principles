@@ -30,7 +30,7 @@ Kubernetes' networking model is most easily understood by contrast with the Dock
 
 ## Docker's Port-Mapping Model (and Why Kubernetes Rejected It)
 
-In the default Docker networking model, containers share the host's network namespace. Since multiple containers might want to listen on the same port (e.g., port 80), Docker uses **port mapping**: the container's port 80 is mapped to a high-numbered port on the host (e.g., 32768). This means:
+In Docker's default bridge networking mode, each container gets its own network namespace connected to the `docker0` bridge on the host. Since containers are isolated behind this bridge, reaching them from outside the host requires **port mapping** (`-p`), which maps a host port into the container's namespace (e.g., host port 32768 to container port 80). This means:
 
 - The container's address from outside is `<host-ip>:<random-port>`, not a predictable address.
 - Every service that needs to communicate with the container must know the host IP and the mapped port.

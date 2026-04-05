@@ -53,7 +53,7 @@ spec:
 
 **Continuous batching**: Traditional batching waits for all requests in a batch to complete before accepting new ones. If one request generates 500 tokens and another generates 10, the short request's GPU cycles are wasted while waiting. Continuous batching (also called iteration-level scheduling) adds and removes requests from the batch at every decode step. The GPU is never idle.
 
-Together, these deliver **up to 24x throughput improvement** over naive serving. Stripe reported a [73% cost reduction](https://stripe.com/blog) after migrating from a traditional serving stack to vLLM.
+Together, these deliver **up to 24x throughput improvement** over naive serving. Organizations adopting vLLM have reported 50--75% cost reductions compared to traditional serving stacks, thanks to the combination of PagedAttention's memory efficiency and continuous batching's GPU utilization gains.
 
 ### Inference Server Comparison
 
@@ -377,9 +377,9 @@ MODEL LOADING STRATEGIES
   ┌──────────┐   block device  ┌──────────┐  load   ┌──────┐
   │ Hyperdisk│────────────────►│ Pod      │────────►│ GPU  │
   │ ML volume│   1.2 TB/s read │          │  ~20min │ VRAM │
-  │ (GKE)    │   throughput    │          │ →20s   │      │
+  │ (GKE)    │   throughput    │          │         │      │
   └──────────┘                 └──────────┘         └──────┘
-  Total: ~20s for 405B.  Was 90 min from GCS.
+  Total: ~20 min for 405B.  Was 90 min from GCS.
 ```
 
 ### The Concurrent Download Corruption Problem
@@ -427,7 +427,7 @@ Google's [Hyperdisk ML](https://cloud.google.com/kubernetes-engine/docs/how-to/p
 ### Text Generation Inference (TGI)
 
 [TGI](https://github.com/huggingface/text-generation-inference) was the first production-grade open-source LLM inference server. It pioneered several techniques now considered industry standard: continuous batching, flash attention integration, tensor parallelism, quantization support (GPTQ, AWQ, EETQ), and speculative decoding.
-As of December 2025, the Hugging Face team recommends vLLM or SGLang for new LLM serving deployments. TGI remains in maintenance mode for existing users. If you are currently running TGI in production, it continues to work reliably --- but new deployments should evaluate vLLM (for throughput) or SGLang (for structured generation and agent workloads) first.
+TGI continues to be actively developed by Hugging Face. TGI 3.x added structured generation, speculative decoding, and multi-LoRA support, keeping it competitive with other inference servers. For new deployments, evaluate TGI alongside vLLM (for throughput) and SGLang (for structured generation and agent workloads) based on your specific requirements.
 
 ### Text Embeddings Inference (TEI)
 

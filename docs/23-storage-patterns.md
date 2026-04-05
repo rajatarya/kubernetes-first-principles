@@ -287,9 +287,9 @@ Velero's pre-backup hooks let you ensure application consistency:
 ```yaml
 metadata:
   annotations:
-    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "pg_start_backup(''velero'')"]'
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "psql -c \"SELECT pg_backup_start(''velero'')\""]'
     pre.hook.backup.velero.io/container: postgres
-    post.hook.backup.velero.io/command: '["/bin/bash", "-c", "pg_stop_backup()"]'
+    post.hook.backup.velero.io/command: '["/bin/bash", "-c", "psql -c \"SELECT pg_backup_stop()\""]'
     post.hook.backup.velero.io/container: postgres
 ```
 

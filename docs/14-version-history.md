@@ -10,7 +10,7 @@ Kubernetes Release Timeline: The Inflection Points
   v1.0       v1.5       v1.7       v1.9       v1.13      v1.20      v1.22      v1.24      v1.29      v1.31
   CNCF       CRI        CRDs       Apps/v1    kubeadm    Docker     API        docker-    Sidecar    nftables
   launch     intro      replace    GA         GA         deprec.    removals   shim       containers kube-proxy
-             Stateful   TPR                   CSI 1.0               forced     removed    GA
+             Stateful   TPR                   CSI 1.0               forced     removed    beta       
              Sets(b)    RBAC GA                                     migration             KMS v2
              PDB                                                                          GA
 
@@ -131,7 +131,7 @@ The **dockershim was removed**, completing the deprecation announced in v1.20. C
 
 ## v1.29 (December 2023): Sidecar Containers and Secrets at Scale
 
-**Sidecar containers reached GA** (formally: native sidecar support via init containers with restartPolicy: Always). This addressed a long-standing problem with the sidecar pattern: Kubernetes had no native concept of a container that started before and stopped after the main container. Log collectors, service mesh proxies, and monitoring agents were deployed as sidecars, but Kubernetes treated them as ordinary containers. This led to startup ordering issues (the sidecar proxy might not be ready when the application started) and shutdown ordering issues (the sidecar might be killed before the application finished draining connections).
+**Sidecar containers reached beta (enabled by default)** (formally: native sidecar support via init containers with restartPolicy: Always, with GA expected in v1.33). This addressed a long-standing problem with the sidecar pattern: Kubernetes had no native concept of a container that started before and stopped after the main container. Log collectors, service mesh proxies, and monitoring agents were deployed as sidecars, but Kubernetes treated them as ordinary containers. This led to startup ordering issues (the sidecar proxy might not be ready when the application started) and shutdown ordering issues (the sidecar might be killed before the application finished draining connections).
 
 **KMS v2 reached GA** for secrets encryption at rest. Kubernetes Secrets are stored in etcd, and without encryption at rest, anyone with access to etcd's data directory can read all Secrets in plaintext. KMS v2 provided a standard interface for integrating with external key management services (AWS KMS, Google Cloud KMS, Azure Key Vault, HashiCorp Vault), ensuring Secrets were encrypted in etcd using keys managed by a dedicated, auditable, access-controlled key management system.
 

@@ -87,7 +87,7 @@ The founders made a crucial strategic decision: Rather than open-sourcing Borg, 
 
 - Using standard open-source components (etcd for storage, instead of Google's proprietary Chubby/Colossus)
 - Supporting multiple container runtimes (not just Google's internal runtime)
-- Designing for extensibility from the start (CRDs, custom controllers, pluggable networking)
+- Designing for extensibility from the start (API extensibility (later ThirdPartyResources, then CRDs), custom controllers, pluggable networking)
 - Making the system portable across cloud providers and on-premises environments
 
 Kubernetes was donated to the newly formed Cloud Native Computing Foundation (CNCF) in 2015, ensuring its governance was independent of any single company. This was a masterstroke of ecosystem building: by making Kubernetes vendor-neutral, Google ensured that every major cloud provider (AWS, Azure, GCP) would offer managed Kubernetes services, creating a de facto standard that benefited everyone --- including Google, whose cloud platform was smaller than AWS but whose expertise in running Kubernetes was unmatched.

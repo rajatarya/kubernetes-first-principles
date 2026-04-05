@@ -175,7 +175,7 @@ Kubernetes ships with a set of default ClusterRoles designed for common access p
 | **cluster-admin** | Cluster-wide | Everything. Full access to all resources in all namespaces. Equivalent to root. |
 | **admin** | Namespace (via RoleBinding) | Full access within a namespace: create/update/delete Roles, RoleBindings, all workloads, secrets, configmaps. Cannot modify namespace quotas or the namespace itself. |
 | **edit** | Namespace (via RoleBinding) | Create/update/delete workloads, services, configmaps, secrets, PVCs. Cannot manage Roles or RoleBindings. |
-| **view** | Namespace (via RoleBinding) | Read-only access to most namespace resources. Cannot view secrets or roles. |
+| **view** | Namespace (via RoleBinding) | Read-only access to most namespace resources. Cannot view secrets. |
 
 The typical pattern is to bind these ClusterRoles via RoleBindings in specific namespaces, not via ClusterRoleBindings:
 

@@ -74,7 +74,7 @@ cat /sys/fs/cgroup/<pod-cgroup>/cpu.stat
 Or via Prometheus:
 
 ```promql
-rate(container_cpu_cfs_throttled_seconds_total[5m])
+rate(container_cpu_cfs_throttled_periods_total[5m])
   / rate(container_cpu_cfs_periods_total[5m])
 ```
 
@@ -229,7 +229,7 @@ This means a cluster with 100 CPUs of total requests might only be using 13 CPUs
 | CPU (batch/background) | Set to average | Set to max | Prevent neighbor starvation |
 | Memory (all workloads) | Set to P95 usage | Set to P99 or max | Always limit memory |
 
-Start with VPA recommendations in Off mode, remove CPU limits for web workloads, always set memory limits, and monitor `container_cpu_cfs_throttled_seconds_total` as a key performance indicator.
+Start with VPA recommendations in Off mode, remove CPU limits for web workloads, always set memory limits, and monitor `container_cpu_cfs_throttled_periods_total` as a key performance indicator.
 
 ## Common Mistakes and Misconceptions
 

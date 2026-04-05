@@ -205,7 +205,7 @@ Pod Security Standards (PSS) replace the deprecated PodSecurityPolicy. They defi
 |-------|-------------|-----------------|
 | **Privileged** | Unrestricted | None |
 | **Baseline** | Minimally restrictive | No hostNetwork, no hostPID, no privileged containers |
-| **Restricted** | Heavily restricted | Must run as non-root, must drop ALL capabilities, read-only root filesystem |
+| **Restricted** | Heavily restricted | Must run as non-root, drop ALL capabilities (only NET_BIND_SERVICE may be added back), allowPrivilegeEscalation: false, seccomp RuntimeDefault or Localhost |
 
 Apply them at the namespace level:
 

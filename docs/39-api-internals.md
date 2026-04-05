@@ -52,7 +52,8 @@ API REQUEST LIFECYCLE
   ┌──────────────────────────────────────────────────────┐
   │  3. MUTATING ADMISSION                                │
   │     Modify the object before validation.              │
-  │     Webhooks called IN SERIAL (order matters).        │
+  │     Webhooks called IN SERIAL (order is not           │
+  │     guaranteed; design for order-independence).        │
   │     May add defaults, inject sidecars, set labels.    │
   └──────────────────────┬───────────────────────────────┘
                          │
@@ -113,7 +114,7 @@ Admission webhooks are the primary extension point for policy enforcement and ob
 
 ### Mutating Admission Webhooks
 
-Mutating webhooks are called **in serial**, in the order defined by their configurations. Each webhook can modify the object, and subsequent webhooks see the modifications made by previous ones. Common uses:
+Mutating webhooks are called **in serial**, but the invocation order is determined by the API server (alphabetically by webhook name) and should not be relied upon. Each webhook can modify the object, and subsequent webhooks see the modifications made by previous ones. Furthermore, the API server may **re-invoke** mutating webhooks if a later webhook modifies the object, to give earlier webhooks a chance to react. Design mutating webhooks to be idempotent and order-independent. Common uses:
 
 - Injecting sidecar containers (Istio, Linkerd)
 - Adding default labels and annotations

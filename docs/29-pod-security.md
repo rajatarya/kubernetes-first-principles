@@ -31,7 +31,7 @@ Without pod security controls, every container is one exploit away from full nod
 | **Privileged escalation** (allowPrivilegeEscalation) | Allowed | Allowed | Forbidden (must be false) |
 | **Running as root** (runAsNonRoot) | Allowed | Allowed | Forbidden (must be true) |
 | **Root user** (runAsUser: 0) | Allowed | Allowed | Forbidden |
-| **Capabilities** | All | Drop ALL, add only: NET_BIND_SERVICE (and others on allowlist) | Drop ALL, add only: NET_BIND_SERVICE |
+| **Capabilities** | All | Cannot add capabilities beyond the default Docker set (AUDIT_WRITE, CHOWN, DAC_OVERRIDE, FKILL, FSETID, KILL, MKNOD, NET_BIND_SERVICE, SETFCAP, SETGID, SETPCAP, SETUID, SYS_CHROOT) | Drop ALL, add only: NET_BIND_SERVICE |
 | **Seccomp profile** | Any or none | Any or none | Must set RuntimeDefault or Localhost |
 | **Volume types** | All | All except hostPath | Restricted set: configMap, downwardAPI, emptyDir, persistentVolumeClaim, projected, secret |
 | **Sysctls** | All | Safe set only | Safe set only |
