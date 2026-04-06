@@ -6,39 +6,22 @@ Crossplane extends Kubernetes' reconciliation engine to any cloud resource --- d
 
 Crossplane installs as a set of controllers in your Kubernetes cluster. It extends the API server with CRDs that represent cloud resources, then reconciles those CRDs against the actual cloud state via provider plugins.
 
-```
-CROSSPLANE RESOURCE FLOW
-──────────────────────────
+```mermaid
+flowchart TD
+    Claim["<b>Claim (XC)</b><br>I need a PostgreSQL DB,<br>medium size"]
+    XR["<b>Composite Resource (XR)</b><br>cluster-scoped, created by<br>Crossplane from Claim"]
+    Comp["Composition (template)<br>maps XR to managed resources"]
 
-  Developer writes:                    Crossplane reconciles:
-  ┌──────────────────┐
-  │ Claim (XC)       │     ┌──────────────────────────────────┐
-  │                  │     │                                  │
-  │ "I need a        │────▶│  Composite Resource (XR)         │
-  │  PostgreSQL DB,  │     │  (cluster-scoped, created by     │
-  │  medium size"    │     │   Crossplane from Claim)         │
-  │                  │     │                                  │
-  └──────────────────┘     └──────────────┬───────────────────┘
-                                          │
-                           Composition    │  maps XR to
-                           (template)     │  managed resources
-                                          │
-                    ┌─────────────────────▼───────────────────┐
-                    │                                         │
-           ┌────────▼────────┐  ┌─────────────────┐  ┌────────▼────────┐
-           │ Managed Resource│  │ Managed Resource│  │ Managed Resource│
-           │                 │  │                 │  │                 │
-           │ RDS Instance    │  │ Subnet Group    │  │ Security Group  │
-           │ (provider-aws)  │  │ (provider-aws)  │  │ (provider-aws)  │
-           └────────┬────────┘  └────────┬────────┘  └────────┬────────┘
-                    │                    │                    │
-                    ▼                    ▼                    ▼
-           ┌──────────────────────────────────────────────────────┐
-           │                    AWS API                           │
-           │                                                      │
-           │  Actual RDS instance, subnet group, security group   │
-           │  created and continuously reconciled                 │
-           └──────────────────────────────────────────────────────┘
+    Claim -->|Developer writes| XR
+    XR --> Comp
+
+    Comp --> MR1["<b>Managed Resource</b><br>RDS Instance<br>(provider-aws)"]
+    Comp --> MR2["<b>Managed Resource</b><br>Subnet Group<br>(provider-aws)"]
+    Comp --> MR3["<b>Managed Resource</b><br>Security Group<br>(provider-aws)"]
+
+    MR1 --> AWS["<b>AWS API</b><br>Actual RDS instance, subnet group,<br>security group created and<br>continuously reconciled"]
+    MR2 --> AWS
+    MR3 --> AWS
 ```
 
 ## Core Concepts

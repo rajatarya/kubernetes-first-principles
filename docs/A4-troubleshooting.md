@@ -6,40 +6,56 @@ This appendix maps the error messages and symptoms you will encounter in practic
 
 ## General Debugging Flowchart
 
-```
-Pod not working?
-       |
-       v
-  kubectl get pods -n <namespace>
-       |
-       v
-  What status do you see?
-       |
-       +---> Pending ───────────────────> Check events: kubectl describe pod <pod>
-       |                                    +-> "Insufficient cpu/memory" -> Scale up or adjust requests
-       |                                    +-> "no nodes match selectors" -> Fix nodeSelector/affinity
-       |                                    +-> "persistentvolumeclaim not bound" -> Check PVC
-       |
-       +---> CrashLoopBackOff ──────────> kubectl logs <pod> --previous
-       |                                    +-> OOMKilled? -> Increase memory limits
-       |                                    +-> App error? -> Fix application startup
-       |                                    +-> Missing config? -> Check ConfigMaps/Secrets
-       |
-       +---> ImagePullBackOff ──────────> kubectl describe pod <pod>
-       |                                    +-> "repository does not exist" -> Fix image name
-       |                                    +-> "unauthorized" -> Fix imagePullSecrets
-       |                                    +-> "tag not found" -> Fix image tag
-       |
-       +---> Running but not working ──> kubectl logs <pod> -f
-       |                                    +-> Check readiness probe: kubectl describe pod
-       |                                    +-> Check service endpoints: kubectl get endpoints
-       |                                    +-> Test from inside: kubectl exec -it <pod> -- sh
-       |
-       +---> Evicted ──────────────────> kubectl describe node <node>
-       |                                    +-> Check for DiskPressure / MemoryPressure
-       |
-       +---> Unknown / NodeLost ───────> kubectl get nodes
-                                            +-> Node NotReady? -> SSH to node, check kubelet
+```mermaid
+flowchart LR
+    Start["Pod not working?"]
+    GetPods["kubectl get pods -n namespace"]
+    Status{"What status do you see?"}
+
+    Start --> GetPods --> Status
+
+    Status --> Pending
+    Status --> Crash["CrashLoopBackOff"]
+    Status --> Image["ImagePullBackOff"]
+    Status --> Running["Running but not working"]
+    Status --> Evicted
+    Status --> Unknown["Unknown / NodeLost"]
+
+    Pending --> PDescribe["kubectl describe pod"]
+    PDescribe --> P1{"Insufficient<br>cpu/memory?"}
+    PDescribe --> P2{"No nodes match<br>selectors?"}
+    PDescribe --> P3{"PVC not bound?"}
+    P1 --> P1Fix["Scale up or adjust requests"]
+    P2 --> P2Fix["Fix nodeSelector/affinity"]
+    P3 --> P3Fix["Check PVC"]
+
+    Crash --> CLogs["kubectl logs --previous"]
+    CLogs --> C1{"OOMKilled?"}
+    CLogs --> C2{"App error?"}
+    CLogs --> C3{"Missing config?"}
+    C1 --> C1Fix["Increase memory limits"]
+    C2 --> C2Fix["Fix application startup"]
+    C3 --> C3Fix["Check ConfigMaps/Secrets"]
+
+    Image --> IDescribe["kubectl describe pod"]
+    IDescribe --> I1{"repo does not exist?"}
+    IDescribe --> I2{"unauthorized?"}
+    IDescribe --> I3{"tag not found?"}
+    I1 --> I1Fix["Fix image name"]
+    I2 --> I2Fix["Fix imagePullSecrets"]
+    I3 --> I3Fix["Fix image tag"]
+
+    Running --> RLogs["kubectl logs -f"]
+    RLogs --> R1["Check readiness probe:<br>kubectl describe pod"]
+    RLogs --> R2["Check service endpoints:<br>kubectl get endpoints"]
+    RLogs --> R3["Test from inside:<br>kubectl exec -it -- sh"]
+
+    Evicted --> EDescribe["kubectl describe node"]
+    EDescribe --> E1["Check for DiskPressure /<br>MemoryPressure"]
+
+    Unknown --> UNodes["kubectl get nodes"]
+    UNodes --> U1{"Node NotReady?"}
+    U1 --> U1Fix["SSH to node, check kubelet"]
 ```
 
 ---

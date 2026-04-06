@@ -8,27 +8,13 @@ This chapter covers the full spectrum of secrets protection: encrypting data at 
 
 When you create a Secret, Kubernetes stores it in etcd. By default, the `identity` provider is used, which means the data is stored as-is (base64-encoded, not encrypted). Anyone with read access to etcd --- a backup, a compromised node, a misconfigured endpoint --- can read every secret in the cluster.
 
-```
-DEFAULT SECRET STORAGE (INSECURE)
-──────────────────────────────────
+```mermaid
+flowchart LR
+    kubectl["<b>kubectl</b><br>create secret generic db-creds<br>--from-literal=password=hunter2"]
+    api["<b>API Server</b>"]
+    etcd["<b>etcd</b><br>/registry/secrets/default/db-creds<br><br>data:<br>&nbsp;&nbsp;password: aHVudGVyMg==<br><br>base64 'hunter2' — NOT encrypted"]
 
-  kubectl create secret generic db-creds \
-    --from-literal=password=hunter2
-
-         │
-         ▼
-  ┌──────────────┐     ┌────────────────────────────┐
-  │  API Server  │────▶│  etcd                      │
-  └──────────────┘     │                            │
-                       │  /registry/secrets/default │
-                       │  /db-creds                 │
-                       │                            │
-                       │  data:                     │
-                       │    password: aHVudGVyMg==  │
-                       │                            │
-                       │  ^^^ base64("hunter2")     │
-                       │  NOT encrypted.            │
-                       └────────────────────────────┘
+    kubectl --> api --> etcd
 ```
 
 ## Encryption at Rest
@@ -67,49 +53,19 @@ The provider order matters. The **first** provider is used for writing (encrypti
 
 Static keys stored in configuration files have an obvious weakness: the key is on the same machine as the encrypted data. If someone compromises the API server node, they have both the ciphertext and the key. KMS v2 solves this with **envelope encryption**.
 
+```mermaid
+flowchart TD
+    A["<b>1. API Server</b><br>Generates random DEK<br>(plaintext, cached in memory)"]
+    B["<b>2. External KMS</b><br>AWS KMS / GCP Cloud KMS /<br>Vault / Azure Key Vault"]
+    C["<b>3. API Server</b><br>Encrypts secret data with plaintext DEK"]
+    D["<b>4. etcd</b><br>Stores encrypted DEK + encrypted data"]
+
+    A -- "Send plaintext DEK<br>for encryption" --> B
+    B -- "Return encrypted DEK<br>(wrapped with KEK;<br>KEK never leaves KMS)" --> C
+    C -- "Store enc(DEK) + enc(data)" --> D
 ```
-KMS v2 ENVELOPE ENCRYPTION
-────────────────────────────
 
-  1. API Server generates a random Data Encryption Key (DEK)
-  2. API Server sends DEK to external KMS for encryption
-  3. KMS encrypts DEK using its Key Encryption Key (KEK)
-  4. API Server stores in etcd:
-     - The encrypted DEK (wrapped by KMS)
-     - The data encrypted with the plaintext DEK
-  5. Plaintext DEK is cached in memory, never written to disk
-
-  ┌──────────────┐         ┌──────────────────┐
-  │  API Server  │         │  External KMS    │
-  │              │         │  (AWS KMS, GCP   │
-  │  ┌─────────┐ │  2.     │   Cloud KMS,     │
-  │  │Plaintext│─┼────────▶   Vault, etc.)    │
-  │  │  DEK    │ │ Encrypt │                  │
-  │  └───┬─────┘ │  DEK    │  ┌────────────┐  │
-  │      │       │         │  │    KEK     │  │
-  │      │       │  3.     │  │ (never     │  │
-  │      │    ◀──┼─────────│  │  leaves    │  │
-  │      │       │ Return  │  │  KMS)      │  │
-  │      │       │ wrapped │  └────────────┘  │
-  │      │       │ DEK     │                  │
-  │      ▼       │         └──────────────────┘
-  │  Encrypt     │
-  │  secret data │
-  │  with DEK    │
-  │      │       │
-  │      ▼       │
-  │  ┌────────┐  │         ┌──────────────────┐
-  │  │Store:  │──┼────────▶│  etcd            │
-  │  │enc(DEK)│  │         │                  │
-  │  │enc(data│  │         │  encrypted DEK   │
-  │  └────────┘  │         │  + encrypted data│
-  └──────────────┘         └──────────────────┘
-
-  KEY INSIGHT: The KEK never leaves the KMS.
-  Even if etcd is fully compromised, the attacker
-  has encrypted data and an encrypted DEK but no
-  way to decrypt either without KMS access.
-```
+> **Key insight:** The KEK never leaves the KMS. Even if etcd is fully compromised, the attacker has encrypted data and an encrypted DEK but no way to decrypt either without KMS access. The plaintext DEK is cached in API Server memory and never written to disk.
 
 ### KMS v2 Configuration
 
@@ -165,36 +121,20 @@ kubectl create secret generic db-creds \
 
 **What it is:** A controller that syncs secrets from external providers (AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, HashiCorp Vault, 1Password, and many more) into Kubernetes Secrets.
 
-```
-EXTERNAL SECRETS OPERATOR SYNC FLOW
-──────────────────────────────────────
+```mermaid
+flowchart TD
+    aws["<b>AWS Secrets Manager</b><br>prod/db-pass"]
+    gcp["<b>GCP Secret Manager</b><br>api-key"]
+    store["<b>SecretStore / ClusterSecretStore</b><br>(auth config per provider)"]
+    eso["<b>External Secrets Operator</b><br>Reads ExternalSecret CRs<br>Fetches values from providers<br>Creates/updates K8s Secrets<br>Syncs on interval (e.g. every 1h)"]
+    secret["<b>Kubernetes Secret</b><br>(auto-created, kept in sync)"]
+    pods["<b>Pods</b><br>Mounted as files or env vars"]
 
-  ┌──────────────────┐     ┌───────────────────┐
-  │  AWS Secrets     │     │  GCP Secret       │
-  │  Manager         │     │  Manager          │
-  │  "prod/db-pass"  │     │  "api-key"        │
-  └────────┬─────────┘     └────────┬──────────┘
-           │                        │
-           │   SecretStore /        │
-           │   ClusterSecretStore   │
-           │   (auth config)        │
-           ▼                        ▼
-  ┌──────────────────────────────────────────┐
-  │  External Secrets Operator (controller)  │
-  │                                          │
-  │  Reads ExternalSecret CRs                │
-  │  Fetches values from providers           │
-  │  Creates/updates Kubernetes Secrets      │
-  │  Syncs on interval (e.g., every 1h)      │
-  └─────────────────┬────────────────────────┘
-                    │
-                    ▼
-  ┌──────────────────────────────────────────┐
-  │  Kubernetes Secret                       │
-  │  (auto-created, kept in sync)            │
-  │                                          │
-  │  Mounted into pods as files or env vars  │
-  └──────────────────────────────────────────┘
+    aws --> store
+    gcp --> store
+    store --> eso
+    eso --> secret
+    secret --> pods
 ```
 
 ```yaml

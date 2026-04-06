@@ -1,24 +1,29 @@
 # Chapter 1: The Road to Kubernetes
 
-```
-Timeline: The Road to Container Orchestration
+```mermaid
+---
+config:
+    flowchart:
+        nodeSpacing: 15
+        rankSpacing: 30
+---
+flowchart LR
+    subgraph industry ["Industry Timeline"]
+        bm["Bare Metal<br>1990s"] --> vm["Virtualization<br>VMware, Xen, KVM<br>2000s"]
+        vm --> cloud["AWS EC2<br>Cloud era<br>2006"]
+        cloud --> cm["Chef / Puppet<br>2009"]
+        cm --> docker["Docker<br>2013"]
+        docker --> k8s["Kubernetes<br>2014"]
+        k8s --> cncf["CNCF + Managed K8s<br>2015+"]
+    end
 
- 1990s          2000s           2006        2009        2013      2014      2015
-   │              │               │           │           │         │         │
-   ▼              ▼               ▼           ▼           ▼         ▼         ▼
- Bare Metal → Virtualization → AWS EC2 → Chef/Puppet → Docker → Kubernetes → CNCF
-                  │               │                       │         │
-              VMware, Xen     Cloud era              Containers  Open-source
-              KVM (2007)                              for all    Borg lessons
+    subgraph google ["Inside Google"]
+        borg["Borg<br>2003"] --> cg["cgroups +<br>namespaces<br>2006–08"]
+        cg --> omega["Omega<br>2011"]
+        omega --> k8sg["Kubernetes<br>2014"]
+    end
 
- Inside Google:
- ───────────────────────────────────────────────────────────────────────────
- 2003-04        2006-2008       2011-13         2014
-   │              │               │              │
-   ▼              │               ▼              ▼
-  Borg         cgroups +       Omega          Kubernetes
-  (internal)   namespaces      (research)     (open-source Borg)
-               in Linux
+    k8sg -.->|"open-sourced<br>as"| k8s
 ```
 
 ## The Bare Metal Era: One Application, One Server

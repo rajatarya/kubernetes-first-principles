@@ -6,44 +6,22 @@ A Kubernetes cluster is not a single thing that fails in a single way. The contr
 
 Kubernetes disaster recovery operates on two distinct layers, and you need both.
 
-```
-TWO-LAYER BACKUP STRATEGY
-───────────────────────────
+```mermaid
+flowchart TD
+    subgraph Layer1["LAYER 1: CLUSTER STATE (etcd)"]
+        Etcd["etcd snapshots capture ALL cluster state:<br>- Every resource object (Pods, Deployments, Services)<br>- RBAC rules, NetworkPolicies, CRDs<br>- Secrets, ConfigMaps<br>- Custom resources (operators, databases, etc.)"]
+        NotCaptured["Does NOT capture:<br>- Persistent Volume data<br>- Container images<br>- External state (DNS, load balancers, IAM)"]
+    end
 
-  LAYER 1: CLUSTER STATE (etcd)
-  ┌──────────────────────────────────────────────────────────┐
-  │  etcd snapshots capture ALL cluster state:               │
-  │  - Every resource object (Pods, Deployments, Services)   │
-  │  - RBAC rules, NetworkPolicies, CRDs                     │
-  │  - Secrets, ConfigMaps                                   │
-  │  - Custom resources (operators, databases, etc.)         │
-  │                                                          │
-  │  What it DOESN'T capture:                                │
-  │  - Persistent Volume data                                │
-  │  - Container images                                      │
-  │  - External state (DNS records, load balancers, IAM)     │
-  └──────────────────────────────────────────────────────────┘
-                         +
-  LAYER 2: WORKLOAD BACKUP (Velero)
-  ┌──────────────────────────────────────────────────────────┐
-  │  Velero backs up selected Kubernetes resources AND       │
-  │  their associated persistent volumes:                    │
-  │  - Namespace-scoped resource manifests                   │
-  │  - PersistentVolume snapshots (via CSI or cloud APIs)    │
-  │  - Label/annotation-based selection                      │
-  │  - Scheduled backups on a cron cadence                   │
-  │                                                          │
-  │  Stored externally in object storage (S3, GCS, MinIO)    │
-  └──────────────────────────────────────────────────────────┘
+    subgraph Layer2["LAYER 2: WORKLOAD BACKUP (Velero)"]
+        Velero["Velero backs up K8s resources AND persistent volumes:<br>- Namespace-scoped resource manifests<br>- PersistentVolume snapshots (via CSI or cloud APIs)<br>- Label/annotation-based selection<br>- Scheduled backups on a cron cadence"]
+        Storage["Stored externally in object storage<br>(S3, GCS, MinIO)"]
+    end
 
-  WHY BOTH?
-  ──────────
-  etcd snapshots:  Full cluster restore after total loss.
-                   Blunt instrument --- all or nothing.
-
-  Velero backups:  Surgical restore of specific namespaces
-                   or workloads. Includes PV data.
-                   Cross-cluster migration.
+    Layer1 --- Why{{"WHY BOTH?"}}
+    Layer2 --- Why
+    Why --> EtcdUse["etcd snapshots: Full cluster restore<br>after total loss. All or nothing."]
+    Why --> VeleroUse["Velero backups: Surgical restore of<br>specific namespaces or workloads.<br>Includes PV data. Cross-cluster migration."]
 ```
 
 **etcd snapshots** are your insurance against total cluster loss. They capture the complete cluster state at a point in time. But they are all-or-nothing --- you cannot restore a single namespace from an etcd snapshot without restoring everything. They also do not include persistent volume data.
@@ -89,32 +67,16 @@ velero backup create full-backup \
 
 A common failure mode during restore is attempting to create resources before their dependencies exist --- a Deployment that references a ConfigMap that has not been restored yet. Velero handles this through a priority-based restore order:
 
-```
-VELERO RESTORE FLOW
-─────────────────────
+```mermaid
+flowchart TD
+    S1["1. Cluster-scoped resources<br>(Namespaces, ClusterRoles, CRDs, StorageClasses)"]
+    S2["2. Namespace-scoped foundation<br>(ServiceAccounts, ConfigMaps, Secrets, PVCs)"]
+    S3["3. Workload resources<br>(Deployments, StatefulSets, DaemonSets, Services)"]
+    S4["4. Dependent resources<br>(Ingress, NetworkPolicies, HPA, PodDisruptionBudgets)"]
+    S5["5. Custom Resources<br>(CRD instances -- restored after CRDs exist)"]
+    S6["6. Volume data<br>(PV snapshots restored and bound to new PVCs)"]
 
-  1. Cluster-scoped resources
-     (Namespaces, ClusterRoles, CRDs, StorageClasses)
-           │
-           ▼
-  2. Namespace-scoped foundation
-     (ServiceAccounts, ConfigMaps, Secrets, PVCs)
-           │
-           ▼
-  3. Workload resources
-     (Deployments, StatefulSets, DaemonSets, Services)
-           │
-           ▼
-  4. Dependent resources
-     (Ingress, NetworkPolicies, HPA, PodDisruptionBudgets)
-           │
-           ▼
-  5. Custom Resources
-     (CRD instances --- restored after CRDs exist)
-           │
-           ▼
-  6. Volume data
-     (PV snapshots restored and bound to new PVCs)
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6
 ```
 
 You can customize this order via restore hooks and init containers to wait for dependencies.

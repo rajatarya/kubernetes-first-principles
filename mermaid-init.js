@@ -29,7 +29,19 @@
         tertiaryTextColor: '#1a3a6b',
         noteBkgColor: '#e8f0fe',
         noteTextColor: '#1a3a6b',
-        noteBorderColor: '#326CE5'
+        noteBorderColor: '#326CE5',
+        // Gantt chart colors
+        taskBkgColor: '#326CE5',
+        taskTextColor: '#ffffff',
+        taskTextDarkColor: '#1a3a6b',
+        doneTaskBkgColor: '#8ab4f8',
+        doneTaskBorderColor: '#326CE5',
+        activeTaskBkgColor: '#326CE5',
+        activeTaskBorderColor: '#1a4eb8',
+        critBkgColor: '#e8453c',
+        sectionBkgColor: '#f0f4fc',
+        altSectionBkgColor: '#e8f0fe',
+        gridColor: '#ccd9f0'
     } : {
         // Dark mode — K8s blue on dark backgrounds
         darkMode: true,
@@ -44,7 +56,19 @@
         tertiaryTextColor: '#a0b8d8',
         noteBkgColor: '#1e3a6e',
         noteTextColor: '#e0e8f5',
-        noteBorderColor: '#5a8ef0'
+        noteBorderColor: '#5a8ef0',
+        // Gantt chart colors
+        taskBkgColor: '#326CE5',
+        taskTextColor: '#e0e8f5',
+        taskTextDarkColor: '#e0e8f5',
+        doneTaskBkgColor: '#1e3a6e',
+        doneTaskBorderColor: '#5a8ef0',
+        activeTaskBkgColor: '#326CE5',
+        activeTaskBorderColor: '#5a8ef0',
+        critBkgColor: '#e8453c',
+        sectionBkgColor: '#141e33',
+        altSectionBkgColor: '#1a2744',
+        gridColor: '#2a3a5a'
     };
 
     mermaid.initialize({

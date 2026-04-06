@@ -8,47 +8,13 @@ This is not an abstraction for its own sake. It is a response to a measurable pr
 
 An internal developer platform is a stack of tools, each handling a layer of the infrastructure problem. The typical production stack looks like this:
 
-```
-INTERNAL DEVELOPER PLATFORM LAYERS
-─────────────────────────────────────
-
-  ┌───────────────────────────────────────────────┐
-  │   Developer Interface                         │
-  │                                               │
-  │   Backstage (service catalog, scaffolding,    │
-  │   docs, API registry, golden paths)           │
-  └───────────────────────┬───────────────────────┘
-                          │
-  ┌───────────────────────▼───────────────────────┐
-  │   Delivery & Deployment                       │
-  │                                               │
-  │   ArgoCD / Flux (GitOps continuous delivery)  │
-  │   Tekton / GitHub Actions (CI pipelines)      │
-  └───────────────────────┬───────────────────────┘
-                          │
-  ┌───────────────────────▼───────────────────────┐
-  │   Infrastructure Provisioning                 │
-  │                                               │
-  │   Crossplane (cloud resources as CRDs)        │
-  │   Terraform (infrastructure as code)          │
-  └───────────────────────┬───────────────────────┘
-                          │
-  ┌───────────────────────▼───────────────────────┐
-  │   Container Platform                          │
-  │                                               │
-  │   Kubernetes (scheduling, networking,         │
-  │   service discovery, autoscaling)             │
-  └───────────────────────┬───────────────────────┘
-                          │
-  ┌───────────────────────▼───────────────────────┐
-  │   Observability                               │
-  │                                               │
-  │   Prometheus + Grafana (metrics)              │
-  │   Loki / Elasticsearch (logs)                 │
-  │   Jaeger / Tempo (traces)                     │
-  │   PagerDuty / OpsGenie (alerting)             │
-  └───────────────────────────────────────────────┘
-```
+| Layer | Purpose | Typical Tools |
+|-------|---------|---------------|
+| **Developer Interface** | Service catalog, scaffolding, docs, API registry, golden paths | Backstage |
+| **Delivery & Deployment** | GitOps continuous delivery, CI pipelines | ArgoCD / Flux, Tekton / GitHub Actions |
+| **Infrastructure Provisioning** | Cloud resources as code | Crossplane (CRDs), Terraform (HCL) |
+| **Container Platform** | Scheduling, networking, service discovery, autoscaling | Kubernetes |
+| **Observability** | Metrics, logs, traces, alerting | Prometheus + Grafana, Loki, Tempo, PagerDuty |
 
 Each layer serves a distinct purpose, and the platform team's job is to integrate them so that developers interact primarily with the top layer.
 

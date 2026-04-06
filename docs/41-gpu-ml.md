@@ -16,116 +16,50 @@ A device plugin is a process (usually running as a DaemonSet on every GPU node) 
 
 3. **Allocate**: When the scheduler places a pod requesting `nvidia.com/gpu: 1` on this node, the kubelet calls `Allocate` with the chosen device ID. The plugin returns the environment variables, device mounts, and annotations needed to make the GPU visible inside the container (e.g., `/dev/nvidia0`, the NVIDIA device files, and `NVIDIA_VISIBLE_DEVICES`).
 
-```
-DEVICE PLUGIN REGISTRATION AND ALLOCATION FLOW
-────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    subgraph Node["GPU Node"]
+        Plugin["NVIDIA Device Plugin (Pod)<br>Reports: GPU-0, GPU-1, GPU-2, GPU-3"]
+        Kubelet["kubelet"]
 
-  GPU Node
-  ┌──────────────────────────────────────────────────────────┐
-  │                                                          │
-  │  ┌──────────────────┐     1. Register("nvidia.com/gpu")  │
-  │  │  NVIDIA Device   │────────────────────────────────►   │
-  │  │  Plugin (Pod)    │                                    │
-  │  │                  │◄───── 2. ListAndWatch() ────────   │
-  │  │  Reports:        │     Plugin streams device IDs:     │
-  │  │  GPU-0, GPU-1,   │     {GPU-0, GPU-1, GPU-2, GPU-3}   │
-  │  │  GPU-2, GPU-3    │                                    │
-  │  │                  │◄───── 4. Allocate(GPU-2) ────────  │
-  │  │                  │─────► Returns:                     │
-  │  │                  │       - /dev/nvidia2               │
-  │  │                  │       - NVIDIA_VISIBLE_DEVICES=2   │
-  │  │                  │       - volume mounts              │
-  │  └──────────────────┘                                    │
-  │                          ┌───────────────┐               │
-  │                          │   kubelet     │               │
-  │                          │               │               │
-  │                          │  3. Updates   │               │
-  │                          │  Node status: │               │
-  │                          │  capacity:    │               │
-  │                          │   nvidia.com/ │               │
-  │                          │   gpu: 4      │               │
-  │                          └──────┬────────┘               │
-  │                                 │                        │
-  └─────────────────────────────────┼────────────────────────┘
-                                    │
-                                    ▼
-                           ┌─────────────────┐
-                           │  API Server     │
-                           │                 │
-                           │  Node object    │
-                           │  .status:       │
-                           │   allocatable:  │
-                           │    nvidia.com/  │
-                           │    gpu: 4       │
-                           └─────────────────┘
+        Plugin -- "1. Register('nvidia.com/gpu')" --> Kubelet
+        Kubelet -- "2. ListAndWatch()<br>Plugin streams device IDs:<br>{GPU-0, GPU-1, GPU-2, GPU-3}" --> Plugin
+        Kubelet -- "4. Allocate(GPU-2)" --> Plugin
+        Plugin -- "Returns:<br>/dev/nvidia2<br>NVIDIA_VISIBLE_DEVICES=2<br>volume mounts" --> Kubelet
+    end
+
+    Kubelet -- "3. Updates Node status:<br>capacity: nvidia.com/gpu: 4" --> API["API Server<br>Node object .status:<br>allocatable: nvidia.com/gpu: 4"]
 ```
 
 The device plugin protocol has two phases --- registration (once at startup) and per-pod allocation. The following sequence diagram shows both:
 
-```
-GPU DEVICE PLUGIN: REGISTRATION AND ALLOCATION
-────────────────────────────────────────────────
+```mermaid
+sequenceDiagram
+    participant Plugin as NVIDIA Device Plugin
+    participant Kubelet as kubelet<br>(device manager)
+    participant API as API Server
+    participant Sched as Scheduler
+    participant User as User (kubectl)
 
-  NVIDIA Device     kubelet           API Server      Scheduler       User
-  Plugin            (device manager)                                  (kubectl)
-    │                  │                  │               │              │
-    │                  │                  │               │              │
-    │ ═══ PHASE 1: REGISTRATION (startup) ═══            │              │
-    │                  │                  │               │              │
-    │  Register()      │                  │               │              │
-    │  via Unix socket │                  │               │              │
-    ├─────────────────▶│                  │               │              │
-    │  accepted        │                  │               │              │
-    │◀─────────────────┤                  │               │              │
-    │                  │                  │               │              │
-    │  ListAndWatch()  │                  │               │              │
-    │  stream: [gpu-0, │                  │               │              │
-    │   gpu-1, gpu-2,  │                  │               │              │
-    │   gpu-3]         │                  │               │              │
-    ├─────────────────▶│                  │               │              │
-    │                  │                  │               │              │
-    │                  │  update Node     │               │              │
-    │                  │  .status.capacity│               │              │
-    │                  │  nvidia.com/gpu:4│               │              │
-    │                  ├─────────────────▶│               │              │
-    │                  │                  │               │              │
-    │ ═══ PHASE 2: PER-POD ALLOCATION ═══│               │              │
-    │                  │                  │               │              │
-    │                  │                  │               │  create Pod  │
-    │                  │                  │               │  nvidia.com/ │
-    │                  │                  │               │  gpu: 1      │
-    │                  │                  │◀──────────────────────────────┤
-    │                  │                  │               │              │
-    │                  │                  │  schedule:    │              │
-    │                  │                  │  node has     │              │
-    │                  │                  │  available GPU│              │
-    │                  │                  ├──────────────▶│              │
-    │                  │                  │               │              │
-    │                  │                  │  bind Pod     │              │
-    │                  │                  │  to node      │              │
-    │                  │◀─────────────────┤               │              │
-    │                  │                  │               │              │
-    │  Allocate()      │                  │               │              │
-    │  request: gpu-0  │                  │               │              │
-    │◀─────────────────┤                  │               │              │
-    │                  │                  │               │              │
-    │  response:       │                  │               │              │
-    │  devices:        │                  │               │              │
-    │   /dev/nvidia0   │                  │               │              │
-    │  env:            │                  │               │              │
-    │   CUDA_VISIBLE_  │                  │               │              │
-    │   DEVICES=0      │                  │               │              │
-    │  mounts:         │                  │               │              │
-    │   /usr/lib/nvidia│                  │               │              │
-    ├─────────────────▶│                  │               │              │
-    │                  │                  │               │              │
-    │                  │  start container │               │              │
-    │                  │  with GPU access │               │              │
-    │                  │  (via CRI)       │               │              │
-    │                  │                  │               │              │
-    │                  │  update Pod      │               │              │
-    │                  │  status: Running │               │              │
-    │                  ├─────────────────▶│               │              │
+    rect rgba(50, 108, 229, 0.1)
+        Note over Plugin,User: PHASE 1: REGISTRATION (startup)
+        Plugin->>Kubelet: Register() via Unix socket
+        Kubelet-->>Plugin: accepted
+        Plugin->>Kubelet: ListAndWatch() stream:<br>[gpu-0, gpu-1, gpu-2, gpu-3]
+        Kubelet->>API: update Node .status.capacity<br>nvidia.com/gpu: 4
+    end
+
+    rect rgba(90, 142, 240, 0.1)
+        Note over Plugin,User: PHASE 2: PER-POD ALLOCATION
+        User->>API: create Pod<br>nvidia.com/gpu: 1
+        API->>Sched: schedule: node has available GPU
+        Sched-->>API: bind Pod to node
+        API-->>Kubelet: Pod assigned to node
+        Kubelet->>Plugin: Allocate() request: gpu-0
+        Plugin-->>Kubelet: response:<br>/dev/nvidia0<br>CUDA_VISIBLE_DEVICES=0<br>/usr/lib/nvidia
+        Note over Kubelet: start container with<br>GPU access (via CRI)
+        Kubelet->>API: update Pod status: Running
+    end
 ```
 
 ### Critical Constraints

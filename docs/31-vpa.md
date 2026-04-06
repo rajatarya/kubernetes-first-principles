@@ -22,34 +22,21 @@ VPA closes this loop by observing actual usage over time and recommending (or ap
 
 VPA consists of three components:
 
-```
-VPA RECOMMENDATION FLOW
-────────────────────────
+```mermaid
+flowchart TD
+    subgraph VPA["VPA Components"]
+        rec["<b>Recommender</b><br>Watches pod metrics over time<br>Builds usage histogram<br>Emits target, lowerBound,<br>upperBound"]
+        upd["<b>Updater</b><br>Evicts pods outside<br>recommended range<br>(Auto mode only)"]
+        adm["<b>Admission Webhook</b><br>Mutates pod spec at<br>creation time<br>(applies recs to new pods)"]
+    end
 
-  ┌─────────────────────────────────────────────────────┐
-  │                 VPA Components                      │
-  │                                                     │
-  │  ┌──────────────┐   ┌──────────────┐   ┌───────────┐│
-  │  │ Recommender  │   │   Updater    │   │ Admission ││
-  │  │              │   │              │   │ Webhook   ││
-  │  │ Watches pod  │   │ Evicts pods  │   │ Mutates   ││
-  │  │ metrics over │   │ that are     │   │ pod spec  ││
-  │  │ time, builds │   │ outside the  │   │ at        ││
-  │  │ histogram of │   │ recommended  │   │ creation  ││
-  │  │ usage, emits │   │ range        │   │ time      ││
-  │  │ target,      │   │              │   │           ││
-  │  │ lowerBound,  │   │ (only in     │   │ (applies  ││
-  │  │ upperBound   │   │  Auto mode)  │   │  recs to  ││
-  │  └──────┬───────┘   └──────┬───────┘   │  new pods)││
-  │         │                  │           └─────┬─────┘│
-  └─────────┼──────────────────┼─────────────────┼──────┘
-            │                  │                 │
-            ▼                  ▼                 ▼
-   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
-   │  Metrics     │   │ Running Pods │   │ API Server   │
-   │  Server /    │   │ (evict +     │   │ (pod create  │
-   │  Prometheus  │   │  recreate)   │   │  admission)  │
-   └──────────────┘   └──────────────┘   └──────────────┘
+    metrics["<b>Metrics Server / Prometheus</b>"]
+    pods["<b>Running Pods</b><br>(evict + recreate)"]
+    api["<b>API Server</b><br>(pod create admission)"]
+
+    rec --> metrics
+    upd --> pods
+    adm --> api
 ```
 
 1. **Recommender:** Continuously observes pod resource usage (via Metrics API or Prometheus) and computes recommendations. It maintains a decaying histogram of usage patterns and outputs four values per container: `lowerBound`, `target`, `uncappedTarget`, and `upperBound`.

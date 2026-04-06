@@ -52,47 +52,26 @@ Without pod security controls, every container is one exploit away from full nod
 
 Pod Security Admission is the built-in admission controller (enabled by default since Kubernetes 1.25) that enforces Pod Security Standards. It operates at the **namespace level** via labels.
 
-```
-PSA ENFORCEMENT FLOW
-──────────────────────
+```mermaid
+flowchart TD
+    kubectl["<b>kubectl apply -f deployment.yaml</b>"]
+    api["<b>API Server</b>"]
+    psa["<b>Pod Security Admission Controller</b><br>Namespace: production"]
+    lookup["Look up namespace labels:<br>enforce: baseline<br>warn: restricted<br>audit: restricted"]
 
-  kubectl apply -f deployment.yaml
-       │
-       ▼
-  ┌──────────────┐
-  │  API Server  │
-  └──────┬───────┘
-         │
-         ▼
-  ┌────────────────────────────────────────────────────┐
-  │  Pod Security Admission Controller                 │
-  │                                                    │
-  │  1. Which namespace is the pod in?                 │
-  │     → "production"                                 │
-  │                                                    │
-  │  2. What labels does the namespace have?           │
-  │     → pod-security.kubernetes.io/enforce: baseline │
-  │     → pod-security.kubernetes.io/warn: restricted  │
-  │     → pod-security.kubernetes.io/audit: restricted │
-  │                                                    │
-  │  3. Check pod spec against each labeled profile:   │
-  │                                                    │
-  │     ENFORCE (baseline):                            │
-  │       Pod uses hostNetwork? → REJECT (403)         │
-  │       Pod uses hostPath?    → REJECT (403)         │
-  │       Pod is privileged?    → REJECT (403)         │
-  │       Otherwise             → ALLOW                │
-  │                                                    │
-  │     WARN (restricted):                             │
-  │       Pod runs as root?     → ALLOW + WARNING      │
-  │       No seccomp profile?   → ALLOW + WARNING      │
-  │       (User sees warnings, pod is admitted)        │
-  │                                                    │
-  │     AUDIT (restricted):                            │
-  │       Same checks as warn   → ALLOW + AUDIT LOG    │
-  │       (Logged for review, pod is admitted)         │
-  │                                                    │
-  └────────────────────────────────────────────────────┘
+    enforce{"<b>ENFORCE (baseline)</b><br>hostNetwork? hostPath?<br>privileged?"}
+    reject["REJECT (403)"]
+    warn{"<b>WARN (restricted)</b><br>runs as root?<br>no seccomp profile?"}
+    audit{"<b>AUDIT (restricted)</b><br>same checks as warn"}
+    allow["ALLOW<br>(pod admitted)"]
+
+    kubectl --> api --> psa --> lookup --> enforce
+    enforce -- "violation" --> reject
+    enforce -- "pass" --> warn
+    warn -- "violation" --> allow
+    warn -. "warnings shown to user" .-> allow
+    allow --> audit
+    audit -. "violations logged for review" .-> allow
 ```
 
 ### Namespace Labels
@@ -140,50 +119,13 @@ pod-security.kubernetes.io/enforce-version: latest
 
 PodSecurityPolicy (PSP) was removed in Kubernetes 1.25. If your cluster still relies on PSP, the migration to PSA follows a deliberate progression:
 
-```
-PSP TO PSA MIGRATION PATH
-───────────────────────────
-
-  Step 1: AUDIT
-  ──────────────
-  Add audit labels to all namespaces.
-  Review audit logs for violations.
-  No impact on running workloads.
-
-      pod-security.kubernetes.io/audit: restricted
-
-  Step 2: WARN
-  ─────────────
-  Add warn labels. Developers see warnings
-  when deploying non-compliant pods.
-  Still no enforcement.
-
-      pod-security.kubernetes.io/warn: restricted
-
-  Step 3: FIX
-  ────────────
-  Update workloads to comply with the target
-  profile. Common changes:
-  - Add runAsNonRoot: true
-  - Add seccompProfile: RuntimeDefault
-  - Drop all capabilities
-  - Switch base images to non-root variants
-
-  Step 4: ENFORCE
-  ────────────────
-  Add enforce labels. Non-compliant pods
-  are rejected. Remove PSP resources.
-
-      pod-security.kubernetes.io/enforce: baseline
-      pod-security.kubernetes.io/warn: restricted
-
-  Step 5: TIGHTEN
-  ─────────────────
-  Move enforcement from baseline to restricted
-  as workloads are updated.
-
-      pod-security.kubernetes.io/enforce: restricted
-```
+| Step | Action | Namespace Label |
+|------|--------|----------------|
+| **1. AUDIT** | Add audit labels to all namespaces.<br>Review audit logs for violations.<br>No impact on running workloads. | `audit: restricted` |
+| **2. WARN** | Add warn labels.<br>Developers see warnings when deploying non-compliant pods.<br>Still no enforcement. | `warn: restricted` |
+| **3. FIX** | Update workloads to comply:<br>- `runAsNonRoot: true`<br>- `seccompProfile: RuntimeDefault`<br>- Drop all capabilities<br>- Switch to non-root base images | (no label change) |
+| **4. ENFORCE** | Add enforce labels.<br>Non-compliant pods are rejected.<br>Remove PSP resources. | `enforce: baseline`<br>`warn: restricted` |
+| **5. TIGHTEN** | Move enforcement from baseline to restricted<br>as workloads are updated. | `enforce: restricted` |
 
 ### Common Migration Fixes
 

@@ -222,59 +222,32 @@ Requests flow: client --> prefill node (processes prompt, generates KV cache) --
 
 The following sequence diagram shows how llm-d splits a single inference request across two specialized node pools --- the prefill node processes the full prompt, then hands off the KV cache to a decode node for token generation:
 
-```
-LLM-D DISAGGREGATED SERVING: PREFILL/DECODE SPLIT
-───────────────────────────────────────────────────
+```mermaid
+sequenceDiagram
+    participant Client as Client (API request)
+    participant GW as Gateway / EPP Router
+    participant Prefill as Prefill Node<br>(vLLM worker)
+    participant KV as KV Cache Transfer
+    participant Decode as Decode Node<br>(vLLM worker)
 
-  Client          Gateway /        Prefill Node        KV Cache         Decode Node         Client
-  (API request)   EPP Router       (vLLM worker)       Transfer         (vLLM worker)       (streaming)
-    │                │                  │                  │                  │                  │
-    │  POST /chat/   │                  │                  │                  │                  │
-    │  completions   │                  │                  │                  │                  │
-    │  {prompt:      │                  │                  │                  │                  │
-    │   4096 tokens} │                  │                  │                  │                  │
-    ├───────────────▶│                  │                  │                  │                  │
-    │                │                  │                  │                  │                  │
-    │                │  route to        │                  │                  │                  │
-    │                │  prefill pool    │                  │                  │                  │
-    │                │  (prompt-heavy)  │                  │                  │                  │
-    │                ├─────────────────▶│                  │                  │                  │
-    │                │                  │                  │                  │                  │
-    │                │                  │  process full    │                  │                  │
-    │                │                  │  prompt in one   │                  │                  │
-    │                │                  │  forward pass    │                  │                  │
-    │                │                  │  (compute-bound, │                  │                  │
-    │                │                  │   high GPU util) │                  │                  │
-    │                │                  │                  │                  │                  │
-    │                │                  │  transfer KV     │                  │                  │
-    │                │                  │  cache state     │                  │                  │
-    │                │                  ├─────────────────▶│                  │                  │
-    │                │                  │                  │                  │                  │
-    │                │                  │  prefill done,   │  deliver KV     │                  │
-    │                │                  │  GPU freed for   │  cache to       │                  │
-    │                │                  │  next prompt     │  decode worker  │                  │
-    │                │                  │                  ├─────────────────▶│                  │
-    │                │                  │                  │                  │                  │
-    │                │                  │                  │                  │  auto-regressive │
-    │                │                  │                  │                  │  token generation│
-    │                │                  │                  │                  │  (memory-bound,  │
-    │                │                  │                  │                  │   sequential)    │
-    │                │                  │                  │                  │                  │
-    │                │                  │                  │                  │  stream tokens   │
-    │                │◀────────────────────────────────────────────────────────┤                  │
-    │  token         │                  │                  │                  │                  │
-    │◀───────────────┤                  │                  │                  │                  │
-    │  token         │                  │                  │                  │                  │
-    │◀───────────────┤                  │                  │                  │                  │
-    │  token         │                  │                  │                  │                  │
-    │◀───────────────┤                  │                  │                  │                  │
-    │  ...           │                  │                  │                  │                  │
-    │  [DONE]        │                  │                  │                  │                  │
-    │◀───────────────┤                  │                  │                  │                  │
+    Client->>GW: POST /chat/completions<br>{prompt: 4096 tokens}
+    GW->>Prefill: route to prefill pool (prompt-heavy)
 
-  Key insight: Prefill is compute-bound (one large forward pass). Decode is
-  memory-bound (sequential token generation). Splitting them lets each pool
-  use optimally-sized GPUs and scale independently.
+    Note over Prefill: Process full prompt in one<br>forward pass (compute-bound,<br>high GPU utilization)
+
+    Prefill->>KV: transfer KV cache state
+    Note over Prefill: Prefill done,<br>GPU freed for next prompt
+    KV->>Decode: deliver KV cache to decode worker
+
+    Note over Decode: Auto-regressive token generation<br>(memory-bound, sequential)
+
+    Decode->>GW: stream tokens
+    loop Token streaming
+        GW->>Client: token
+    end
+    GW->>Client: [DONE]
+
+    Note over Client,Decode: Key insight: Prefill is compute-bound (one large forward pass).<br>Decode is memory-bound (sequential token generation).<br>Splitting them lets each pool use optimally-sized GPUs and scale independently.
 ```
 
 ### KV Cache Management
@@ -498,8 +471,6 @@ spec:
 Use NIM when you need maximum performance with minimal tuning effort and are running NVIDIA-supported models on NVIDIA GPUs. The pre-optimization is the differentiator: NIM containers include TensorRT-LLM engines compiled for specific GPU architectures, with quantization, batching, and cache settings already tuned. You trade flexibility for performance.
 
 Use vLLM directly when you need full control over serving configuration, run non-NVIDIA hardware (AMD ROCm, Intel Gaudi), serve models not in the NIM catalog, or need to customize the serving logic (custom sampling, constrained decoding, speculative decoding with draft models). vLLM's open-source community moves fast --- new model architectures are typically supported within days of release.
-
-For Hugging Face infrastructure specifically, the typical pattern is: vLLM for the Inference API (maximum model coverage, rapid updates) and NIM for dedicated enterprise deployments where a fixed set of models must run at peak performance.
 
 ## Common Mistakes and Misconceptions
 

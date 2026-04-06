@@ -29,41 +29,21 @@ No change. The system has stabilized.
 
 To prevent constant oscillation around the target, the HPA applies a **tolerance of 0.1** (10%). If the ratio `currentMetric / desiredMetric` falls within `[0.9, 1.1]`, the HPA takes no action. This dead zone prevents the controller from chasing noise.
 
-```
-HPA FEEDBACK LOOP
-─────────────────
+```mermaid
+sequenceDiagram
+    participant M as Metrics API
+    participant H as HPA Controller
+    participant D as Deployment
+    participant P as Pods
 
-   ┌─────────────────────────────────────────────────────────┐
-   │                    HPA Controller                       │
-   │                  (runs every 15s)                       │
-   │                                                         │
-   │   1. Fetch current metric values from Metrics API       │
-   │   2. Compute ratio = currentMetric / desiredMetric      │
-   │   3. If ratio within [0.9, 1.1] → no action             │
-   │   4. desiredReplicas = ceil(current * ratio)            │
-   │   5. Clamp to [minReplicas, maxReplicas]                │
-   │   6. Patch Deployment .spec.replicas                    │
-   │                                                         │
-   └──────────┬──────────────────────────────┬───────────────┘
-              │                              │
-              │ scale up/down                │ fetch metrics
-              ▼                              ▼
-   ┌──────────────────┐          ┌───────────────────────┐
-   │   Deployment     │          │   Metrics API         │
-   │   Controller     │          │                       │
-   │                  │          │   metrics.k8s.io      │
-   │  Adjusts Pod     │          │   (CPU, memory)       │
-   │  count to match  │          │                       │
-   │  .spec.replicas  │          │   custom.metrics.k8s  │
-   └────────┬─────────┘          │   (requests/sec, etc) │
-            │                    │                       │
-            ▼                    │   external.metrics.k8s│
-   ┌──────────────────┐          │   (SQS depth, etc)    │
-   │  Running Pods    │──────────┘                       │
-   │  (report metrics │   metrics scraped                │
-   │   via cAdvisor   │   from pods                      │
-   │   or custom)     │                                  │
-   └──────────────────┘          └───────────────────────┘
+    loop Every 15 seconds
+        H->>M: Fetch current metrics
+        M-->>H: CPU 80%, target 60%
+        Note right of H: ratio = 80/60 = 1.33<br>Outside tolerance (0.9–1.1)<br>desiredReplicas = ceil(current * 1.33)<br>Clamp to [min, max]
+        H->>D: Patch .spec.replicas
+        D->>P: Create new pods (or terminate)
+        P-->>M: Report metrics via cAdvisor
+    end
 ```
 
 ## Default Metrics: CPU and Memory

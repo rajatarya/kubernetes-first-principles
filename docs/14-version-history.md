@@ -2,23 +2,38 @@
 
 For a visual timeline showing how the entire ecosystem evolved in parallel, see [Appendix E: Architecture Evolution Timeline](A5-timeline.md).
 
-```
-Kubernetes Release Timeline: The Inflection Points
-
-2015       2016       2017       2018       2019       2020       2021       2022       2023       2024
-  |          |          |          |          |          |          |          |          |          |
-  v1.0       v1.5       v1.7       v1.9       v1.13      v1.20      v1.22      v1.24      v1.29      v1.31
-  CNCF       CRI        CRDs       Apps/v1    kubeadm    Docker     API        docker-    Sidecar    nftables
-  launch     intro      replace    GA         GA         deprec.    removals   shim       containers kube-proxy
-             Stateful   TPR                   CSI 1.0               forced     removed    beta       
-             Sets(b)    RBAC GA                                     migration             KMS v2
-             PDB                                                                          GA
-
-  ──────────>──────────>──────────>──────────>──────────>──────────>──────────>──────────>──────────>
-  "Can it     "Can it     "Can we    "Is it      "Can      "Cleaning   "Removing  "Runtime   "Mature
-   run?"       handle      extend     production  anyone    house"      the        independ-  platform"
-               state?"     it?"       ready?"     set it                debt"     ence"
-                                                  up?"
+```mermaid
+timeline
+    title Kubernetes Release Timeline — The Inflection Points
+    section Can it run?
+        v1.0 (2015) : CNCF launch
+                    : Pods, Services, Secrets
+    section Can it handle state?
+        v1.5 (2016) : CRI introduced
+                    : StatefulSets (beta)
+                    : PodDisruptionBudgets
+    section Can we extend it?
+        v1.7 (2017) : CRDs replace TPR
+                    : RBAC GA
+    section Is it production ready?
+        v1.9 (2018) : Apps/v1 GA
+                    : Workloads API stable
+    section Can anyone set it up?
+        v1.13 (2019) : kubeadm GA
+                     : CSI 1.0
+    section Cleaning house
+        v1.20 (2020) : Docker deprecation announced
+    section Removing the debt
+        v1.22 (2021) : API removals forced migration
+                     : beta APIs off by default
+    section Runtime independence
+        v1.24 (2022) : dockershim removed
+                     : Kubernetes runs on containerd/CRI-O only
+    section Mature platform
+        v1.29 (2023) : Sidecar containers (beta)
+                     : KMS v2 GA
+        v1.31 (2024) : nftables kube-proxy (beta)
+                     : AppArmor GA
 ```
 
 ## v1.0 (July 2015): The Starting Line

@@ -10,37 +10,18 @@ The Cluster Autoscaler (CA) is a Kubernetes controller that watches for pods stu
 
 ### How It Works
 
+```mermaid
+flowchart LR
+    pending["Pending Pods"] --> CA["Cluster<br>Autoscaler"]
+    CA -->|"which group<br>can fit?"| A["Node Group A<br>m5.large"]
+    CA -->|"which group<br>can fit?"| B["Node Group B<br>m5.4xlarge"]
+    CA -->|"which group<br>can fit?"| C["Node Group C<br>p3.2xlarge (GPU)"]
+    A --> cloud["Cloud API<br>+1 node"]
+    B --> cloud
+    C --> cloud
 ```
-CLUSTER AUTOSCALER ARCHITECTURE
-─────────────────────────────────
 
-  ┌─────────────────────────────────────────────────────┐
-  │                 Cluster Autoscaler                  │
-  │                                                     │
-  │  1. Watch for Pending pods (unschedulable)          │
-  │  2. Simulate scheduling against node group          │
-  │     templates to find which group can fit the pod   │
-  │  3. Call cloud API: "add 1 node to node-group-X"    │
-  │                                                     │
-  │  4. Watch for underutilized nodes (<50% used)       │
-  │  5. Simulate moving all pods to other nodes         │
-  │  6. If safe: drain node, call cloud API to delete   │
-  └────────┬────────────────────────────────────────────┘
-           │
-           ▼
-  ┌─────────────────────────────────────────────────────┐
-  │              Cloud Provider API                     │
-  │                                                     │
-  │  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
-  │  │ Node     │  │ Node     │  │ Node     │           │
-  │  │ Group A  │  │ Group B  │  │ Group C  │           │
-  │  │          │  │          │  │          │           │
-  │  │ m5.large │  │ m5.4xl   │  │ p3.2xl   │           │
-  │  │ min:2    │  │ min:0    │  │ min:0    │           │
-  │  │ max:20   │  │ max:10   │  │ max:5    │           │
-  │  └──────────┘  └──────────┘  └──────────┘           │
-  └─────────────────────────────────────────────────────┘
-```
+> **Key constraint:** Each node group is a fixed pool of identical instances. CA picks a group and increments its count — it cannot mix instance types or optimize across groups.
 
 The critical abstraction is the **node group** (called Auto Scaling Group on AWS, Managed Instance Group on GCP, VM Scale Set on Azure). Each node group is a pool of identically configured nodes: same instance type, same labels, same taints. The Cluster Autoscaler does not provision individual machines --- it increments or decrements a node group's desired count.
 
@@ -66,42 +47,16 @@ Karpenter takes a fundamentally different approach. Instead of managing node gro
 
 ### Architecture
 
-```
-KARPENTER ARCHITECTURE
-───────────────────────
+```mermaid
+flowchart LR
+    pending2["Pending Pods<br>(batched 10s)"] --> K["Karpenter<br>bin-pack + select"]
+    K -->|"best fit from<br>full catalog"| cloud2["Cloud API<br>launch exact instance"]
 
-  ┌─────────────────────────────────────────────────────┐
-  │                   Karpenter                         │
-  │                                                     │
-  │  1. Watch for Pending pods                          │
-  │  2. Batch pending pods (wait 10s for stragglers)    │
-  │  3. Bin-pack pods into optimal instance types       │
-  │  4. Call EC2 Fleet API directly:                    │
-  │     "launch 1x m5.2xlarge in us-east-1b, spot"      │
-  │                                                     │
-  │  5. Continuously evaluate: can I consolidate?       │
-  │     Move pods from underused nodes to others,       │
-  │     terminate the empty node.                       │
-  └────────┬────────────────────────────────────────────┘
-           │
-           ▼
-  ┌─────────────────────────────────────────────────────┐
-  │              Cloud API (direct)                     │
-  │                                                     │
-  │  No node groups. Karpenter selects from the         │
-  │  full catalog of instance types:                    │
-  │                                                     │
-  │  NodePool spec:                                     │
-  │    requirements:                                    │
-  │    - key: karpenter.sh/capacity-type                │
-  │      operator: In                                   │
-  │      values: [on-demand, spot]                      │
-  │    - key: node.kubernetes.io/instance-type          │
-  │      operator: In                                   │
-  │      values: [m5.large, m5.xlarge, m5.2xlarge,      │
-  │               m6i.large, m6i.xlarge, c5.large, ...] │
-  └─────────────────────────────────────────────────────┘
+    cloud2 --> ex1["m5.2xlarge<br>spot, us-east-1b"]
+    cloud2 --> ex2["c5.xlarge<br>on-demand, us-east-1a"]
 ```
+
+> **Key difference:** No node groups. Karpenter evaluates the full instance type catalog, bin-packs pending pods, and launches exactly the right instance — type, size, AZ, and purchase option — in a single API call.
 
 ### Why Karpenter Is Architecturally Superior
 
@@ -115,54 +70,38 @@ Karpenter eliminates this entirely. It evaluates the full instance type catalog 
 
 The following sequence diagram shows the timing of each step in Karpenter's scaling cascade --- notice the 10-second batching window that enables better bin-packing:
 
-```
-KARPENTER SCALING CASCADE (~60-90 seconds end-to-end)
-─────────────────────────────────────────────────────
+```mermaid
+sequenceDiagram
+    participant PP as Pending Pod
+    participant K as Karpenter
+    participant EC2 as EC2 Fleet API
+    participant VM as New EC2
+    participant KL as kubelet
+    participant S as Scheduler
+    participant P as Pod
 
-  Pending Pod     Karpenter        EC2 Fleet API    New EC2          kubelet         Scheduler       Pod
-  (unschedulable) Controller                        Instance         (on new node)
-    │               │                  │               │               │               │              │
-    │  detected     │                  │               │               │               │              │
-    │  (0-10s)      │                  │               │               │               │              │
-    ├──────────────▶│                  │               │               │               │              │
-    │               │                  │               │               │               │              │
-    │               │  batch pending   │               │               │               │              │
-    │               │  pods (10s wait) │               │               │               │              │
-    │               │                  │               │               │               │              │
-    │               │  select optimal  │               │               │               │              │
-    │               │  instance type   │               │               │               │              │
-    │               │  (bin-pack)      │               │               │               │              │
-    │               │                  │               │               │               │              │
-    │               │  CreateFleet     │               │               │               │              │
-    │               │  (spot/OD, AZ,   │               │               │               │              │
-    │               │   instance type) │               │               │               │              │
-    │               ├─────────────────▶│               │               │               │              │
-    │               │  fleet accepted  │               │               │               │              │
-    │               │◀─────────────────┤               │               │               │              │
-    │               │  (~5s)           │               │               │               │              │
-    │               │                  │  launch VM    │               │               │              │
-    │               │                  ├──────────────▶│               │               │              │
-    │               │                  │               │               │               │              │
-    │               │                  │               │  boot OS,     │               │              │
-    │               │                  │               │  start kubelet│               │              │
-    │               │                  │               │  (~20-30s)    │               │              │
-    │               │                  │               ├──────────────▶│               │              │
-    │               │                  │               │               │               │              │
-    │               │                  │               │               │  register     │              │
-    │               │                  │               │               │  node with    │              │
-    │               │                  │               │               │  API server   │              │
-    │               │                  │               │               │  (~5s)        │              │
-    │               │                  │               │               │               │              │
-    │               │                  │               │               │  node Ready   │              │
-    │               │                  │               │               ├──────────────▶│              │
-    │               │                  │               │               │               │              │
-    │               │                  │               │               │               │  bind pod    │
-    │               │                  │               │               │               │  to node     │
-    │               │                  │               │               │               ├─────────────▶│
-    │               │                  │               │               │               │              │
-    │               │                  │               │               │               │  Running     │
-    │               │                  │               │               │               │  (~60-90s    │
-    │               │                  │               │               │               │  total)      │
+    Note over PP,K: 0-10s
+    PP->>K: detected (unschedulable)
+
+    Note over K: batch pending pods (10s wait)
+    Note over K: select optimal instance type (bin-pack)
+
+    K->>EC2: CreateFleet (spot/OD, AZ, instance type)
+    EC2-->>K: fleet accepted (~5s)
+
+    EC2->>VM: launch VM
+
+    Note over VM,KL: ~20-30s
+    VM->>KL: boot OS, start kubelet
+
+    Note over KL: ~5s
+    KL->>KL: register node with API server
+
+    KL->>S: node Ready
+    S->>P: bind pod to node
+
+    Note over PP,P: ~60-90s total end-to-end
+    Note over P: Running
 ```
 
 **Consolidation.** Karpenter continuously evaluates whether existing nodes can be consolidated. If node A is 30% utilized and node B is 25% utilized, Karpenter can cordon both, move their pods to a single smaller node, and terminate the originals. Cluster Autoscaler can only scale down nodes that are underutilized --- it cannot replace a node with a smaller one.

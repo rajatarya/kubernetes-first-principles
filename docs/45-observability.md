@@ -24,54 +24,42 @@ OpenTelemetry (OTel) provides a vendor-neutral framework for instrumentation, co
 
 The Collector is the workhorse of the OTel pipeline. How you deploy it determines the reliability, scalability, and cost of your observability stack.
 
-```
-OTEL COLLECTOR DEPLOYMENT PATTERNS
-────────────────────────────────────
+```mermaid
+flowchart TD
+    subgraph P1["PATTERN 1: DAEMONSET / AGENT (most widely adopted)"]
+        subgraph N1["Node 1"]
+            A1["App A"] --> C1["OTel Collector"]
+            A2["App B"] --> C1
+        end
+        subgraph N2["Node 2"]
+            A3["App C"] --> C2["OTel Collector"]
+            A4["App D"] --> C2
+        end
+        C1 --> B1["Backends"]
+        C2 --> B1
+    end
 
-  PATTERN 1: DAEMONSET / AGENT (most widely adopted pattern)
-  ┌─────────────────────────────────────────────────────────┐
-  │   Node 1                  Node 2                        │
-  │  ┌───────┐ ┌───────┐     ┌───────┐ ┌───────┐            │
-  │  │ App A │ │ App B │     │ App C │ │ App D │            │
-  │  └───┬───┘ └───┬───┘     └───┬───┘ └───┬───┘            │
-  │      │         │             │         │                │
-  │      ▼         ▼             ▼         ▼                │
-  │  ┌──────────────────┐   ┌──────────────────┐            │
-  │  │  OTel Collector  │   │  OTel Collector  │            │
-  │  │  (DaemonSet)     │   │  (DaemonSet)     │            │
-  │  └────────┬─────────┘   └────────┬─────────┘            │
-  └───────────┼──────────────────────┼──────────────────────┘
-              │                      │
-              ▼                      ▼
-        ┌──────────────────────────────────┐
-        │         Backends                 │
-        │  (Prometheus/Mimir, Loki, Tempo) │
-        └──────────────────────────────────┘
+    P1 --> P2
 
-  PATTERN 2: SIDECAR
-  ┌──────────────────┐
-  │  Pod             │
-  │  ┌─────┐ ┌─────┐ │     Per-pod collector.
-  │  │ App │→│OTel │ │     High isolation.
-  │  └─────┘ └──┬──┘ │     High resource overhead.
-  └─────────────┼────┘
-                ▼
-            Backend
+    subgraph P2["PATTERN 2: SIDECAR (per-pod collector, high isolation)"]
+        subgraph Pod["Pod"]
+            App["App"] --> OTel["OTel Collector"]
+        end
+        OTel --> B2["Backend"]
+    end
 
-  PATTERN 3: GATEWAY
-  ┌───────┐ ┌───────┐ ┌───────┐
-  │ App A │ │ App B │ │ App C │
-  └───┬───┘ └───┬───┘ └───┬───┘
-      │         │         │
-      └────────┬┘─────────┘
-               ▼
-  ┌──────────────────────────┐
-  │   OTel Collector Gateway │     Centralized collector.
-  │   (Deployment, scaled)   │     Single point for processing.
-  │   (load-balanced)        │     Easier to manage, SPOF risk.
-  └────────────┬─────────────┘
-               ▼
-           Backend
+    P2 --> P3
+
+    subgraph P3["PATTERN 3: GATEWAY (centralized, scaled Deployment)"]
+        GA["App A"] --> GW["OTel Collector Gateway"]
+        GB["App B"] --> GW
+        GC["App C"] --> GW
+        GW --> B3["Backend"]
+    end
+
+    style P1 stroke:#326CE5
+    style P2 stroke:#326CE5
+    style P3 stroke:#326CE5
 ```
 
 **DaemonSet (Agent)** is the recommended pattern for most clusters. Each node runs a collector pod that receives telemetry from all application pods on that node via localhost. This minimizes network hops, provides natural load distribution, and fails gracefully (a collector crash affects only one node).
@@ -95,35 +83,22 @@ The most widely adopted open-source backend stack for Kubernetes observability i
 
 This stack is entirely open source (all Grafana Labs projects under AGPLv3) and can be self-hosted or consumed as Grafana Cloud. The key advantage over alternatives is the tight integration --- Grafana can correlate a metric spike to traces to logs without leaving the UI.
 
-```
-THE LGTM STACK
-────────────────
+```mermaid
+flowchart TD
+    Apps["Applications"]
+    Collector["OTel Collector Agent<br>(DaemonSet)"]
+    Mimir["Mimir<br>(metrics)"]
+    Tempo["Tempo<br>(traces)"]
+    Loki["Loki<br>(logs)"]
+    Grafana["Grafana<br>(query, visualize, alert)"]
 
-  Applications
-       │
-       ▼
-  ┌──────────────────────────┐
-  │   OTel Collector Agent   │
-  │   (DaemonSet)            │
-  └────┬─────────┬─────────┬─┘
-       │         │         │
-    metrics    traces     logs
-       │         │         │
-       ▼         ▼         ▼
-  ┌─────────┐ ┌───────┐ ┌──────┐
-  │ Mimir   │ │Tempo  │ │ Loki │
-  │(metrics)│ │(trace)│ │(logs)│
-  └────┬────┘ └──┬────┘ └──┬───┘
-       │         │         │
-       └─────────┼─────────┘
-                 │
-                 ▼
-         ┌────────────┐
-         │  Grafana   │
-         │  (query,   │
-         │  visualize,│
-         │  alert)    │
-         └────────────┘
+    Apps --> Collector
+    Collector -- "metrics" --> Mimir
+    Collector -- "traces" --> Tempo
+    Collector -- "logs" --> Loki
+    Mimir --> Grafana
+    Tempo --> Grafana
+    Loki --> Grafana
 ```
 
 ## The OpenTelemetry Operator

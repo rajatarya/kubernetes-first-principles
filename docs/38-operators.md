@@ -10,55 +10,35 @@ This chapter covers how to build operators using the standard Go toolchain: the 
 
 Every controller follows the same fundamental pattern. The control plane delivers a **reconcile request** --- essentially a namespace/name pair --- and the controller's job is to make reality match the desired state for that object. The loop looks like this:
 
-```
-THE RECONCILE LOOP
-───────────────────
+```mermaid
+flowchart TD
+    WQ["Work Queue<br>ns/name, ns/name, ..."] --> Fetch
 
-  ┌──────────────────────────────────────────────────────────────┐
-  │                      Work Queue                              │
-  │  ┌──────────┐  ┌──────────┐  ┌──────────┐                    │
-  │  │ ns/name  │  │ ns/name  │  │ ns/name  │  ...               │
-  │  └────┬─────┘  └──────────┘  └──────────┘                    │
-  └───────┼──────────────────────────────────────────────────────┘
-          │
-          ▼
-  ┌───────────────┐
-  │  1. FETCH     │  Get the primary resource by ns/name.
-  │               │  If not found (deleted) → cleanup → return.
-  └───────┬───────┘
-          │
-          ▼
-  ┌───────────────┐
-  │  2. LIST      │  List owned/related child resources
-  │               │  (Deployments, Services, ConfigMaps, etc.)
-  └───────┬───────┘
-          │
-          ▼
-  ┌───────────────┐
-  │  3. COMPARE   │  Diff desired state (from spec) against
-  │               │  actual state (from listed resources).
-  └───────┬───────┘
-          │
-          ▼
-  ┌───────────────┐
-  │  4. ACT       │  Create missing resources.
-  │               │  Update drifted resources.
-  │               │  Delete obsolete resources.
-  └───────┬───────┘
-          │
-          ▼
-  ┌───────────────┐
-  │  5. STATUS    │  Update the status subresource of the
-  │               │  primary resource (conditions, counts, etc.)
-  └───────┬───────┘
-          │
-          ▼
-  ┌───────────────┐
-  │  6. RETURN    │  Return a Result:
-  │               │    error       → requeue with backoff
-  │               │    RequeueAfter → requeue after duration
-  │               │    empty       → done (terminal)
-  └───────────────┘
+    Fetch["1. FETCH<br>Get resource by ns/name"]
+    Fetch -->|"found"| List
+    Fetch -->|"not found<br>(deleted)"| Cleanup["Cleanup owned resources"] --> Done
+
+    List["2. LIST<br>List owned child resources<br>(Deployments, Services, etc.)"]
+    List --> Compare
+
+    Compare["3. COMPARE<br>Diff desired state (spec)<br>vs actual state (children)"]
+    Compare --> Act
+
+    Act{"4. ACT"}
+    Act -->|"missing"| Create["Create resources"]
+    Act -->|"drifted"| Update["Update resources"]
+    Act -->|"obsolete"| Delete["Delete resources"]
+    Create --> Status
+    Update --> Status
+    Delete --> Status
+
+    Status["5. STATUS<br>Update status subresource<br>(conditions, counts)"]
+    Status --> Return
+
+    Return{"6. RETURN"}
+    Return -->|"error"| ErrRequeue["Requeue with<br>exponential backoff"] --> WQ
+    Return -->|"RequeueAfter"| TimedRequeue["Requeue after<br>duration"] --> WQ
+    Return -->|"nil, nil"| Done2["Done<br>(wait for next event)"]
 ```
 
 ## Kubebuilder Scaffolding

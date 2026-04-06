@@ -95,32 +95,21 @@ spec:
         memory: 64Mi
 ```
 
-```
-NAMESPACE ISOLATION MODEL
-──────────────────────────
-
-  ┌─────────────────────────────────────────────────┐
-  │                 Shared Cluster                  │
-  │                                                 │
-  │  ┌───────────────────┐  ┌───────────────────┐   │
-  │  │  team-alpha       │  │  team-beta        │   │
-  │  │                   │  │                   │   │
-  │  │  RBAC: own role   │  │  RBAC: own role   │   │
-  │  │  NetworkPolicy:   │  │  NetworkPolicy:   │   │
-  │  │    deny by default│  │    deny by default│   │
-  │  │  ResourceQuota:   │  │  ResourceQuota:   │   │
-  │  │    10 CPU, 20Gi   │  │    8 CPU, 16Gi    │   │
-  │  │  LimitRange:      │  │  LimitRange:      │   │
-  │  │    defaults set   │  │    defaults set   │   │
-  │  │                   │  │                   │   │
-  │  │  ┌─────┐ ┌─────┐  │  │  ┌─────┐ ┌─────┐  │   │
-  │  │  │Pod A│ │Pod B│  │  │  │Pod C│ │Pod D│  │   │
-  │  │  └─────┘ └─────┘  │  │  └─────┘ └─────┘  │   │
-  │  └───────────────────┘  └───────────────────┘   │
-  │                                                 │
-  │  Shared: API server, scheduler, kubelet,        │
-  │          etcd, container runtime, nodes         │
-  └─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Cluster["Shared Cluster"]
+        subgraph Alpha["team-alpha"]
+            AlphaConfig["RBAC: own role<br>NetworkPolicy: deny by default<br>ResourceQuota: 10 CPU, 20Gi<br>LimitRange: defaults set"]
+            PodA["Pod A"]
+            PodB["Pod B"]
+        end
+        subgraph Beta["team-beta"]
+            BetaConfig["RBAC: own role<br>NetworkPolicy: deny by default<br>ResourceQuota: 8 CPU, 16Gi<br>LimitRange: defaults set"]
+            PodC["Pod C"]
+            PodD["Pod D"]
+        end
+        Shared["<b>Shared:</b> API server, scheduler, kubelet,<br>etcd, container runtime, nodes"]
+    end
 ```
 
 ### Limitations of Namespace Isolation
@@ -153,42 +142,27 @@ HNC does not add stronger isolation --- it makes namespace management more scala
 
 When namespace isolation is insufficient, the next step is **vCluster** --- a project that creates virtual Kubernetes clusters inside a host cluster. Each vCluster runs its own API server, controller manager, and (optionally) its own etcd, all as pods within a namespace of the host cluster. Tenants interact with their vCluster as if it were a standalone cluster.
 
-```
-vCLUSTER ISOLATION MODEL
-──────────────────────────
-
-  ┌────────────────────────────────────────────────────────┐
-  │                    Host Cluster                        │
-  │                                                        │
-  │  ┌───────────────────────────┐  ┌────────────────────┐ │
-  │  │  Namespace: vc-alpha      │  │ Namespace: vc-beta │ │
-  │  │                           │  │                    │ │
-  │  │  ┌─────────────────────┐  │  │ ┌────────────────┐ │ │
-  │  │  │  vCluster "alpha"   │  │  │ │ vCluster "beta"│ │ │
-  │  │  │                     │  │  │ │                │ │ │
-  │  │  │  Own API server     │  │  │ │ Own API server │ │ │
-  │  │  │  Own controller-mgr │  │  │ │ Own ctrl-mgr   │ │ │
-  │  │  │  Own scheduler      │  │  │ │ Own scheduler  │ │ │
-  │  │  │  Own etcd (or SQLite│  │  │ │ Own etcd       │ │ │
-  │  │  │  for lightweight)   │  │  │ │                │ │ │
-  │  │  │                     │  │  │ │                │ │ │
-  │  │  │  Tenant sees:       │  │  │ │ Tenant sees:   │ │ │
-  │  │  │  - Own namespaces   │  │  │ │ - Own ns       │ │ │
-  │  │  │  - Own CRDs         │  │  │ │ - Own CRDs     │ │ │
-  │  │  │  - Own RBAC         │  │  │ │ - Own RBAC     │ │ │
-  │  │  │  - Own secrets      │  │  │ │ - Own secrets  │ │ │
-  │  │  └─────────┬───────────┘  │  │ └───────┬────────┘ │ │
-  │  │            │              │  │         │          │ │
-  │  │  ┌─────────▼───────────┐  │  │ ┌───────▼────────┐ │ │
-  │  │  │  Syncer             │  │  │ │ Syncer         │ │ │
-  │  │  │  Syncs pods to host │  │  │ │ Syncs pods     │ │ │
-  │  │  │  cluster for actual │  │  │ │ to host        │ │ │
-  │  │  │  scheduling         │  │  │ │                │ │ │
-  │  │  └─────────────────────┘  │  │ └────────────────┘ │ │
-  │  └───────────────────────────┘  └────────────────────┘ │
-  │                                                        │
-  │  Host cluster provides: nodes, networking, storage     │
-  └────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Host["Host Cluster"]
+        subgraph VCAlpha["Namespace: vc-alpha"]
+            subgraph Alpha["vCluster alpha"]
+                AlphaCP["Own API server<br>Own controller-mgr<br>Own scheduler<br>Own etcd (or SQLite)"]
+                AlphaTenant["<b>Tenant sees:</b><br>Own namespaces<br>Own CRDs<br>Own RBAC<br>Own secrets"]
+            end
+            SyncerA["Syncer<br>Syncs pods to host<br>cluster for actual scheduling"]
+            Alpha --> SyncerA
+        end
+        subgraph VCBeta["Namespace: vc-beta"]
+            subgraph Beta["vCluster beta"]
+                BetaCP["Own API server<br>Own ctrl-mgr<br>Own scheduler<br>Own etcd"]
+                BetaTenant["<b>Tenant sees:</b><br>Own namespaces<br>Own CRDs<br>Own RBAC<br>Own secrets"]
+            end
+            SyncerB["Syncer<br>Syncs pods to host"]
+            Beta --> SyncerB
+        end
+        HostProvides["Host cluster provides: nodes, networking, storage"]
+    end
 ```
 
 ### How vCluster Works

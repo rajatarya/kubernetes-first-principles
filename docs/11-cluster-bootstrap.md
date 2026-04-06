@@ -1,21 +1,23 @@
 # Chapter 11: Bootstrapping a Cluster --- From kube-up.sh to kubeadm
 
-```
-Timeline: Cluster Bootstrap Tools
-
-2014          2016          2018          2020          2022          2024
-  |             |             |             |             |             |
-  v             v             v             v             v             v
-kube-up.sh    kubeadm       kubeadm GA    k3s mature    Managed K8s  Managed K8s
-(GCE only)    (alpha)       kops GA       kind 0.9      dominates    >70% of
-              minikube      kubespray     k0s 0.9                    production
-              kops alpha    k3s launch
-
-              ──────────── Increasing abstraction ────────────>
-
-              "Provision     "Bootstrap    "Single        "You don't
-              and install    on existing   binary, no     even think
-              everything"    machines"     dependencies"  about it"
+```mermaid
+gantt
+    title Cluster Bootstrap Tools — Increasing Abstraction
+    dateFormat YYYY
+    axisFormat %Y
+    section Provision Everything
+        kube-up.sh (GCE only)       :done, 2014, 2016
+    section Bootstrap on Machines
+        kubeadm (alpha → GA 2018)   :done, 2016, 2024
+        kops (alpha → GA 2018)      :done, 2016, 2024
+        minikube                    :done, 2016, 2024
+        kubespray                   :done, 2018, 2024
+    section Single Binary
+        k3s                         :done, 2018, 2024
+        kind                        :done, 2018, 2024
+        k0s                         :done, 2020, 2024
+    section Managed K8s Dominates
+        GKE / EKS / AKS            :active, 2018, 2026
 ```
 
 ## The Problem: What Does It Actually Take to Run Kubernetes?

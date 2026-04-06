@@ -167,38 +167,20 @@ Topology Manager only affects Guaranteed QoS pods. Burstable and BestEffort pods
 
 A node's total resources (capacity) are not entirely available for pods. The kubelet reserves resources for itself, the OS, and eviction thresholds:
 
-```
-NODE RESOURCE ACCOUNTING
-────────────────────────
-
-  ┌──────────────────────────────────────┐
-  │  Node Capacity (total)               │
-  │  e.g., 16 CPU, 64 Gi memory          │
-  │                                      │
-  │  ┌────────────────────────────────┐  │
-  │  │  kube-reserved                 │  │
-  │  │  (kubelet, container runtime)  │  │
-  │  │  cpu: 200m, memory: 1Gi        │  │
-  │  └────────────────────────────────┘  │
-  │  ┌────────────────────────────────┐  │
-  │  │  system-reserved               │  │
-  │  │  (OS daemons, sshd, journald)  │  │
-  │  │  cpu: 100m, memory: 500Mi      │  │
-  │  └────────────────────────────────┘  │
-  │  ┌────────────────────────────────┐  │
-  │  │  eviction-threshold            │  │
-  │  │  (hard: memory.available<100Mi)│  │
-  │  └────────────────────────────────┘  │
-  │  ┌────────────────────────────────┐  │
-  │  │  ALLOCATABLE                   │  │
-  │  │  = capacity - kube-reserved    │  │
-  │  │    - system-reserved           │  │
-  │  │    - eviction-threshold        │  │
-  │  │                                │  │
-  │  │  This is what pods can use.    │  │
-  │  │  15.7 CPU, 62.4 Gi             │  │
-  │  └────────────────────────────────┘  │
-  └──────────────────────────────────────┘
+```mermaid
+block
+  columns 2
+  block
+    columns 1
+    blockArrowId1<["<b>capacity</b>:<br>16 CPU, 64 Gi memory"]>(right)
+    blockArrowId2<["<b>kube-reserved</b><br>kubelet, container runtime<br>cpu: 200m, memory: 1Gi"]>(right)
+    blockArrowId3<["<b>system-reserved</b><br>OS daemons, sshd, journald<br>cpu: 100m, memory: 500Mi"]>(right)
+    blockArrowId4<["<b>eviction-threshold</b><br>memory.available < 100Mi"]>(right)
+  end
+  block
+    columns 1
+    AL["= capacity<br>− kube-reserved<br>− system-reserved<br>− eviction-threshold<br><br>= 15.7 CPU, 62.4 Gi<br><br><b>This is what the scheduler<br>uses to place pods.</b>"]
+end
 ```
 
 The scheduler uses **allocatable**, not capacity, when deciding whether a pod fits on a node. If you do not set kube-reserved and system-reserved, the node can become unstable under load as the kubelet and OS compete with pods for resources.

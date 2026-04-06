@@ -26,59 +26,29 @@ The version in the group name (`v1`, `v2`) is the *API version*, not the softwar
 
 Every request to the API server passes through a series of stages.
 
-```
-API REQUEST LIFECYCLE
-──────────────────────
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant AuthN as Authentication
+    participant AuthZ as Authorization
+    participant MW as Mutating Webhooks
+    participant SV as Schema Validation
+    participant VW as Validating Webhooks
+    participant E as etcd
 
-  Client Request (kubectl, controller, kubelet)
-       │
-       ▼
-  ┌──────────────────────────────────────────────────────┐
-  │  1. AUTHENTICATION                                   │
-  │     Who are you?                                     │
-  │     (x509 certs, bearer tokens, OIDC, webhook)       │
-  │     Result: username, groups, extra fields           │
-  └──────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
-  ┌──────────────────────────────────────────────────────┐
-  │  2. AUTHORIZATION                                    │
-  │     Are you allowed to do this?                      │
-  │     (RBAC, ABAC, Webhook, Node)                      │
-  │     Result: allow / deny                             │
-  └──────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
-  ┌──────────────────────────────────────────────────────┐
-  │  3. MUTATING ADMISSION                               │
-  │     Modify the object before validation.             │
-  │     Webhooks called IN SERIAL (order is not          │
-  │     guaranteed; design for order-independence).      │
-  │     May add defaults, inject sidecars, set labels    │
-  └──────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
-  ┌──────────────────────────────────────────────────────┐
-  │  4. OBJECT SCHEMA VALIDATION                         │
-  │     Does the object match the OpenAPI schema?        │
-  │     (built-in validation + CEL validation rules)     │
-  └──────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
-  ┌──────────────────────────────────────────────────────┐
-  │  5. VALIDATING ADMISSION                             │
-  │     Final policy checks. Reject if rules violated.   │
-  │     Webhooks called IN PARALLEL (order irrelevant).  │
-  │     Cannot modify the object.                        │
-  └──────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
-  ┌──────────────────────────────────────────────────────┐
-  │  6. ETCD STORAGE                                     │
-  │     Convert to storage version.                      │
-  │     Write to etcd.                                   │
-  │     Return response to client.                       │
-  └──────────────────────────────────────────────────────┘
+    C->>AuthN: request (kubectl, controller, kubelet)
+    Note right of AuthN: Who are you?<br>x509 certs, bearer tokens,<br>OIDC, webhook
+    AuthN->>AuthZ: user: alice, groups: [devs]
+    Note right of AuthZ: Are you allowed?<br>RBAC, Webhook, Node
+    AuthZ->>MW: allowed
+    Note right of MW: Modify object (serial)<br>Add defaults, inject sidecars,<br>set labels
+    MW->>SV: mutated object
+    Note right of SV: OpenAPI schema check<br>+ CEL validation rules
+    SV->>VW: valid object
+    Note right of VW: Policy checks (parallel)<br>Cannot modify, only reject
+    VW->>E: approved
+    Note right of E: Convert to storage version<br>Write to etcd
+    E-->>C: response
 ```
 
 The ordering of mutating before validating is deliberate. Mutating webhooks may add fields that validating webhooks then check. If validation ran first, it would reject objects that mutating webhooks would have fixed.
@@ -134,54 +104,45 @@ Validating webhooks are called **in parallel** after all mutating webhooks have 
 
 The following diagram traces a Pod creation through the full admission webhook pipeline, showing how mutating webhooks run serially (each receiving the output of the previous one) while validating webhooks run in parallel (all must allow for the request to succeed).
 
-```
-ADMISSION WEBHOOK PIPELINE: SEQUENCE OF EVENTS
-────────────────────────────────────────────────
+```mermaid
+sequenceDiagram
+    participant Client as Client (kubectl)
+    participant API as API Server
+    participant MW1 as Mutating Webhook 1<br>(e.g. Istio sidecar inject)
+    participant MW2 as Mutating Webhook 2<br>(e.g. Vault secret inject)
+    participant SV as Schema Validator
+    participant VW1 as Validating Webhook 1<br>(e.g. OPA Gatekeeper)
+    participant VW2 as Validating Webhook 2<br>(e.g. Kyverno)
+    participant etcd as etcd
 
-  Client        API Server     Mutating WH 1   Mutating WH 2   Schema         Validating WH 1  Validating WH 2   etcd
-  (kubectl)                    (e.g. Istio      (e.g. Vault     Validation     (e.g. OPA        (e.g. Kyverno)
-                               sidecar inject)  secret inject)                  Gatekeeper)
-    |               |               |               |               |               |               |              |
-    |  CREATE Pod   |               |               |               |               |               |              |
-    |-------------->|               |               |               |               |               |              |
-    |               |  authn/authz  |               |               |               |               |              |
-    |               |---(internal)--|               |               |               |               |              |
-    |               |               |               |               |               |               |              |
-    |               |-- SERIAL -----|               |               |               |               |              |
-    |               |  POST /mutate |               |               |               |               |              |
-    |               |-------------->|               |               |               |               |              |
-    |               |  mutated obj  |               |               |               |               |              |
-    |               |<--------------|               |               |               |               |              |
-    |               |               |               |               |               |               |              |
-    |               |  POST /mutate (with mutations from WH 1)      |               |               |              |
-    |               |------------------------------->|               |               |               |              |
-    |               |  mutated obj  |               |               |               |               |              |
-    |               |<-------------------------------|               |               |               |              |
-    |               |               |               |               |               |               |              |
-    |               |  validate schema              |               |               |               |              |
-    |               |----------------------------------------------->|               |               |              |
-    |               |  OK           |               |               |               |               |              |
-    |               |<-----------------------------------------------|               |               |              |
-    |               |               |               |               |               |               |              |
-    |               |-- PARALLEL ---|---------------|---------------|               |               |              |
-    |               |  POST /validate               |               |               |               |              |
-    |               |----------------------------------------------------------------------->|               |              |
-    |               |  POST /validate               |               |               |               |              |
-    |               |--------------------------------------------------------------------------------------->|              |
-    |               |               |               |               |  allowed: true |               |              |
-    |               |<-----------------------------------------------------------------------|               |              |
-    |               |               |               |               |               |  allowed: true |              |
-    |               |<---------------------------------------------------------------------------------------|              |
-    |               |               |               |               |               |               |              |
-    |               |  ALL passed -> store          |               |               |               |              |
-    |               |---------------------------------------------------------------------------------------------->|
-    |               |  stored       |               |               |               |               |              |
-    |               |<----------------------------------------------------------------------------------------------|
-    |  201 Created  |               |               |               |               |               |              |
-    |<--------------|               |               |               |               |               |              |
+    Client->>API: CREATE Pod
+    Note over API: authn/authz (internal)
 
-  Mutating webhooks run SERIALLY -- each sees the output of the previous one
-  Validating webhooks run in PARALLEL -- ALL must allow, ANY can reject
+    rect rgba(50, 108, 229, 0.1)
+        Note over API,MW2: Mutating webhooks run SERIALLY
+        API->>MW1: POST /mutate
+        MW1-->>API: mutated obj
+        API->>MW2: POST /mutate (with mutations from WH 1)
+        MW2-->>API: mutated obj
+    end
+
+    API->>SV: validate schema
+    SV-->>API: OK
+
+    rect rgba(90, 142, 240, 0.1)
+        Note over API,VW2: Validating webhooks run in PARALLEL
+        par
+            API->>VW1: POST /validate
+            VW1-->>API: allowed: true
+        and
+            API->>VW2: POST /validate
+            VW2-->>API: allowed: true
+        end
+    end
+
+    API->>etcd: ALL passed -> store
+    etcd-->>API: stored
+    API-->>Client: 201 Created
 ```
 
 ### Configuration Details
@@ -227,21 +188,16 @@ When a CRD serves multiple versions, the API server needs a way to convert betwe
 
 The model is **hub and spoke**: you designate one version as the "hub" (typically the storage version), and the webhook converts between the hub and every other version. This avoids the combinatorial explosion of converting between every pair of versions.
 
-```
-CONVERSION WEBHOOK: HUB AND SPOKE
-───────────────────────────────────
+```mermaid
+flowchart LR
+    Hub["v1<br>(Hub / storage version)"]
+    A["v1alpha1"]
+    B["v1beta1"]
 
-       v1alpha1 ◄────┐
-                     │
-       v1beta1  ◄────┤  Hub: v1 (storage version)
-                     │
-       v1       ◄────┘  (no conversion needed for hub)
-
-  Request for v1alpha1:
-    etcd (v1) ──▶ webhook converts v1 → v1alpha1 ──▶ client
-
-  Create via v1beta1:
-    client ──▶ webhook converts v1beta1 → v1 ──▶ etcd (v1)
+    Hub -- "webhook converts<br>v1 → v1alpha1" --> A
+    A -- "webhook converts<br>v1alpha1 → v1" --> Hub
+    Hub -- "webhook converts<br>v1 → v1beta1" --> B
+    B -- "webhook converts<br>v1beta1 → v1" --> Hub
 ```
 
 Conversion webhooks must be lossless --- converting v1beta1 → v1 → v1beta1 must produce the original object. If a new version adds fields that older versions lack, use annotations to preserve the data during round-trips. This is subtle and error-prone; test conversion extensively.

@@ -18,42 +18,32 @@ The data is stored under a key hierarchy rooted at `/registry/`. A Pod named `ng
 
 ## etcd Cluster Architecture
 
-```
-ETCD CLUSTER WITH RAFT CONSENSUS
-──────────────────────────────────
+```mermaid
+flowchart TD
+    subgraph Member1["etcd Member 1 (LEADER)"]
+        WAL1["WAL<br>(write-ahead log)"]
+        DB1["DB<br>(boltdb / bbolt)"]
+    end
+    subgraph Member2["etcd Member 2 (FOLLOWER)"]
+        WAL2["WAL<br>(write-ahead log)"]
+        DB2["DB<br>(boltdb / bbolt)"]
+    end
+    subgraph Member3["etcd Member 3 (FOLLOWER)"]
+        WAL3["WAL<br>(write-ahead log)"]
+        DB3["DB<br>(boltdb / bbolt)"]
+    end
 
-  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-  │   etcd Member 1 │    │   etcd Member 2 │    │   etcd Member 3 │
-  │   (LEADER)      │    │   (FOLLOWER)    │    │   (FOLLOWER)    │
-  │                 │    │                 │    │                 │
-  │  ┌───────────┐  │    │  ┌───────────┐  │    │  ┌───────────┐  │
-  │  │  WAL      │  │    │  │  WAL      │  │    │  │  WAL      │  │
-  │  │ (write-   │  │    │  │ (write-   │  │    │  │ (write-   │  │
-  │  │  ahead    │  │    │  │  ahead    │  │    │  │  ahead    │  │
-  │  │  log)     │  │    │  │  log)     │  │    │  │  log)     │  │
-  │  └───────────┘  │    │  └───────────┘  │    │  └───────────┘  │
-  │  ┌───────────┐  │    │  ┌───────────┐  │    │  ┌───────────┐  │
-  │  │  DB       │  │    │  │  DB       │  │    │  │  DB       │  │
-  │  │ (boltdb/  │  │    │  │ (boltdb/  │  │    │  │ (boltdb/  │  │
-  │  │  bbolt)   │  │    │  │  bbolt)   │  │    │  │  bbolt)   │  │
-  │  └───────────┘  │    │  └───────────┘  │    │  └───────────┘  │
-  └────────┬────────┘    └────────┬────────┘    └────────┬────────┘
-           │                      │                      │
-           └──────────┬───────────┴──────────────┬───────┘
-                      │   Raft Consensus         │
-                      │   (replicate log         │
-                      │    entries to            │
-                      │    majority)             │
-                      ▼                          ▼
-              Write requires agreement     Read can be served
-              from majority (2 of 3)       by any member (with
-                                           consistency options)
+    Member1 -- "Raft: replicate<br>log entries" --> Member2
+    Member1 -- "Raft: replicate<br>log entries" --> Member3
 
-  ┌──────────────────────────────────────────────────────────────┐
-  │  API Server connects to etcd via gRPC over TLS.              │
-  │  Only the API server should talk to etcd directly.           │
-  │  All other components go through the API server.             │
-  └──────────────────────────────────────────────────────────────┘
+    Writes["Write requires agreement<br>from majority (2 of 3)"]
+    Reads["Read can be served by<br>any member (with<br>consistency options)"]
+    Member1 --- Writes
+    Member2 --- Reads
+
+    API["API Server connects via gRPC over TLS.<br>Only the API server talks to etcd directly.<br>All other components go through the API server."]
+    Writes --- API
+    Reads --- API
 ```
 
 Raft requires a **quorum** --- a majority of members --- to commit writes. With 3 members, you can lose 1. With 5, you can lose 2. Always run an **odd** number of members. An even number provides no additional fault tolerance (4 members still tolerates only 1 failure, same as 3) while increasing the coordination overhead.
@@ -228,63 +218,60 @@ When etcd is down and you have a snapshot, follow this sequence.
 
 The following sequence diagram shows the exact ordering of a disaster recovery restore. **The order is critical** --- starting API servers before etcd is stopped, or restoring only some members, causes data loss or split-brain:
 
-```
-ETCD DISASTER RECOVERY: RESTORE SEQUENCE
-──────────────────────────────────────────
+```mermaid
+sequenceDiagram
+    participant Op as SRE / Operator
+    participant API1 as API Server (node 1)
+    participant API23 as API Server (node 2+3)
+    participant E1 as etcd member-1
+    participant E2 as etcd member-2
+    participant E3 as etcd member-3
+    participant Tool as etcdutl
 
-  SRE /          API Server     API Server     etcd           etcd           etcd           etcdutl
-  Operator       (node 1)       (node 2+3)     member-1       member-2       member-3
-    │               │               │              │              │              │              │
-    │  1. Stop ALL API servers      │              │              │              │              │
-    │  (prevent writes during       │              │              │              │              │
-    │   restore)                    │              │              │              │              │
-    ├──────────────▶│               │              │              │              │              │
-    ├───────────────────────────────▶              │              │              │              │
-    │           stopped         stopped            │              │              │              │
-    │               │               │              │              │              │              │
-    │  2. Stop ALL etcd members     │              │              │              │              │
-    ├──────────────────────────────────────────────▶│              │              │              │
-    ├─────────────────────────────────────────────────────────────▶│              │              │
-    ├────────────────────────────────────────────────────────────────────────────▶│              │
-    │               │               │          stopped         stopped        stopped          │
-    │               │               │              │              │              │              │
-    │  3. Restore snapshot on EACH member          │              │              │              │
-    │     (etcdutl snapshot restore)               │              │              │              │
-    ├─────────────────────────────────────────────────────────────────────────────────────────▶│
-    │               │               │              │              │              │              │
-    │               │               │  restore     │  restore     │  restore     │              │
-    │               │               │  to new      │  to new      │  to new      │              │
-    │               │               │  data-dir    │  data-dir    │  data-dir    │              │
-    │               │               │◀─────────────────────────────────────────────────────────┤
-    │               │               │              │◀──────────────────────────────────────────┤
-    │               │               │              │              │◀─────────────────────────────┤
-    │               │               │              │              │              │              │
-    │  4. Replace data directories  │              │              │              │              │
-    │     (mv new-data → /var/lib/etcd)            │              │              │              │
-    ├──────────────────────────────────────────────▶├──────────────├──────────────┤              │
-    │               │               │              │              │              │              │
-    │  5. Start etcd members (one at a time)       │              │              │              │
-    ├──────────────────────────────────────────────▶│              │              │              │
-    │               │               │           running          │              │              │
-    ├─────────────────────────────────────────────────────────────▶│              │              │
-    │               │               │              │           running          │              │
-    ├────────────────────────────────────────────────────────────────────────────▶│              │
-    │               │               │              │              │           running           │
-    │               │               │              │              │              │              │
-    │  6. Verify: etcdctl endpoint health          │              │              │              │
-    │     + etcdctl member list     │              │              │              │              │
-    ├──────────────────────────────────────────────▶├──────────────├──────────────┤              │
-    │               │               │          all healthy        │              │              │
-    │               │               │              │              │              │              │
-    │  7. Start API servers         │              │              │              │              │
-    ├──────────────▶│               │              │              │              │              │
-    ├───────────────────────────────▶              │              │              │              │
-    │           running         running            │              │              │              │
-    │               │               │              │              │              │              │
-    │  ⚠ CRITICAL: If you start API servers       │              │              │              │
-    │  before stopping etcd, new writes            │              │              │              │
-    │  will be lost when the snapshot              │              │              │              │
-    │  overwrites the data directory.              │              │              │              │
+    Note over Op,Tool: 1. Stop ALL API servers (prevent writes during restore)
+    Op->>API1: stop
+    Op->>API23: stop
+    API1-->>Op: stopped
+    API23-->>Op: stopped
+
+    Note over Op,Tool: 2. Stop ALL etcd members
+    Op->>E1: stop
+    Op->>E2: stop
+    Op->>E3: stop
+    E1-->>Op: stopped
+    E2-->>Op: stopped
+    E3-->>Op: stopped
+
+    Note over Op,Tool: 3. Restore snapshot on EACH member
+    Op->>Tool: etcdutl snapshot restore
+    Tool->>E1: restore to new data-dir
+    Tool->>E2: restore to new data-dir
+    Tool->>E3: restore to new data-dir
+
+    Note over Op,Tool: 4. Replace data directories (mv new-data -> /var/lib/etcd)
+    Op->>E1: replace data-dir
+    Op->>E2: replace data-dir
+    Op->>E3: replace data-dir
+
+    Note over Op,Tool: 5. Start etcd members (one at a time)
+    Op->>E1: start
+    E1-->>Op: running
+    Op->>E2: start
+    E2-->>Op: running
+    Op->>E3: start
+    E3-->>Op: running
+
+    Note over Op,Tool: 6. Verify: etcdctl endpoint health + member list
+    Op->>E1: health check
+    E1-->>Op: all healthy
+
+    Note over Op,Tool: 7. Start API servers
+    Op->>API1: start
+    Op->>API23: start
+    API1-->>Op: running
+    API23-->>Op: running
+
+    Note over Op,Tool: CRITICAL: If you start API servers<br>before stopping etcd, new writes will be<br>lost when the snapshot overwrites the data directory.
 ```
 
 Follow these steps:
