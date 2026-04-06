@@ -1,16 +1,28 @@
 # Chapter 6: The Ecosystem — Why Operators, Helm, and Service Meshes Exist
 
 ```mermaid
-flowchart TD
-    APP["YOUR APPLICATION"]
-    TOOLS["GitOps: ArgoCD / Flux<br>Packaging: Helm / Kustomize<br>Observability: Prometheus / Grafana"]
-    MESH["SERVICE MESH (optional)<br>Istio / Linkerd / Cilium Service Mesh<br>mTLS, traffic management, distributed tracing"]
-    OPS["OPERATORS<br>PostgreSQL Operator | Kafka Operator | Prometheus Operator | ...<br>CRD + Controller = domain knowledge as code"]
-    CORE["KUBERNETES CORE<br>Deployments, Services, ConfigMaps, Secrets, RBAC, CRDs<br>API Server, etcd, Scheduler, Controllers, Kubelet"]
-    PLUGINS["INFRASTRUCTURE PLUGINS<br>CNI: Flannel/Calico/Cilium | CRI: containerd/CRI-O<br>CSI: EBS/NFS/Ceph | Cloud Controller Manager"]
-    LINUX["LINUX + HARDWARE<br>cgroups, namespaces, iptables/eBPF, kernel"]
+block-beta
+    columns 3
 
-    APP --> TOOLS --> MESH --> OPS --> CORE --> PLUGINS --> LINUX
+    APP["YOUR APPLICATION"]:3
+
+    GITOPS["GitOps\nArgoCD / Flux"]
+    PKG["Packaging\nHelm / Kustomize"]
+    OBS["Observability\nPrometheus / Grafana"]
+
+    MESH["SERVICE MESH (optional) — Istio / Linkerd / Cilium"]:3
+
+    OPH["OPERATORS — CRD + Controller = domain knowledge as code\nPostgreSQL / Kafka / Any Domain Operator"]:3
+
+    CORE["KUBERNETES CORE\nDeployments, Services, ConfigMaps, Secrets, RBAC, CRDs\nAPI Server, etcd, Scheduler, Controllers, Kubelet"]:3
+
+    CNI["NETWORK (CNI)\nFlannel / Calico / \nCilium"]
+    CRI["RUNTIME (CRI)\ncontainerd / CRI-O"]
+    CSI["STORAGE (CSI)\nEBS / NFS / Ceph"]
+
+    LINUX["LINUX + HARDWARE — cgroups, namespaces, iptables/eBPF, kernel"]:3
+
+    style CORE fill:#1a4eb8,color:#fff,stroke:#0d2d6e,stroke-width:3px
 ```
 
 Kubernetes provides the middle layers.

@@ -3,29 +3,29 @@
 ## Foundational Papers
 
 **Large-scale cluster management at Google with Borg** (Verma et al., EuroSys 2015) --- The landmark paper describing Google's Borg system, which directly inspired Kubernetes. Covers the declarative job specification, bin packing scheduler, naming service, and lessons learned from a decade of production use.
-- https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/
+- <a href="https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/" target="_blank">research.google/pubs/large-scale-cluster-management-at-google-with-borg</a>
 
 **Borg, Omega, and Kubernetes** (Burns, Grant, Oppenheimer, Tune, Wilkes, ACM Queue 2016) --- A retrospective by the architects of all three systems, explicitly discussing the lessons learned from Borg and Omega that were applied to Kubernetes.
-- https://research.google/pubs/borg-omega-and-kubernetes/
+- <a href="https://research.google/pubs/borg-omega-and-kubernetes/" target="_blank">research.google/pubs/borg-omega-and-kubernetes</a>
 
 **Omega: flexible, scalable schedulers for large compute clusters** (Schwarzkopf et al., EuroSys 2013) --- Describes Google's Omega scheduling system and its shared-state, optimistic-concurrency approach, which influenced Kubernetes' multi-controller architecture.
 
 **Design Patterns for Container-Based Distributed Systems** (Burns and Oppenheimer, USENIX HotCloud 2016) --- By Brendan Burns, co-founder of Kubernetes. Identifies common patterns in containerized systems: sidecar, ambassador, adapter. These patterns became the foundation for service meshes and the Operator pattern.
-- https://www.usenix.org/conference/hotcloud16/workshop-program/presentation/burns
+- <a href="https://www.usenix.org/conference/hotcloud16/workshop-program/presentation/burns" target="_blank">usenix.org/conference/hotcloud16/.../burns</a>
 
 ## Official Design Documents
 
 **Kubernetes Design Proposals Archive** --- The archive of Kubernetes Enhancement Proposals (KEPs) and design documents. Reading these documents reveals the reasoning behind specific design decisions.
-- https://github.com/kubernetes/design-proposals-archive
+- <a href="https://github.com/kubernetes/design-proposals-archive" target="_blank">github.com/kubernetes/design-proposals-archive</a>
 
 **Kubernetes Architecture Documentation** --- The official documentation of Kubernetes' architecture, including descriptions of every control plane and node component.
-- https://kubernetes.io/docs/concepts/architecture/
+- <a href="https://kubernetes.io/docs/concepts/architecture/" target="_blank">kubernetes.io/docs/concepts/architecture</a>
 
 **Kubernetes API Concepts** --- Official documentation of the Kubernetes API model, versioning, and extension mechanisms.
-- https://kubernetes.io/docs/concepts/overview/kubernetes-api/
+- <a href="https://kubernetes.io/docs/concepts/overview/kubernetes-api/" target="_blank">kubernetes.io/docs/concepts/overview/kubernetes-api</a>
 
 **Kubernetes Networking Model** --- Official documentation of the Kubernetes networking model and its requirements.
-- https://kubernetes.io/docs/concepts/cluster-administration/networking/
+- <a href="https://kubernetes.io/docs/concepts/cluster-administration/networking/" target="_blank">kubernetes.io/docs/concepts/cluster-administration/networking</a>
 
 ## Key Talks
 
